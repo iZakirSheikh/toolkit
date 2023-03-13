@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "Toolkit"
 include ':app'
 include ':preferences'
+include ':core-ktx'
