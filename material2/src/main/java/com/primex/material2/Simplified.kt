@@ -558,3 +558,230 @@ inline fun BottomSheetDialog(
             content = content,
         )
 }
+
+
+
+/**
+ * A simple extension of [OutlinedButton2] with direct support of [label] and [crown].
+ * @see OutlinedButton2
+ * @param label The string label.
+ * @param crown The top icon.
+ */
+@Composable
+inline fun OutlinedButton2(
+    label: String,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    crown: Painter? = null,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = null,
+    shape: Shape = MaterialTheme.shapes.small,
+    border: BorderStroke? = ButtonDefaults.outlinedBorder,
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding
+) = OutlinedButton2(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    elevation = elevation,
+    shape = shape,
+    border = border,
+    colors = colors,
+    contentPadding = contentPadding,
+    content = {
+        if (crown != null)
+            Icon(
+                painter = crown,
+                contentDescription = null,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+        Label(text = label)
+    },
+)
+
+@Composable
+inline fun OutlinedButton2(
+    label: AnnotatedString,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    crown: Painter? = null,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = null,
+    shape: Shape = MaterialTheme.shapes.small,
+    border: BorderStroke? = ButtonDefaults.outlinedBorder,
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding
+) = OutlinedButton2(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    elevation = elevation,
+    shape = shape,
+    border = border,
+    colors = colors,
+    contentPadding = contentPadding,
+    content = {
+        if (crown != null)
+            Icon(
+                painter = crown,
+                contentDescription = null,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+        Label(text = label)
+    },
+)
+
+
+/**
+ * A simple extension of [OutlinedButton2] with direct support of [label] and [crown].
+ * @see OutlinedButton2
+ * @param label The string label.
+ * @param crown The top icon.
+ */
+@Composable
+inline fun TextButton2(
+    label: String,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    crown: Painter? = null,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = null,
+    shape: Shape = MaterialTheme.shapes.small,
+    border: BorderStroke? = null,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+) = TextButton2(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    elevation = elevation,
+    shape = shape,
+    border = border,
+    colors = colors,
+    contentPadding = contentPadding,
+    content = {
+        if (crown != null)
+            Icon(
+                painter = crown,
+                contentDescription = null,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+        Label(text = label)
+    },
+)
+
+@Composable
+inline fun TextButton2(
+    label: AnnotatedString,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    crown: Painter? = null,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = null,
+    shape: Shape = MaterialTheme.shapes.small,
+    border: BorderStroke? = null,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+) = TextButton2(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    elevation = elevation,
+    shape = shape,
+    border = border,
+    colors = colors,
+    contentPadding = contentPadding,
+    content = {
+        if (crown != null)
+            Icon(
+                painter = crown,
+                contentDescription = null,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+        Label(text = label)
+    },
+)
+
+
+
+/**
+ * A simple extension of [OutlinedButton2] with direct support of [label] and [crown].
+ * @see OutlinedButton2
+ * @param label The string label.
+ * @param crown The top icon.
+ */
+@Composable
+inline fun Button2(
+    label: String,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    crown: Painter? = null,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = ButtonDefaults.elevation(),
+    shape: Shape = MaterialTheme.shapes.small,
+    border: BorderStroke? = null,
+    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+) = Button2(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    elevation = elevation,
+    shape = shape,
+    border = border,
+    colors = colors,
+    contentPadding = contentPadding,
+    content = {
+        if (crown != null)
+            Icon(
+                painter = crown,
+                contentDescription = null,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+        Label(text = label)
+    },
+)
+
+@Composable
+inline fun Button2(
+    label: AnnotatedString,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    crown: Painter? = null,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = ButtonDefaults.elevation(),
+    shape: Shape = MaterialTheme.shapes.small,
+    border: BorderStroke? = null,
+    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding
+) = Button2(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    elevation = elevation,
+    shape = shape,
+    border = border,
+    colors = colors,
+    contentPadding = contentPadding,
+    content = {
+        if (crown != null)
+            Icon(
+                painter = crown,
+                contentDescription = null,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+        Label(text = label)
+    },
+)
