@@ -17,3 +17,4 @@ rootProject.name = "Toolkit"
 include ':app'
 include ':preferences'
 include ':core-ktx'
+include ':material2'

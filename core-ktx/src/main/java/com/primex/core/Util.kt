@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.res.Resources
 import android.util.Log
 import android.view.Window
 import androidx.compose.foundation.layout.PaddingValues
@@ -80,33 +81,7 @@ inline fun LockScreenOrientation(orientation: Int) {
     }
 }
 
-/**
- * Return a copy of [Color] from [hue], [saturation], and [lightness] (HSL representation).
- *
- * @param hue The color value in the range (0..360), where 0 is red, 120 is green, and
- * 240 is blue; default value is null; which makes is unaltered.
- * @param saturation The amount of [hue] represented in the color in the range (0..1),
- * where 0 has no color and 1 is fully saturated; default value is null; which makes is unaltered.
- * @param lightness A range of (0..1) where 0 is black, 0.5 is fully colored, and 1 is
- * white; default value is null; which makes is unaltered.
- */
-fun Color.hsl(
-    hue: Float? = null,
-    saturation: Float? = null,
-    lightness: Float? = null,
-    alpha: Float? = null
-): Color {
-    val hsl = FloatArray(3)
-    ColorUtils.colorToHSL(toArgb(), hsl)
 
-    // use value or default.
-    return Color.hsl(
-        hue = hue ?: hsl[0],
-        saturation = saturation ?: hsl[1],
-        lightness = lightness ?: hsl[2],
-        alpha = alpha ?: this.alpha,
-    )
-}
 
 /**
  * Returns a new [PaddingValues] object that is the result of adding the values of the specified
@@ -202,3 +177,20 @@ fun calculate(calculation: () -> Unit) {
 inline fun <reified T> castTo(anything: Any): T {
     return anything as T
 }
+
+
+/**
+ * Provides/finds a [Activity] that is wrapped inside the [LocalContext]
+ */
+val ProvidableCompositionLocal<Context>.activity
+    @ReadOnlyComposable
+    @Composable
+    get() = current.findActivity()
+
+/**
+ * Returns a Resources instance for the application's package.
+ */
+val ProvidableCompositionLocal<Context>.resources: Resources
+    @ReadOnlyComposable
+    @Composable
+    inline get() = current.resources
