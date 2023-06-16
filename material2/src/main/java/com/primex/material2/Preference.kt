@@ -11,7 +11,16 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.Checkbox
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
+import androidx.compose.material.Slider
+import androidx.compose.material.Switch
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.Composable
@@ -25,17 +34,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.primex.core.acquireFocusOnInteraction
+import com.primex.core.composableOrNull
+import com.primex.core.padding
 import com.primex.core.rememberState
 
-private val IconSpaceReservedModifier =
-    Modifier
-        // .padding(start = 16.dp)
-        .size(24.dp)
+private const val TAG = "Preference"
+
+/**
+ * This is the container for some defaults of the preference composable.
+ */
+object PreferenceDefaults {
+    /**
+     * The padding required to save oif user wants leading icon space to be reserved.
+     */
+    val IconSpaceReserved = 12.dp
+}
 
 /**
  * A General [Preference(title = )] representation.
@@ -53,128 +70,65 @@ private val IconSpaceReservedModifier =
  */
 @Composable
 fun Preference(
-    title: AnnotatedString,
+    title: CharSequence,
     modifier: Modifier = Modifier,
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
+    summery: CharSequence? = null,
     enabled: Boolean = true,
     widget: @Composable (() -> Unit)? = null,
     revealable: (@Composable () -> Unit)? = null,
     forceVisible: Boolean = false,
 ) {
-
-    val leading =
-        @Composable {
-            when {
-                icon != null -> Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                iconSpaceReserved -> Spacer(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .then(IconSpaceReservedModifier)
-                )
-                else -> Spacer(modifier = Modifier)
-            }
-        }
-    val interactionSource: MutableInteractionSource = remember {
-        MutableInteractionSource()
-    }
-    val expanded by when (forceVisible) {
-        true -> rememberState(initial = true)
-        else -> interactionSource.collectIsFocusedAsState()
-    }
-
-
-    val title =
-        @Composable {
-            Text(
-                text = title,
-                maxLines = if (singleLineTitle) 1 else 3,
-                overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.SemiBold
+    // The only difference is that we are using the new ListTile.
+    val interactionSource = remember(::MutableInteractionSource)
+    val listModifier = when (forceVisible || !enabled) {
+        true -> modifier
+        else -> Modifier
+            .acquireFocusOnInteraction(
+                interactionSource, indication = LocalIndication.current
             )
+            .then(modifier)
+            .animateContentSize()
+    }
+    ListTile(color = Color.Transparent, trailing = widget, enabled = enabled, headline = {
+        Text(
+            text = title,
+            maxLines = if (singleLineTitle) 1 else 2,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.SemiBold
+        )
+    }, summery = composableOrNull(!summery.isNullOrBlank()) {
+        Text(
+            text = summery ?: "", maxLines = 4, overflow = TextOverflow.Ellipsis
+        )
+    }, leading = composableOrNull(icon != null || iconSpaceReserved) {
+        when {
+            // non-null write the icon.
+            icon != null -> Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            // preserve the space in case user requested.
+            iconSpaceReserved -> Spacer(Modifier.padding(PreferenceDefaults.IconSpaceReserved))
         }
-
-    val summery =
-        @Composable {
-            Crossfade(targetState = summery) { text ->
-                if (!text.isNullOrBlank())
-                    Text(
-                        text = text,
-                        maxLines = 6,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .padding(top = 2.dp),
-                    )
-            }
+    }, footer = composableOrNull(revealable != null) {
+        val expanded by when (forceVisible) {
+            true -> rememberState(initial = true)
+            else -> interactionSource.collectIsFocusedAsState()
         }
-
-    val hidiable =
-        @Composable {
-            Crossfade(targetState = expanded) { value ->
-                if (value)
-                    revealable?.invoke()
-            }
+        Crossfade(targetState = expanded, label = TAG) { value ->
+            if (value) revealable?.invoke()
         }
-
-    val listModifier =
-        when (forceVisible || !enabled) {
-            true -> modifier
-            else -> Modifier
-                .acquireFocusOnInteraction(interactionSource, indication = LocalIndication.current)
-                .then(modifier)
-                .animateContentSize()
-        }
-
-    ListTile(
-        modifier = listModifier,
-        text = title,
-        secondaryText = summery,
-        leading = leading,
-        enabled = enabled,
-        trailing = widget,
-        bottom = hidiable,
-        centreVertically = true
+    }, modifier = listModifier
     )
 }
-
-
-@Composable
-fun Preference(
-    title: String,
-    modifier: Modifier = Modifier,
-    singleLineTitle: Boolean = true,
-    iconSpaceReserved: Boolean = true,
-    icon: ImageVector? = null,
-    summery: String? = null,
-    enabled: Boolean = true,
-    widget: @Composable (() -> Unit)? = null,
-    revealable: (@Composable () -> Unit)? = null,
-    forceVisible: Boolean = false,
-) {
-    Preference(
-        title = AnnotatedString(title),
-        modifier = modifier,
-        singleLineTitle = singleLineTitle,
-        iconSpaceReserved = iconSpaceReserved,
-        icon = icon,
-        summery = summery?.let { AnnotatedString(it) },
-        enabled = enabled,
-        widget = widget,
-        revealable = revealable,
-        forceVisible = forceVisible
-    )
-}
-
 
 @Composable
 fun SwitchPreference(
-    title: AnnotatedString,
+    title: CharSequence,
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit),
     modifier: Modifier = Modifier,
@@ -182,7 +136,7 @@ fun SwitchPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
+    summery: CharSequence? = null,
 ) {
     Preference(
         modifier = modifier.clickable(enabled = enabled) {
@@ -200,23 +154,21 @@ fun SwitchPreference(
     )
 }
 
-
 @Composable
 fun CheckBoxPreference(
-    title: AnnotatedString,
+    title: CharSequence,
     checked: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
+    summery: CharSequence? = null,
     onCheckedChange: ((Boolean) -> Unit)
 ) {
-    Preference(
-        modifier = modifier.clickable(enabled = enabled) {
-            onCheckedChange(!checked)
-        },
+    Preference(modifier = modifier.clickable(enabled = enabled) {
+        onCheckedChange(!checked)
+    },
         title = title,
         enabled = enabled,
         singleLineTitle = singleLineTitle,
@@ -225,14 +177,12 @@ fun CheckBoxPreference(
         summery = summery,
         widget = {
             Checkbox(enabled = enabled, checked = checked, onCheckedChange = null)
-        }
-    )
+        })
 }
-
 
 @Composable
 fun <T> DropDownPreference(
-    title: AnnotatedString,
+    title: CharSequence,
     defaultValue: T,
     onRequestChange: (T) -> Unit,
     modifier: Modifier = Modifier,
@@ -249,45 +199,43 @@ fun <T> DropDownPreference(
     }
 
 
-    val widget =
-        @Composable {
-            Box {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                )
+    val widget = @Composable {
+        Box {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+            )
 
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    entries.forEach { (placeHolder, value) ->
-                        val onEntryClick = {
-                            if (value != defaultValue) {
-                                onRequestChange(value)
-                                expanded = false
-                            }
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                entries.forEach { (placeHolder, value) ->
+                    val onEntryClick = {
+                        if (value != defaultValue) {
+                            onRequestChange(value)
+                            expanded = false
                         }
-                        DropdownMenuItem(onClick = onEntryClick) {
-                            RadioButton(
-                                selected = value == defaultValue,
-                                // = null,
-                                enabled = enabled,
-                                onClick = null
-                            )
+                    }
+                    DropdownMenuItem(onClick = onEntryClick) {
+                        RadioButton(
+                            selected = value == defaultValue,
+                            // = null,
+                            enabled = enabled, onClick = null
+                        )
 
-                            Text(
-                                text = placeHolder,
-                                style = MaterialTheme.typography.body1,
-                                fontWeight = if (value != defaultValue) FontWeight.SemiBold else FontWeight.Bold,
-                                modifier = Modifier
-                                    .padding(start = 16.dp, end = 16.dp)
-                                    .fillMaxSize(),
-                                maxLines = 2,
-                                color = if (value == defaultValue) MaterialTheme.colors.secondary else LocalContentColor.current
-                            )
-                        }
+                        Text(
+                            text = placeHolder,
+                            style = MaterialTheme.typography.body1,
+                            fontWeight = if (value != defaultValue) FontWeight.SemiBold else FontWeight.Bold,
+                            modifier = Modifier
+                                .padding(start = 16.dp, end = 16.dp)
+                                .fillMaxSize(),
+                            maxLines = 2,
+                            color = if (value == defaultValue) MaterialTheme.colors.secondary else LocalContentColor.current
+                        )
                     }
                 }
             }
         }
+    }
 
     Preference(
         modifier = modifier.clickable(enabled = enabled) {
@@ -298,93 +246,17 @@ fun <T> DropDownPreference(
         singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
-        summery = AnnotatedString(default),
+        summery = default,
         widget = widget
     )
 }
 
-
 @Composable
-fun ColorPickerPreference(
-    title: AnnotatedString,
-    defaultEntry: Color,
-    entries: List<Color>,
-    onRequestValueChange: (Color) -> Unit,
+private inline fun TextButtons(
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    singleLineTitle: Boolean = true,
-    iconSpaceReserved: Boolean = true,
-    icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
-    forceVisible: Boolean = false,
+    noinline onConfirmClick: () -> Unit,
+    noinline onCancelClick: () -> Unit
 ) {
-    val widget =
-        @Composable {
-            val color by animateColorAsState(targetValue = defaultEntry)
-            Spacer(
-                modifier = Modifier
-                    .background(color = color, shape = CircleShape)
-                    .requiredSize(40.dp)
-            )
-        }
-
-    var checked by rememberState(initial = defaultEntry)
-
-    val revealable =
-        @Composable {
-
-            val startPadding = (if (iconSpaceReserved) 24.dp else 0.dp) + 8.dp
-
-            Column(
-                modifier = Modifier
-                    .padding(start = startPadding)
-                    .fillMaxWidth()
-            ) {
-
-                ColorPicker(
-                    entries = entries,
-                    checked = checked,
-                    onColorChecked = { checked = it },
-                    modifier = Modifier.padding(vertical = 10.dp)
-                )
-
-                val manager = LocalFocusManager.current
-                val onCancelClick = {
-                    if (!forceVisible)
-                        manager.clearFocus(true)
-                }
-                val onConfirmClick = {
-                    if (!forceVisible)
-                        manager.clearFocus(true)
-                    onRequestValueChange(checked)
-                }
-                TextButtons(
-                    onCancelClick = onCancelClick,
-                    onConfirmClick = onConfirmClick,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-    Preference(
-        title = title,
-        icon = icon,
-        summery = summery,
-        singleLineTitle = singleLineTitle,
-        enabled = enabled,
-        modifier = modifier,
-        forceVisible = forceVisible,
-        widget = widget,
-        revealable = revealable
-    )
-}
-
-@Composable
-private fun TextButtons(
-    modifier: Modifier = Modifier,
-    onConfirmClick: () -> Unit,
-    onCancelClick: () -> Unit
-) {
-
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.End,
@@ -400,10 +272,80 @@ private fun TextButtons(
     }
 }
 
+@Composable
+fun ColorPickerPreference(
+    title: CharSequence,
+    defaultEntry: Color,
+    entries: List<Color>,
+    onRequestValueChange: (Color) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    singleLineTitle: Boolean = true,
+    iconSpaceReserved: Boolean = true,
+    icon: ImageVector? = null,
+    summery: CharSequence? = null,
+    forceVisible: Boolean = false,
+) {
+    val widget = @Composable {
+        val color by animateColorAsState(targetValue = defaultEntry)
+        Spacer(
+            modifier = Modifier
+                .background(color = color, shape = CircleShape)
+                .requiredSize(40.dp)
+        )
+    }
+
+    var checked by rememberState(initial = defaultEntry)
+
+    val revealable = @Composable {
+
+        val startPadding = (if (iconSpaceReserved) 24.dp else 0.dp) + 8.dp
+
+        Column(
+            modifier = Modifier
+                .padding(start = startPadding)
+                .fillMaxWidth()
+        ) {
+
+            ColorPicker(
+                entries = entries,
+                checked = checked,
+                onColorChecked = { checked = it },
+                modifier = Modifier.padding(vertical = 10.dp)
+            )
+
+            val manager = LocalFocusManager.current
+            val onCancelClick = {
+                if (!forceVisible) manager.clearFocus(true)
+            }
+            val onConfirmClick = {
+                if (!forceVisible) manager.clearFocus(true)
+                onRequestValueChange(checked)
+            }
+            TextButtons(
+                onCancelClick = onCancelClick,
+                onConfirmClick = onConfirmClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+    Preference(
+        title = title,
+        icon = icon,
+        summery = summery,
+        singleLineTitle = singleLineTitle,
+        enabled = enabled,
+        modifier = modifier,
+        forceVisible = forceVisible,
+        widget = widget,
+        revealable = revealable
+    )
+}
+
 
 @Composable
 fun SliderPreference(
-    title: AnnotatedString,
+    title: CharSequence,
     defaultValue: Float,
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
@@ -412,66 +354,57 @@ fun SliderPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
+    summery: CharSequence? = null,
     forceVisible: Boolean = false,
     iconChange: ImageVector? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
 ) {
-
-    val revealable =
-        @Composable {
-            val startPadding = (if (iconSpaceReserved) 24.dp + 16.dp else 0.dp) + 8.dp
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = startPadding)
+    val revealable = @Composable {
+        val startPadding = (if (iconSpaceReserved) 24.dp + 16.dp else 0.dp) + 8.dp
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = startPadding)
+        ) {
+            // place slider
+            var value by rememberState(initial = defaultValue)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                // place slider
-                var value by rememberState(initial = defaultValue)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    if (iconChange != null)
-                        Icon(
-                            imageVector = iconChange,
-                            contentDescription = null,
-                        )
-                    Slider(
-                        value = value,
-                        onValueChange = {
-                            value = it
-                        },
-                        valueRange = valueRange,
-                        steps = steps,
-                        modifier = Modifier.weight(1f)
-                    )
-                    if (iconChange != null) {
-                        Icon(
-                            imageVector = iconChange,
-                            contentDescription = null,
-                            modifier = Modifier.scale(1.5f)
-                        )
-                    }
-                }
-
-                val manager = LocalFocusManager.current
-                val onCancelClick = {
-                    if (!forceVisible)
-                        manager.clearFocus(true)
-                }
-                val onConfirmClick = {
-                    if (!forceVisible)
-                        manager.clearFocus(true)
-                    onValueChange(value)
-                }
-                TextButtons(
-                    onCancelClick = onCancelClick,
-                    onConfirmClick = onConfirmClick,
-                    modifier = Modifier.fillMaxWidth()
+                if (iconChange != null) Icon(
+                    imageVector = iconChange,
+                    contentDescription = null,
                 )
+                Slider(
+                    value = value, onValueChange = {
+                        value = it
+                    }, valueRange = valueRange, steps = steps, modifier = Modifier.weight(1f)
+                )
+                if (iconChange != null) {
+                    Icon(
+                        imageVector = iconChange,
+                        contentDescription = null,
+                        modifier = Modifier.scale(1.5f)
+                    )
+                }
             }
+
+            val manager = LocalFocusManager.current
+            val onCancelClick = {
+                if (!forceVisible) manager.clearFocus(true)
+            }
+            val onConfirmClick = {
+                if (!forceVisible) manager.clearFocus(true)
+                onValueChange(value)
+            }
+            TextButtons(
+                onCancelClick = onCancelClick,
+                onConfirmClick = onConfirmClick,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
+    }
 
     Preference(
         modifier = modifier,
@@ -486,3 +419,4 @@ fun SliderPreference(
         revealable = revealable
     )
 }
+

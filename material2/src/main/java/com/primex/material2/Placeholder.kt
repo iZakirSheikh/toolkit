@@ -15,7 +15,7 @@ private val PLACE_HOLDER_ICON_BOX_SIZE = 192.dp
 private val PLACE_HOLDER_ICON_BOX_DEFAULT_SIZE = 56.dp
 
 @Composable
-fun VPlaceholder(
+private fun Vertical(
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
     message: @Composable (() -> Unit)? = null,
@@ -78,7 +78,7 @@ fun VPlaceholder(
 }
 
 @Composable
-fun HPlaceholder(
+private fun Horizontal(
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
     message: @Composable (() -> Unit)? = null,
@@ -147,15 +147,15 @@ fun HPlaceholder(
 @Composable
 @NonRestartableComposable
 fun Placeholder(
+    title: @Composable (() -> Unit),
     modifier: Modifier = Modifier,
-    vertical: Boolean,
+    vertical: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
     message: @Composable (() -> Unit)? = null,
     action: @Composable (() -> Unit)? = null,
-    title: @Composable (() -> Unit),
 ) {
     when (vertical) {
-        true -> VPlaceholder(modifier, icon, message, action, title)
-        else -> HPlaceholder(modifier, icon, message, action, title)
+        true -> Vertical(modifier, icon, message, action, title)
+        else -> Horizontal(modifier, icon, message, action, title)
     }
 }
