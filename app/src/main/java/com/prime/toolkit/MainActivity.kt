@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,6 +19,7 @@ import com.prime.toolkit.ui.theme.ToolkitTheme
 import com.primex.material2.Label
 import com.primex.material2.Placeholder
 import com.primex.material2.Preference
+import com.primex.material2.SwitchPreference
 import com.primex.preferences.Preferences
 
 class MainActivity : ComponentActivity() {
@@ -44,7 +46,7 @@ fun Greeting(name: String) {
 @Preview
 @Composable
 fun PLaceholder() {
-    Surface(modifier = Modifier.fillMaxSize()) {
-       Label(text = "Hi Android")
+    Surface(modifier = Modifier) {
+      SwitchPreference(title = "Dark Mode", checked = false, onCheckedChange = {}, summery = "Toggle dark Mode On/Off", icon = Icons.Outlined.Star)
     }
 }
