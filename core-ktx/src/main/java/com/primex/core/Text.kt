@@ -27,7 +27,7 @@ sealed interface Text {
          * @param value The text value to use.
          * @return A new [Text] instance with the given value.
          */
-        operator fun invoke(value: String): Text = Raw(value.asAnnotatedString)
+        operator fun invoke(value: String): Text = Raw(value)
 
         /**
          * Creates a [Text] instance with the given [AnnotatedString].
@@ -35,7 +35,7 @@ sealed interface Text {
          * @param value The annotated string value to use.
          * @return A new [Text] instance with the given value.
          */
-        operator fun invoke(value: AnnotatedString): Text = Raw(value)
+        operator fun invoke(value: CharSequence): Text = Raw(value)
 
 
         /**
@@ -89,7 +89,7 @@ sealed interface Text {
  */
 @JvmInline
 @Immutable
-private value class Raw(val value: AnnotatedString) : Text
+private value class Raw(val value: CharSequence) : Text
 
 /**
  * Constructs an [StringResource] String [Text] wrapper.
@@ -183,31 +183,30 @@ val Text.raw: Any
     get() = when (this) {
             is HtmlResource -> id
             is PluralResource -> id
-            is Raw -> value.text
+            is Raw -> value
             is StringResource -> id
             is StringResource2 -> id
             is PluralResource2 -> id
         }
 
 
-private val String.asAnnotatedString
-    inline get() = AnnotatedString(this)
-
 /**
- * Unpacks the text wrapper to result [AnnotatedString]
+ * Unpacks the text wrapper to result in a `CharSequence`, which can be either a `String` or an `AnnotatedString`.
+ *
+ * @return The unpacked `CharSequence` result.
  */
-val Text.get: AnnotatedString
+val Text.get: CharSequence
     @Composable
     @ReadOnlyComposable
     @NonRestartableComposable
     get() = when (this) {
             is HtmlResource -> stringHtmlResource(id = this.id)
             is PluralResource ->
-                pluralStringResource(id = this.id, count = this.quantity).asAnnotatedString
+                pluralStringResource(id = this.id, count = this.quantity)
             is PluralResource2 -> stringHtmlResource(this.id, this.quantity, this.formatArgs)
             is Raw -> this.value
-            is StringResource -> stringResource(id = id).asAnnotatedString
-            is StringResource2 -> stringResource(id, formatArgs).asAnnotatedString
+            is StringResource -> stringResource(id = id)
+            is StringResource2 -> stringResource(id, formatArgs)
         }
 
 
@@ -217,29 +216,30 @@ val Text.get: AnnotatedString
 @Composable
 @ReadOnlyComposable
 @NonRestartableComposable
+@Deprecated("Use the extension fun get")
 fun stringResource(value: Text) = value.get
 
 /**
  * **Note: Doesn't support collecting [HtmlResource] Strings.
  * @param text: The [Text] to collect.
  */
-fun Resources.resolve(text: Text): AnnotatedString =
+fun Resources.resolve(text: Text): CharSequence =
     when (text) {
         is HtmlResource -> error("Not supported when collecting from Resource")
-        is PluralResource -> getQuantityString(text.id, text.quantity).asAnnotatedString
+        is PluralResource -> getQuantityString(text.id, text.quantity)
         is PluralResource2 -> getQuantityString(
             text.id,
             text.quantity,
             text.formatArgs
-        ).asAnnotatedString
+        )
         is Raw -> text.value
-        is StringResource -> getString(text.id).asAnnotatedString
-        is StringResource2 -> getString(text.id, text.formatArgs).asAnnotatedString
+        is StringResource -> getString(text.id)
+        is StringResource2 -> getString(text.id, text.formatArgs)
     }
 
 /**
  * @see resolve
  */
 @JvmName("resolve2")
-fun Resources.resolve(text: Text?): AnnotatedString? =
+fun Resources.resolve(text: Text?): CharSequence? =
     if (text == null) null else resolve(text)
