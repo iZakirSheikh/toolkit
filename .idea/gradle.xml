@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/core-ktx" />
             <option value="$PROJECT_DIR$/material2" />
+            <option value="$PROJECT_DIR$/material3" />
             <option value="$PROJECT_DIR$/preferences" />
           </set>
         </option>
