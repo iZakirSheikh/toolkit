@@ -159,11 +159,10 @@ fun ListTile(
     // Actual layout
     Layout(
         content = content,
-        modifier = Modifier
+        modifier = modifier
             .background(color, shape)
             .fillMaxWidth()
             .heightIn(minHeight)
-            .then(modifier)
             .padding(outerPaddingValues)
     ) { measurables, constraints ->
         val width = constraints.maxWidth

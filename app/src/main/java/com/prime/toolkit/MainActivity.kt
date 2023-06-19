@@ -10,14 +10,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
@@ -61,34 +64,22 @@ fun Greeting(name: String) {
 @Preview
 @Composable
 fun PLaceholder() {
-    Surface {
-        com.primex.material3.ListTile(
-            headline = { Text(text = "Headline") },
-            leading = {
-                Icon(imageVector = Icons.Outlined.Star, contentDescription = null)
-            },
-            trailing = {
-                Icon(
-                    imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = null
-                )
-            },
-            subtitle = { Text(text = "This is the subtitle text and this maybe represetnts the desc text of headline.") },
-            overline = { Text(text = "Overline") },
-            footer = {
-                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                    repeat(10) {
-                        OutlinedButton(
-                            label = "index: $it",
-                            onClick = { /*TODO*/ },
-                            leading = rememberVectorPainter(
-                                image = Icons.Outlined.Star
-                            ),
-                            modifier = Modifier.padding(4.dp)
-                        )
-                    }
-                }
-            }
-        )
+    Scaffold {
+        Surface(modifier = Modifier.padding(it)) {
+            ListTile(
+                headline = { Text(text = "Headling") },
+                subtitle = { Text(text = "This is the subtitle; max lines is 4; this makes it look cool.") },
+                leading = {
+                    Icon(imageVector = Icons.Outlined.Info, contentDescription = null)
+                },
+                trailing = {
+                    com.primex.material2.IconButton(
+                        imageVector = Icons.Outlined.MoreVert,
+                        onClick = { /*TODO*/ })
+                },
+                color = Color.Cyan,
+                modifier = Modifier.padding(10.dp)
+            )
+        }
     }
 }
