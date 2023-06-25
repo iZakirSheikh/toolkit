@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.primex.core'
+    namespace 'com.primex.material3'
     compileSdk 33
 
     defaultConfig {
@@ -44,10 +44,16 @@ android {
     }
 }
 
+
 dependencies {
-    implementation 'androidx.core:core:1.10.1'
-    compileOnly "androidx.compose.foundation:foundation:$compose_ui_version"
-    //compileOnly "androidx.compose.ui:ui:$compose_version"
+    implementation project(path: ':core-ktx')
+    compileOnly "androidx.compose.foundation:foundation-layout:$compose_ui_version"
+    compileOnly "androidx.compose.ui:ui:$compose_ui_version"
+    compileOnly("androidx.compose.material3:material3:1.2.0-alpha02")
+
+    implementation "androidx.compose.ui:ui-util:$compose_ui_version"
+    //implementation "androidx.compose.ui:ui-tooling:$compose_version"
+    //implementation "androidx.core:core-ktx:1.9.0"
 }
 
 // Because the components are created only during the afterEvaluate phase, you must
@@ -62,7 +68,7 @@ afterEvaluate {
 
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.primex.toolkit'
-                artifactId = 'core-ktx'
+                artifactId = 'material3'
                 version = '1.0.0'
             }
         }

@@ -1,4 +1,4 @@
-package com.primex.material2
+package com.primex.material3
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,9 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.Alignment
@@ -18,9 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
+private const val TAG = "Placeholder"
+
 private val PLACE_HOLDER_ICON_BOX_SIZE = 192.dp
 private val PLACE_HOLDER_ICON_BOX_DEFAULT_SIZE = 56.dp
 
+// FIXME: Update Placeholder to handle orientation changes and fill the available height instead of
+//  occupying the entire screen.
+
+/**
+ * Composes a vertical [Placeholder] layout.
+ */
 @Composable
 private fun Vertical(
     modifier: Modifier = Modifier,
@@ -60,19 +67,19 @@ private fun Vertical(
 
         // Place Title
         ProvideTextStyle(
-            style = MaterialTheme.typography.h4,
+            value = MaterialTheme.typography.headlineMedium.copy(textAlign = TextAlign.Center),
             content = title,
-            textAlign = TextAlign.Center
         )
 
         //Message
         if (message != null) {
             Spacer(modifier = Modifier.padding(vertical = 8.dp))
             ProvideTextStyle(
-                style = MaterialTheme.typography.body2,
-                alpha = ContentAlpha.medium,
+                value = MaterialTheme.typography.bodyMedium.copy(
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
                 content = message,
-                textAlign = TextAlign.Center
             )
         }
 
@@ -84,6 +91,9 @@ private fun Vertical(
     }
 }
 
+/**
+ * Composes a vertical [Placeholder] layout.
+ */
 @Composable
 private fun Horizontal(
     modifier: Modifier = Modifier,
@@ -113,7 +123,7 @@ private fun Horizontal(
 
             // Place Title
             ProvideTextStyle(
-                value = MaterialTheme.typography.h4,
+                value = MaterialTheme.typography.headlineMedium,
                 content = title
             )
 
@@ -121,8 +131,7 @@ private fun Horizontal(
             if (message != null) {
                 Spacer(modifier = Modifier.padding(vertical = 8.dp))
                 ProvideTextStyle(
-                    style = MaterialTheme.typography.body2,
-                    alpha = ContentAlpha.medium,
+                    value = MaterialTheme.typography.bodyMedium,
                     content = message
                 )
             }
@@ -154,15 +163,16 @@ private fun Horizontal(
 @Composable
 @NonRestartableComposable
 fun Placeholder(
-    title: @Composable (() -> Unit),
+    vertical: Boolean,
     modifier: Modifier = Modifier,
-    vertical: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
     message: @Composable (() -> Unit)? = null,
     action: @Composable (() -> Unit)? = null,
+    title: @Composable (() -> Unit),
 ) {
     when (vertical) {
         true -> Vertical(modifier, icon, message, action, title)
         else -> Horizontal(modifier, icon, message, action, title)
     }
 }
+

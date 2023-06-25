@@ -1,16 +1,14 @@
-package com.primex.material2
+package com.primex.material3
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.contentColorFor
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -22,38 +20,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 private const val TAG = "ListTile"
-
-
-/**
- * @see ListTile
- */
-@Composable
-@Deprecated("Use the new ListTile.")
-inline fun ListTile(
-    modifier: Modifier = Modifier,
-    selected: Boolean = false,
-    enabled: Boolean = true,
-    centreVertically: Boolean = false,
-    noinline leading: @Composable (() -> Unit)? = null,
-    noinline secondaryText: @Composable (() -> Unit)? = null,
-    noinline overlineText: @Composable (() -> Unit)? = null,
-    noinline trailing: @Composable (() -> Unit)? = null,
-    noinline bottom: @Composable (() -> Unit)? = null,
-    noinline text: @Composable () -> Unit
-) {
-    ListTile(
-        headline = text,
-        modifier = modifier,
-        enabled = enabled,
-        leading = leading,
-        subtitle = secondaryText,
-        overline = overlineText,
-        trailing = trailing,
-        footer = bottom,
-        centerAlign = centreVertically,
-        color = if (selected) LocalContentColor.current.copy(0.2f) else Color.Transparent
-    )
-}
 
 private val LIST_TILE_START_PADDING = 16.dp
 private val LIST_TILE_VERTICAL_PADDING = 8.dp
@@ -69,6 +35,9 @@ private val TRAILING_CONTENT_START_PADDING = 16.dp
 private val LIST_ITEM_ONE_LINE_CONTAINER_HEIGHT = 56.0.dp
 private val LIST_ITEM_TWO_LINE_CONTAINER_HEIGHT = 72.0.dp
 private val LIST_ITEM_THREE_LINE_CONTAINER_HEIGHT = 88.0.dp
+
+private const val ListItemDisabledLabelTextOpacity = 0.3f
+private const val ListItemDisabledIconOpacity = 0.38f
 
 /**
  * Advanced Fast/Light version of [ListItem].
@@ -95,7 +64,7 @@ private val LIST_ITEM_THREE_LINE_CONTAINER_HEIGHT = 88.0.dp
 fun ListTile(
     headline: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.surface,
+    color: Color = MaterialTheme.colorScheme.surface,
     enabled: Boolean = true,
     shape: Shape = RectangleShape,
     subtitle: (@Composable () -> Unit)? = null,
@@ -108,37 +77,38 @@ fun ListTile(
     // Provide color and style to the composable.
     // Also, control the enabling and disabling of this composable.
     val content = @Composable {
-        val onColor = contentColorFor(backgroundColor = color)
-        val typography = MaterialTheme.typography
-        // Style the compatibles
-        CompositionLocalProvider(
-            LocalContentColor provides onColor,
-            LocalContentAlpha provides if (enabled) ContentAlpha.high else ContentAlpha.disabled,
-        ) {
-            // Headline
-            ProvideTextStyle(typography.subtitle1) {
+
+        val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+        val onSurface = MaterialTheme.colorScheme.onSurface
+
+        var onColor = if (enabled) onSurface else onSurface.copy(ListItemDisabledLabelTextOpacity)
+        CompositionLocalProvider(LocalContentColor provides onColor) {
+            ProvideTextStyle(value = MaterialTheme.typography.bodyLarge) {
                 headline() // 0
             }
-            // Leading/Trailing icons; I guess doesn't need TextStyle I guess.
+        }
+
+        onColor = if (enabled) onSurfaceVariant else onSurface.copy(ListItemDisabledIconOpacity)
+        CompositionLocalProvider(LocalContentColor provides onColor) {
             leading?.invoke() // 1
             trailing?.invoke() // 2
-            //Overline
-            ProvideTextStyle(typography.overline) {
+        }
+
+        onColor = onSurfaceVariant
+        CompositionLocalProvider(LocalContentColor provides onColor) {
+            ProvideTextStyle(value = MaterialTheme.typography.labelSmall) {
                 overline?.invoke() // 3
             }
-            // Support Text
-            CompositionLocalProvider(
-                LocalContentAlpha provides if (enabled) ContentAlpha.medium else ContentAlpha.disabled,
-                content = {
-                    ProvideTextStyle(value = typography.body2) {
-                        subtitle?.invoke() // 4
-                    }
-                }
-            )
-            // Bottom
+        }
+
+        CompositionLocalProvider(LocalContentColor provides onColor) {
+            ProvideTextStyle(value = MaterialTheme.typography.bodyMedium) {
+                subtitle?.invoke() // 4
+            }
             footer?.invoke()// 5
         }
     }
+
     // Find how many lines are there.
     val lines = when {
         subtitle == null && overline == null -> 1
@@ -180,7 +150,7 @@ fun ListTile(
         val trailingPlaceable =
             if (trailing != null) measurables[++index].measure(unrestricted) else null
         // The space remained for text part of this composable.
-        var remaining = width -
+        val remaining = width -
                 (if (leadingPlaceable == null) 0 else leadingPlaceable.width + leadingPaddingPx) -
                 (if (trailingPlaceable == null) 0 else trailingPlaceable.width + trailingPaddingPx)
         // fill-space between leading and trailing placeable.
@@ -232,6 +202,3 @@ fun ListTile(
         }
     }
 }
-
-
-

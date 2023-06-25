@@ -20,7 +20,37 @@ import androidx.core.graphics.ColorUtils
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.Closeable
-
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.RenderVectorGroup
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ParagraphStyle
+import androidx.compose.ui.text.PlatformParagraphStyle
+import androidx.compose.ui.text.PlatformSpanStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontSynthesis
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextGeometricTransform
+import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.style.TextMotion
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 
 /**
  * A composable function that creates a [MutableState] object which can be used to hold and update
@@ -194,3 +224,181 @@ val ProvidableCompositionLocal<Context>.resources: Resources
     @ReadOnlyComposable
     @Composable
     inline get() = current.resources
+
+/**
+ * Returns a Composable function if the condition is true, otherwise returns null.
+ *
+ * @param condition The boolean condition that determines if the composable function should be returned.
+ * @param content The composable function to be returned if the condition is true.
+ * @return The composable function if the condition is true, otherwise null.
+ */
+fun composableOrNull(condition: Boolean, content: @Composable () -> Unit) = when (condition) {
+    true -> content
+    else -> null
+}
+
+/**
+ *  Applies the specified span style to the [AnnotatedString.Builder] and invokes the specified
+ *  [block].
+ *  @see SpanStyle
+ */
+inline fun <R : Any> AnnotatedString.Builder.withSpanStyle(
+    color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    fontStyle: androidx.compose.ui.text.font.FontStyle? = null,
+    fontSynthesis: FontSynthesis? = null,
+    fontFamily: androidx.compose.ui.text.font.FontFamily? = null,
+    fontFeatureSettings: String? = null,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
+    baselineShift: BaselineShift? = null,
+    textGeometricTransform: TextGeometricTransform? = null,
+    localeList: LocaleList? = null,
+    background: Color = Color.Unspecified,
+    textDecoration: TextDecoration? = null,
+    shadow: Shadow? = null,
+    platformStyle: PlatformSpanStyle? = null,
+    drawStyle: DrawStyle? = null,
+    block: AnnotatedString.Builder.() -> R
+): R = withStyle(
+    SpanStyle(
+        color,
+        fontSize,
+        fontWeight,
+        fontStyle,
+        fontSynthesis,
+        fontFamily,
+        fontFeatureSettings,
+        letterSpacing,
+        baselineShift,
+        textGeometricTransform,
+        localeList,
+        background,
+        textDecoration,
+        shadow,
+        platformStyle,
+        drawStyle
+    ), block
+)
+
+/**
+ *  Applies the specified span style to the [AnnotatedString.Builder] and invokes the specified
+ *  [block].
+ *  @see SpanStyle
+ */
+inline fun <R : Any> AnnotatedString.Builder.withSpanStyle(
+    brush: Brush?,
+    alpha: Float = Float.NaN,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    fontStyle: androidx.compose.ui.text.font.FontStyle? = null,
+    fontSynthesis: FontSynthesis? = null,
+    fontFamily: androidx.compose.ui.text.font.FontFamily? = null,
+    fontFeatureSettings: String? = null,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
+    baselineShift: BaselineShift? = null,
+    textGeometricTransform: TextGeometricTransform? = null,
+    localeList: LocaleList? = null,
+    background: Color = Color.Unspecified,
+    textDecoration: TextDecoration? = null,
+    shadow: Shadow? = null,
+    platformStyle: PlatformSpanStyle? = null,
+    drawStyle: DrawStyle? = null,
+    block: AnnotatedString.Builder.() -> R
+): R = withStyle(
+    SpanStyle(
+        brush,
+        alpha,
+        fontSize,
+        fontWeight,
+        fontStyle,
+        fontSynthesis,
+        fontFamily,
+        fontFeatureSettings,
+        letterSpacing,
+        baselineShift,
+        textGeometricTransform,
+        localeList,
+        background,
+        textDecoration,
+        shadow,
+        platformStyle,
+        drawStyle
+    ), block
+)
+
+
+/**
+ *  Applies the specified Paragraph style to the [AnnotatedString.Builder] and invokes the specified
+ *  [block].
+ *  @see ParagraphStyle
+ */
+inline fun <R : Any> AnnotatedString.Builder.withParagraphStyle(
+    textAlign: TextAlign? = null,
+    textDirection: TextDirection? = null,
+    lineHeight: TextUnit = TextUnit.Unspecified,
+    textIndent: TextIndent? = null,
+    platformStyle: PlatformParagraphStyle? = null,
+    lineHeightStyle: LineHeightStyle? = null,
+    lineBreak: LineBreak? = null,
+    hyphens: Hyphens? = null,
+    textMotion: TextMotion? = null,
+    crossinline block: AnnotatedString.Builder.() -> R
+): R = withStyle(
+    ParagraphStyle(
+        textAlign,
+        textDirection,
+        lineHeight,
+        textIndent,
+        platformStyle,
+        lineHeightStyle,
+        lineBreak,
+        hyphens,
+        textMotion
+    ), block
+)
+
+
+/**
+ * Applies the given text style to the receiver [AnnotatedString.Builder] and executes the provided [block].
+ *
+ * @param style The text style to apply to the receiver [AnnotatedString.Builder].
+ * @param block The block of code to execute within the context of the modified [AnnotatedString.Builder].
+ * @return The result of executing the [block].
+ */
+inline fun <R : Any> AnnotatedString.Builder.withStyle(
+    style: TextStyle,
+    crossinline block: AnnotatedString.Builder.() -> R
+): R = withStyle(style.toParagraphStyle()) {
+    withStyle(style.toSpanStyle(), block)
+}
+
+
+/**
+ * Creates and remembers a vector painter while providing options to style it.
+ *
+ * This function creates a vector painter and stores it for future reference. It allows you to apply various styles
+ * to the painter, such as color, stroke width, etc.
+ */
+@Composable
+inline fun rememberVectorPainter(
+    image: ImageVector,
+    defaultWidth: Dp = image.defaultWidth,
+    defaultHeight: Dp = image.defaultHeight,
+    viewportWidth: Float = image.viewportWidth,
+    viewportHeight: Float = image.viewportHeight,
+    name: String = image.name,
+    tintColor: Color = image.tintColor,
+    tintBlendMode: BlendMode = image.tintBlendMode,
+    autoMirror: Boolean = image.autoMirror,
+) = rememberVectorPainter(
+    defaultWidth = defaultWidth,
+    defaultHeight = defaultHeight,
+    viewportWidth = viewportWidth,
+    viewportHeight = viewportHeight,
+    name = name,
+    tintColor = tintColor,
+    tintBlendMode = tintBlendMode,
+    autoMirror = autoMirror,
+    content = { _, _ -> RenderVectorGroup(group = image.root) }
+)

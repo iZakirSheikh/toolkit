@@ -9,9 +9,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.Checkbox
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
+import androidx.compose.material.Slider
+import androidx.compose.material.Switch
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.Composable
@@ -25,17 +42,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.primex.core.acquireFocusOnInteraction
+import com.primex.core.composableOrNull
 import com.primex.core.rememberState
 
-private val IconSpaceReservedModifier =
-    Modifier
-        // .padding(start = 16.dp)
-        .size(24.dp)
+private const val TAG = "Preference"
+
+/**
+ * This is the container for some defaults of the preference composable.
+ */
+object PreferenceDefaults {
+    /**
+     * The padding required to save oif user wants leading icon space to be reserved.
+     */
+    val IconSpaceReserved = 12.dp
+}
 
 /**
  * A General [Preference(title = )] representation.
@@ -53,128 +77,69 @@ private val IconSpaceReservedModifier =
  */
 @Composable
 fun Preference(
-    title: AnnotatedString,
+    title: CharSequence,
     modifier: Modifier = Modifier,
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
+    summery: CharSequence? = null,
     enabled: Boolean = true,
     widget: @Composable (() -> Unit)? = null,
     revealable: (@Composable () -> Unit)? = null,
     forceVisible: Boolean = false,
 ) {
-
-    val leading =
-        @Composable {
-            when {
-                icon != null -> Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                iconSpaceReserved -> Spacer(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .then(IconSpaceReservedModifier)
-                )
-                else -> Spacer(modifier = Modifier)
-            }
-        }
-    val interactionSource: MutableInteractionSource = remember {
-        MutableInteractionSource()
+    // The only difference is that we are using the new ListTile.
+    val interactionSource = remember(::MutableInteractionSource)
+    val listModifier = when (forceVisible || !enabled) {
+        true -> modifier
+        else -> Modifier
+            .acquireFocusOnInteraction(interactionSource, LocalIndication.current)
+            .then(modifier)
+            .animateContentSize()
     }
-    val expanded by when (forceVisible) {
-        true -> rememberState(initial = true)
-        else -> interactionSource.collectIsFocusedAsState()
-    }
-
-
-    val title =
-        @Composable {
+    ListTile(
+        color = Color.Transparent,
+        trailing = widget,
+        enabled = enabled,
+        headline = {
             Text(
                 text = title,
-                maxLines = if (singleLineTitle) 1 else 3,
+                maxLines = if (singleLineTitle) 1 else 2,
                 overflow = TextOverflow.Ellipsis,
                 fontWeight = FontWeight.SemiBold
             )
-        }
-
-    val summery =
-        @Composable {
-            Crossfade(targetState = summery) { text ->
-                if (!text.isNullOrBlank())
-                    Text(
-                        text = text,
-                        maxLines = 6,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .padding(top = 2.dp),
-                    )
+        },
+        subtitle = composableOrNull(!summery.isNullOrBlank()) {
+            Text(text = summery ?: "", maxLines = 4, overflow = TextOverflow.Ellipsis)
+        },
+        leading = composableOrNull(icon != null || iconSpaceReserved) {
+            when {
+                // non-null write the icon.
+                icon != null -> Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                // preserve the space in case user requested.
+                iconSpaceReserved -> Spacer(Modifier.padding(PreferenceDefaults.IconSpaceReserved))
+            }
+        },
+        // show footer in case available.
+        footer = composableOrNull(revealable != null) {
+            val expanded by when (forceVisible) {
+                true -> rememberState(initial = true)
+                else -> interactionSource.collectIsFocusedAsState()
+            }
+            Crossfade(targetState = expanded, label = TAG) { value ->
+                if (value) revealable?.invoke()
             }
         }
-
-    val hidiable =
-        @Composable {
-            Crossfade(targetState = expanded) { value ->
-                if (value)
-                    revealable?.invoke()
-            }
-        }
-
-    val listModifier =
-        when (forceVisible || !enabled) {
-            true -> modifier
-            else -> Modifier
-                .acquireFocusOnInteraction(interactionSource, indication = LocalIndication.current)
-                .then(modifier)
-                .animateContentSize()
-        }
-
-    ListTile(
-        modifier = listModifier,
-        text = title,
-        secondaryText = summery,
-        leading = leading,
-        enabled = enabled,
-        trailing = widget,
-        bottom = hidiable,
-        centreVertically = true
     )
 }
-
-
-@Composable
-fun Preference(
-    title: String,
-    modifier: Modifier = Modifier,
-    singleLineTitle: Boolean = true,
-    iconSpaceReserved: Boolean = true,
-    icon: ImageVector? = null,
-    summery: String? = null,
-    enabled: Boolean = true,
-    widget: @Composable (() -> Unit)? = null,
-    revealable: (@Composable () -> Unit)? = null,
-    forceVisible: Boolean = false,
-) {
-    Preference(
-        title = AnnotatedString(title),
-        modifier = modifier,
-        singleLineTitle = singleLineTitle,
-        iconSpaceReserved = iconSpaceReserved,
-        icon = icon,
-        summery = summery?.let { AnnotatedString(it) },
-        enabled = enabled,
-        widget = widget,
-        revealable = revealable,
-        forceVisible = forceVisible
-    )
-}
-
 
 @Composable
 fun SwitchPreference(
-    title: AnnotatedString,
+    title: CharSequence,
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit),
     modifier: Modifier = Modifier,
@@ -182,7 +147,7 @@ fun SwitchPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
+    summery: CharSequence? = null,
 ) {
     Preference(
         modifier = modifier.clickable(enabled = enabled) {
@@ -203,14 +168,14 @@ fun SwitchPreference(
 
 @Composable
 fun CheckBoxPreference(
-    title: AnnotatedString,
+    title: CharSequence,
     checked: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
+    summery: CharSequence? = null,
     onCheckedChange: ((Boolean) -> Unit)
 ) {
     Preference(
@@ -232,7 +197,7 @@ fun CheckBoxPreference(
 
 @Composable
 fun <T> DropDownPreference(
-    title: AnnotatedString,
+    title: CharSequence,
     defaultValue: T,
     onRequestChange: (T) -> Unit,
     modifier: Modifier = Modifier,
@@ -298,7 +263,7 @@ fun <T> DropDownPreference(
         singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
-        summery = AnnotatedString(default),
+        summery = default,
         widget = widget
     )
 }
@@ -306,7 +271,7 @@ fun <T> DropDownPreference(
 
 @Composable
 fun ColorPickerPreference(
-    title: AnnotatedString,
+    title: CharSequence,
     defaultEntry: Color,
     entries: List<Color>,
     onRequestValueChange: (Color) -> Unit,
@@ -315,7 +280,7 @@ fun ColorPickerPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
+    summery: CharSequence? = null,
     forceVisible: Boolean = false,
 ) {
     val widget =
@@ -403,7 +368,7 @@ private fun TextButtons(
 
 @Composable
 fun SliderPreference(
-    title: AnnotatedString,
+    title: CharSequence,
     defaultValue: Float,
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
@@ -412,7 +377,7 @@ fun SliderPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: AnnotatedString? = null,
+    summery: CharSequence? = null,
     forceVisible: Boolean = false,
     iconChange: ImageVector? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
