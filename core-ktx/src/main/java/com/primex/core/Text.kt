@@ -195,7 +195,7 @@ val Text.raw: Any
  *
  * @return The unpacked `CharSequence` result.
  */
-val Text.get: CharSequence
+val Text.value: CharSequence
     @Composable
     @ReadOnlyComposable
     @NonRestartableComposable
@@ -209,6 +209,13 @@ val Text.get: CharSequence
             is StringResource2 -> stringResource(id, formatArgs)
         }
 
+@Deprecated("Use value Text.value instead.")
+inline val Text.get: CharSequence
+    @Composable
+    @ReadOnlyComposable
+    @NonRestartableComposable
+    inline get() = value
+
 
 /**
  * Resolves the resource to [AnnotatedString]
@@ -216,8 +223,8 @@ val Text.get: CharSequence
 @Composable
 @ReadOnlyComposable
 @NonRestartableComposable
-@Deprecated("Use the extension fun get")
-fun stringResource(value: Text) = value.get
+@Deprecated("Use the extension fun value")
+fun stringResource(value: Text) = value.value
 
 /**
  * **Note: Doesn't support collecting [HtmlResource] Strings.
