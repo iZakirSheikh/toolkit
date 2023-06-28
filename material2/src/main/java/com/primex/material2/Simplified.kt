@@ -30,34 +30,8 @@ import com.primex.material2.dialog.BottomSheetDialogProperties
 
 
 @Composable
-@Deprecated("Use the new Text with CharSequance.")
 inline fun Label(
-    text: AnnotatedString,
-    modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    fontWeight: FontWeight? = null,
-    textAlign: TextAlign? = null,
-    maxLines: Int = 1,
-    style: TextStyle = LocalTextStyle.current,
-) {
-    Text(
-        text = text,
-        modifier = modifier,
-        style = style,
-        maxLines = maxLines,
-        color = color,
-        overflow = TextOverflow.Ellipsis,
-        fontWeight = fontWeight,
-        fontSize = fontSize,
-        textAlign = textAlign
-    )
-}
-
-@Composable
-@Deprecated("Use the new Text with CharSequance.")
-inline fun Label(
-    text: String,
+    text: CharSequence,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
     fontSize: TextUnit = TextUnit.Unspecified,
@@ -83,30 +57,7 @@ inline fun Label(
 @Composable
 @Deprecated("Use the new Text with CharSequance.")
 inline fun Header(
-    text: AnnotatedString,
-    modifier: Modifier = Modifier,
-    style: TextStyle = MaterialTheme.typography.h6,
-    color: Color = Color.Unspecified,
-    fontSize: TextUnit = style.fontSize,
-    fontWeight: FontWeight? = null,
-    textAlign: TextAlign? = null,
-    maxLines: Int = 1,
-) = Label(
-    modifier = modifier,
-    style = style,
-    color = color,
-    maxLines = maxLines,
-    fontWeight = fontWeight,
-    text = text,
-    fontSize = fontSize,
-    textAlign = textAlign
-)
-
-@NonRestartableComposable
-@Composable
-@Deprecated("Use the new Text with CharSequance.")
-inline fun Header(
-    text: String,
+    text: CharSequence,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.h6,
     color: Color = Color.Unspecified,
@@ -127,28 +78,8 @@ inline fun Header(
 
 
 @Composable
-@Deprecated("Use the new Text with CharSequance.")
 inline fun Caption(
-    text: AnnotatedString,
-    modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
-    fontWeight: FontWeight? = null,
-    textAlign: TextAlign? = null,
-    maxLines: Int = 1,
-) = Label(
-    text = text,
-    modifier = modifier,
-    style = MaterialTheme.typography.caption,
-    color = color,
-    fontWeight = fontWeight,
-    textAlign = textAlign,
-    maxLines = maxLines
-)
-
-@Composable
-@Deprecated("Use the new Text with CharSequance.")
-inline fun Caption(
-    text: String,
+    text: CharSequence,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
     fontWeight: FontWeight? = null,
@@ -304,9 +235,9 @@ inline fun Button(
             Icon(
                 painter = leading,
                 contentDescription = null,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
             )
-        Text(text = label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Label(text = label)
     }
 )
 
@@ -338,9 +269,9 @@ inline fun OutlinedButton(
             Icon(
                 painter = leading,
                 contentDescription = null,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
             )
-        Text(text = label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Label(text = label)
     },
 )
 
@@ -371,9 +302,9 @@ inline fun TextButton(
             Icon(
                 painter = leading,
                 contentDescription = null,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
             )
-        Text(text = label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Label(text = label)
     }
 )
 
@@ -437,9 +368,9 @@ inline fun OutlinedButton2(
             Icon(
                 painter = crown,
                 contentDescription = null,
-                modifier = Modifier.padding(bottom = 6.dp)
+                modifier = Modifier.padding(bottom = ButtonDefaults.IconSpacing)
             )
-        Text(text = label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Label(text = label)
     },
 )
 
@@ -471,9 +402,9 @@ inline fun TextButton2(
             Icon(
                 painter = crown,
                 contentDescription = null,
-                modifier = Modifier.padding(bottom = 6.dp)
+                modifier = Modifier.padding(bottom = ButtonDefaults.IconSpacing)
             )
-        Text(text = label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Label(text = label)
     },
 )
 
@@ -512,9 +443,9 @@ inline fun Button2(
             Icon(
                 painter = crown,
                 contentDescription = null,
-                modifier = Modifier.padding(bottom = 6.dp)
+                modifier = Modifier.padding(bottom = ButtonDefaults.IconSpacing)
             )
-        Text(text = label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Label(text = label)
     },
 )
 
