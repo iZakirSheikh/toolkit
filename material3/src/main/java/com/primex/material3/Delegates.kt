@@ -59,8 +59,34 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.primex.core.Text
+import com.primex.core.padding
 
 private const val TAG = "Delegates"
+
+@Composable
+inline fun Label(
+    text: CharSequence,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    textAlign: TextAlign? = null,
+    maxLines: Int = 1,
+    style: TextStyle = LocalTextStyle.current,
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = style,
+        maxLines = maxLines,
+        color = color,
+        overflow = TextOverflow.Ellipsis,
+        fontWeight = fontWeight,
+        fontSize = fontSize,
+        textAlign = textAlign
+    )
+}
+
 
 /**
  * A simple `[IconButton] composable that takes [painter] as content instead of content composable.
@@ -185,7 +211,42 @@ inline fun Button(
                 contentDescription = null,
                 modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
             )
-            Text(text = label)
+            Label(text = label)
+        }
+    )
+}
+
+@Composable
+inline fun Button2(
+    label: CharSequence,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: Painter? = null,
+    enabled: Boolean = true,
+    shape: Shape = ButtonDefaults.shape,
+    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+    Button2(
+        onClick,
+        modifier,
+        enabled,
+        shape,
+        colors,
+        elevation,
+        border,
+        contentPadding,
+        interactionSource,
+        content = {
+            if (icon != null) Icon(
+                painter = icon,
+                contentDescription = null,
+                modifier = Modifier.padding(bottom = ButtonDefaults.IconSpacing)
+            )
+            Label(text = label)
         }
     )
 }
@@ -216,11 +277,40 @@ inline fun OutlinedButton(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null)
-        Text(
-            text = label,
-            Modifier.padding(start = ButtonDefaults.IconSpacing)
-        )
+            Icon(painter = icon, contentDescription = null, modifier = Modifier.padding(end = ButtonDefaults.IconSpacing))
+        Label(text = label)
+    }
+}
+
+
+@Composable
+inline fun OutlinedButton2(
+    label: CharSequence,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: Painter? = null,
+    enabled: Boolean = true,
+    shape: Shape = ButtonDefaults.outlinedShape,
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(0.12f)),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+    OutlinedButton2(
+        onClick,
+        modifier,
+        enabled,
+        shape,
+        colors,
+        elevation,
+        border,
+        contentPadding,
+        interactionSource
+    ) {
+        if (icon != null)
+            Icon(painter = icon, contentDescription = null, modifier = Modifier.padding(bottom = ButtonDefaults.IconSpacing))
+        Label(text = label)
     }
 }
 
@@ -250,14 +340,166 @@ inline fun TextButton(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null)
-        Text(
-            text = label,
-            Modifier.padding(start = ButtonDefaults.IconSpacing)
-        )
+            Icon(painter = icon, contentDescription = null,   Modifier.padding(end = ButtonDefaults.IconSpacing))
+        Label(text = label)
     }
 }
 
+@Composable
+inline fun TextButton2(
+    label: CharSequence,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: Painter? = null,
+    enabled: Boolean = true,
+    shape: Shape = ButtonDefaults.textShape,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+) {
+    TextButton2(
+        onClick,
+        modifier,
+        enabled,
+        shape,
+        colors,
+        elevation,
+        border,
+        contentPadding,
+        interactionSource
+    ) {
+        if (icon != null)
+            Icon(painter = icon, contentDescription = null,   Modifier.padding(bottom = ButtonDefaults.IconSpacing))
+        Label(text = label)
+    }
+}
+
+@Composable
+inline fun FilledTonalButton(
+    label: CharSequence,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: Painter? = null,
+    enabled: Boolean = true,
+    shape: Shape = ButtonDefaults.textShape,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+) {
+    FilledTonalButton2(
+        onClick,
+        modifier,
+        enabled,
+        shape,
+        colors,
+        elevation,
+        border,
+        contentPadding,
+        interactionSource
+    ) {
+        if (icon != null)
+            Icon(painter = icon, contentDescription = null,   Modifier.padding(end = ButtonDefaults.IconSpacing))
+        Label(text = label)
+    }
+}
+
+@Composable
+inline fun FilledTonalButton2(
+    label: CharSequence,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: Painter? = null,
+    enabled: Boolean = true,
+    shape: Shape = ButtonDefaults.textShape,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+) {
+    FilledTonalButton2(
+        onClick,
+        modifier,
+        enabled,
+        shape,
+        colors,
+        elevation,
+        border,
+        contentPadding,
+        interactionSource
+    ) {
+        if (icon != null)
+            Icon(painter = icon, contentDescription = null,   Modifier.padding(bottom = ButtonDefaults.IconSpacing))
+        Text(text = label)
+    }
+}
+
+
+@Composable
+inline fun ElevatedButton(
+    label: CharSequence,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: Painter? = null,
+    enabled: Boolean = true,
+    shape: Shape = ButtonDefaults.textShape,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+) {
+    androidx.compose.material3.ElevatedButton(
+        onClick,
+        modifier,
+        enabled,
+        shape,
+        colors,
+        elevation,
+        border,
+        contentPadding,
+        interactionSource
+    ) {
+        if (icon != null)
+            Icon(painter = icon, contentDescription = null,   Modifier.padding(end = ButtonDefaults.IconSpacing))
+        Label(text = label)
+    }
+}
+
+@Composable
+inline fun ElevatedButton2(
+    label: CharSequence,
+    noinline onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: Painter? = null,
+    enabled: Boolean = true,
+    shape: Shape = ButtonDefaults.textShape,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+) {
+    ElevatedButton2(
+        onClick,
+        modifier,
+        enabled,
+        shape,
+        colors,
+        elevation,
+        border,
+        contentPadding,
+        interactionSource
+    ) {
+        if (icon != null)
+            Icon(painter = icon, contentDescription = null,   Modifier.padding(bottom = ButtonDefaults.IconSpacing))
+        Label(text = label)
+    }
+}
 
 /**
  * Returns a Composable function if the condition is true, otherwise returns null.
@@ -270,3 +512,5 @@ internal inline fun composableOrNull(condition: Boolean, noinline content: @Comp
     true -> content
     else -> null
 }
+
+
