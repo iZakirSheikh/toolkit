@@ -22,14 +22,6 @@ import androidx.compose.ui.text.AnnotatedString
 sealed interface Text {
     companion object {
         /**
-         * Creates a [Text] instance with the given [String] value.
-         *
-         * @param value The text value to use.
-         * @return A new [Text] instance with the given value.
-         */
-        operator fun invoke(value: String): Text = Raw(value)
-
-        /**
          * Creates a [Text] instance with the given [AnnotatedString].
          *
          * @param value The annotated string value to use.
