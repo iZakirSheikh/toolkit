@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,14 +23,19 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.prime.toolkit.ui.theme.ToolkitTheme
 import com.primex.core.padding
+import com.primex.core.rememberState
 import com.primex.core.rememberVectorPainter
 import com.primex.material2.Label
 import com.primex.material2.ListTile
@@ -65,21 +71,25 @@ fun Greeting(name: String) {
 @Composable
 fun PLaceholder() {
     Scaffold {
-        Surface(modifier = Modifier.padding(it)) {
-            ListTile(
-                headline = { Text(text = "Headling") },
-                subtitle = { Text(text = "This is the subtitle; max lines is 4; this makes it look cool.") },
-                leading = {
-                    Icon(imageVector = Icons.Outlined.Info, contentDescription = null)
-                },
-                trailing = {
-                    com.primex.material2.IconButton(
-                        imageVector = Icons.Outlined.MoreVert,
-                        onClick = { /*TODO*/ })
-                },
-                color = Color.Cyan,
-                modifier = Modifier.padding(10.dp)
-            )
-        }
+       Column(modifier = Modifier.padding(it)) {
+           Preference(
+               title = "App Version",
+               summery = buildAnnotatedString {
+                   append("2.2.5-debug")
+                   append("\nHave feedback we would like to here, but please dont share sensitive information.\nTap to open feedback dialog.")
+               },
+               icon = Icons.Outlined.Info,
+
+               )
+
+           var checked by rememberState(initial = false)
+           SwitchPreference(
+               title = "Color Status Bar",
+               summery = "Force Color Status Bar.",
+               checked = checked,
+               onCheckedChange = { checked =!checked},
+               icon = Icons.Outlined.Settings
+           )
+       }
     }
 }

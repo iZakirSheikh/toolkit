@@ -98,6 +98,7 @@ fun Preference(
             .animateContentSize()
     }
     ListTile(
+        modifier = listModifier,
         color = Color.Transparent,
         trailing = widget,
         enabled = enabled,

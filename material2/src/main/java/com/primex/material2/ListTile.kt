@@ -207,7 +207,7 @@ fun ListTile(
             constraints.minHeight
         )
         val topAlign =
-            if (centerAlign) false else height > LIST_ITEM_ONE_LINE_CONTAINER_HEIGHT.toPx()
+            if (centerAlign) false else height > LIST_ITEM_ONE_LINE_CONTAINER_HEIGHT.toPx() * 1.2f
         // place each item as per restrictions.
         layout(width, height + (bottomPlaceable?.height ?: 0)) {
             var x: Int = 0
