@@ -51,11 +51,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val x = Preferences(this)
         setContent {
-            ToolkitTheme {
-                // A surface container using the 'background' color from the theme
+            ToolkitTheme { // A surface container using the 'background' color from the theme
                 PLaceholder()
-
-
             }
         }
     }
