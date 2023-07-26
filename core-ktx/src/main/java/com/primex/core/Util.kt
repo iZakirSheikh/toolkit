@@ -188,7 +188,7 @@ suspend inline fun <T> synchronised(lock: Mutex, action: () -> T): T {
 @SuppressLint("ComposableNaming")
 @Composable
 @ReadOnlyComposable
-@Deprecated("Not recommanded to use.")
+@Deprecated("Not recommended to use.", level = DeprecationLevel.HIDDEN)
 fun calculate(calculation: () -> Unit) {
     calculation.invoke()
 }
@@ -232,7 +232,10 @@ val ProvidableCompositionLocal<Context>.resources: Resources
  * @param content The composable function to be returned if the condition is true.
  * @return The composable function if the condition is true, otherwise null.
  */
-fun composableOrNull(condition: Boolean, content: @Composable () -> Unit) = when (condition) {
+fun composableOrNull(
+    condition: Boolean,
+    content: @Composable () -> Unit
+) = when (condition) {
     true -> content
     else -> null
 }
