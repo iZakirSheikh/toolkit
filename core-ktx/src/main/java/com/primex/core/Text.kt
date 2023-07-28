@@ -135,7 +135,7 @@ private value class PluralResource(val packedValue: Long) : Text {
 
     @Stable
     val quantity: Int
-        get() = unpackInt1(packedValue)
+        get() = unpackInt2(packedValue)
 }
 
 /**
@@ -173,13 +173,13 @@ private data class PluralResource2(
  */
 val Text.raw: Any
     get() = when (this) {
-            is HtmlResource -> id
-            is PluralResource -> id
-            is Raw -> value
-            is StringResource -> id
-            is StringResource2 -> id
-            is PluralResource2 -> id
-        }
+        is HtmlResource -> id
+        is PluralResource -> id
+        is Raw -> value
+        is StringResource -> id
+        is StringResource2 -> id
+        is PluralResource2 -> id
+    }
 
 
 /**
@@ -192,14 +192,15 @@ val Text.value: CharSequence
     @ReadOnlyComposable
     @NonRestartableComposable
     get() = when (this) {
-            is HtmlResource -> stringHtmlResource(id = this.id)
-            is PluralResource ->
-                pluralStringResource(id = this.id, count = this.quantity)
-            is PluralResource2 -> stringHtmlResource(this.id, this.quantity, this.formatArgs)
-            is Raw -> this.value
-            is StringResource -> stringResource(id = id)
-            is StringResource2 -> stringResource(id, formatArgs)
-        }
+        is HtmlResource -> stringHtmlResource(id = this.id)
+        is PluralResource ->
+            pluralStringResource(id = this.id, count = this.quantity)
+
+        is PluralResource2 -> pluralStringResource(this.id, this.quantity, this.formatArgs)
+        is Raw -> this.value
+        is StringResource -> stringResource(id = id)
+        is StringResource2 -> stringResource(id, formatArgs)
+    }
 
 @Deprecated("Use value Text.value instead.")
 inline val Text.get: CharSequence
@@ -210,13 +211,21 @@ inline val Text.get: CharSequence
 
 
 /**
- * Resolves the resource to [AnnotatedString]
+ * @see Text.value
  */
 @Composable
 @ReadOnlyComposable
 @NonRestartableComposable
 @Deprecated("Use the extension fun value")
 fun stringResource(value: Text) = value.value
+
+/**
+ * @see Text.value
+ */
+@Composable
+@ReadOnlyComposable
+@NonRestartableComposable
+fun stringResource(value: Text?) = value?.value
 
 /**
  * **Note: Doesn't support collecting [HtmlResource] Strings.
@@ -231,6 +240,7 @@ fun Resources.resolve(text: Text): CharSequence =
             text.quantity,
             text.formatArgs
         )
+
         is Raw -> text.value
         is StringResource -> getString(text.id)
         is StringResource2 -> getString(text.id, text.formatArgs)
