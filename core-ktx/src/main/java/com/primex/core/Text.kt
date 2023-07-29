@@ -225,6 +225,7 @@ fun stringResource(value: Text) = value.value
 @Composable
 @ReadOnlyComposable
 @NonRestartableComposable
+@JvmName("stringResource1")
 fun stringResource(value: Text?) = value?.value
 
 /**
