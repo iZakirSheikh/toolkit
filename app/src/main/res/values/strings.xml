@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Toolkit</string>
+
+    <string name="test_string_with_arg">string %d</string>
 </resources>

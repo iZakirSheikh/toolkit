@@ -202,10 +202,10 @@ val Text.value: CharSequence
         is PluralResource ->
             pluralStringResource(id = this.id, count = this.quantity)
 
-        is PluralResource2 -> pluralStringResource(this.id, this.quantity, this.formatArgs)
+        is PluralResource2 -> pluralStringResource(this.id, this.quantity, *this.formatArgs)
         is Raw -> this.value
         is StringResource -> stringResource(id = id)
-        is StringResource2 -> stringResource(id, formatArgs)
+        is StringResource2 -> stringResource(id, *formatArgs)
     }
 
 @Deprecated("Use value Text.value instead.")
@@ -241,15 +241,10 @@ fun Resources.resolve(text: Text): CharSequence =
     when (text) {
         is HtmlResource -> error("Not supported when collecting from Resource")
         is PluralResource -> getQuantityString(text.id, text.quantity)
-        is PluralResource2 -> getQuantityString(
-            text.id,
-            text.quantity,
-            text.formatArgs
-        )
-
+        is PluralResource2 -> getQuantityString(text.id, text.quantity, *text.formatArgs)
         is Raw -> text.value
         is StringResource -> getString(text.id)
-        is StringResource2 -> getString(text.id, text.formatArgs)
+        is StringResource2 -> getString(text.id, *text.formatArgs)
     }
 
 /**
