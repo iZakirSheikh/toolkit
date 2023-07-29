@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 
 
 /**
@@ -27,6 +28,7 @@ sealed interface Text {
          * @param value The annotated string value to use.
          * @return A new [Text] instance with the given value.
          */
+        @Deprecated("use the builder fun")
         operator fun invoke(value: CharSequence): Text = Raw(value)
 
 
@@ -37,6 +39,7 @@ sealed interface Text {
          * @param formatArgs The format arguments to use.
          * @return A new [Text] instance with the given value.
          */
+        @Deprecated("use the builder fun")
         operator fun invoke(@StringRes id: Int, formatArgs: Array<out Any>): Text =
             StringResource2(id, formatArgs)
 
@@ -47,6 +50,7 @@ sealed interface Text {
          * @param isHtml A flag indicating whether the string is in HTML format. Defaults to false.
          * @return A [Text] object representing the specified string resource.
          */
+        @Deprecated("use the builder fun")
         operator fun invoke(@StringRes id: Int, isHtml: Boolean = false): Text =
             if (isHtml) HtmlResource(id) else StringResource(id)
 
@@ -60,6 +64,7 @@ sealed interface Text {
          * @param quantity The quantity to use for pluralization.
          * @return An instance of [PluralResource] created using the provided parameters.
          */
+        @Deprecated("use the builder fun")
         operator fun invoke(@PluralsRes id: Int, quantity: Int): Text =
             PluralResource(packInts(id, quantity))
 
@@ -71,6 +76,7 @@ sealed interface Text {
          * @param formatArgs Optional format arguments to be applied to the string resource
          * @return A [PluralResource2] text item
          */
+        @Deprecated("use the builder fun")
         operator fun invoke(id: Int, quantity: Int, vararg formatArgs: Any): Text =
             PluralResource2(id, quantity, formatArgs)
     }
@@ -216,7 +222,6 @@ inline val Text.get: CharSequence
 @Composable
 @ReadOnlyComposable
 @NonRestartableComposable
-@Deprecated("Use the extension fun value")
 fun stringResource(value: Text) = value.value
 
 /**
@@ -253,3 +258,28 @@ fun Resources.resolve(text: Text): CharSequence =
 @JvmName("resolve2")
 fun Resources.resolve(text: Text?): CharSequence? =
     if (text == null) null else resolve(text)
+
+/**
+A builder fun that builds a raw [Text] wrapper.
+ */
+fun buildText(value: String): Text = Raw(value)
+
+fun buildText(value: AnnotatedString): Text = Raw(value)
+
+fun buildText(builder: (AnnotatedString.Builder).() -> Unit): Text =
+    Raw(buildAnnotatedString(builder))
+
+fun buildTextResource(@StringRes id: Int): Text =
+    StringResource(id)
+
+fun buildTextResource(@StringRes id: Int, vararg formatArgs: Any): Text =
+    StringResource2(id, formatArgs)
+
+fun buildHtmlResource(@StringRes id: Int): Text =
+    HtmlResource(id)
+
+fun buildPluralResource(@PluralsRes id: Int, quantity: Int): Text =
+    PluralResource(packInts(id, quantity))
+
+fun buildPluralResource(id: Int, quantity: Int, vararg formatArgs: Any): Text =
+    PluralResource2(id, quantity, formatArgs)
