@@ -2,7 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="PrevPref">
+      <entry key="PreviewComposeText">
         <State />
       </entry>
       <entry key="PreviewMaterial2Pref">
@@ -15,9 +15,6 @@
         <State />
       </entry>
       <entry key="app">
-        <State />
-      </entry>
-      <entry key="custom">
         <State />
       </entry>
     </value>

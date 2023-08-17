@@ -20,6 +20,7 @@ import androidx.compose.ui.text.buildAnnotatedString
  */
 @Immutable
 @Stable
+@Deprecated("Use direcly correcponding resource extension funs")
 sealed interface Text {
     companion object {
         /**
@@ -222,6 +223,7 @@ inline val Text.get: CharSequence
 @Composable
 @ReadOnlyComposable
 @NonRestartableComposable
+@Deprecated("Use direcly correcponding resource extension funs")
 fun stringResource(value: Text) = value.value
 
 /**
@@ -231,12 +233,14 @@ fun stringResource(value: Text) = value.value
 @ReadOnlyComposable
 @NonRestartableComposable
 @JvmName("stringResource1")
+@Deprecated("Use direcly correcponding resource extension funs")
 fun stringResource(value: Text?) = value?.value
 
 /**
  * **Note: Doesn't support collecting [HtmlResource] Strings.
  * @param text: The [Text] to collect.
  */
+@Deprecated("Use direcly correcponding resource extension funs")
 fun Resources.resolve(text: Text): CharSequence =
     when (text) {
         is HtmlResource -> error("Not supported when collecting from Resource")
@@ -251,30 +255,38 @@ fun Resources.resolve(text: Text): CharSequence =
  * @see resolve
  */
 @JvmName("resolve2")
+@Deprecated("Use direcly correcponding resource extension funs")
 fun Resources.resolve(text: Text?): CharSequence? =
     if (text == null) null else resolve(text)
 
 /**
 A builder fun that builds a raw [Text] wrapper.
  */
+@Deprecated("Use direcly correcponding resource extension funs")
 fun buildText(value: String): Text = Raw(value)
-
+@Deprecated("Use direcly correcponding resource extension funs")
 fun buildText(value: AnnotatedString): Text = Raw(value)
 
+@Deprecated("Use direcly correcponding resource extension funs")
 fun buildText(builder: (AnnotatedString.Builder).() -> Unit): Text =
     Raw(buildAnnotatedString(builder))
 
+@Deprecated("Use direcly correcponding resource extension funs")
 fun buildTextResource(@StringRes id: Int): Text =
     StringResource(id)
 
+@Deprecated("Use direcly correcponding resource extension funs")
 fun buildTextResource(@StringRes id: Int, vararg formatArgs: Any): Text =
     StringResource2(id, formatArgs)
 
+@Deprecated("Use direcly correcponding resource extension funs")
 fun buildHtmlResource(@StringRes id: Int): Text =
     HtmlResource(id)
 
+@Deprecated("Use direcly correcponding resource extension funs")
 fun buildPluralResource(@PluralsRes id: Int, quantity: Int): Text =
     PluralResource(packInts(id, quantity))
 
+@Deprecated("Use direcly correcponding resource extension funs")
 fun buildPluralResource(id: Int, quantity: Int, vararg formatArgs: Any): Text =
     PluralResource2(id, quantity, formatArgs)

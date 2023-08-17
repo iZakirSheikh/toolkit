@@ -112,20 +112,10 @@ private fun resources(): Resources {
  */
 @Composable
 @ReadOnlyComposable
+@Deprecated("Use direcly correcponding resource extension funs")
 fun stringHtmlResource(@StringRes id: Int): AnnotatedString {
     val resources = resources()
     val density = LocalDensity.current
     val text = resources.getText(id)
     return if (text !is Spanned) AnnotatedString(text.toString()) else text.annotate(density)
-}
-
-
-/**
- * The fun is currently not supported.
- * @see stringHtmlResource
- */
-@Composable
-@ReadOnlyComposable
-fun stringHtmlResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString {
-    TODO(" Not Implemented Yet!")
 }

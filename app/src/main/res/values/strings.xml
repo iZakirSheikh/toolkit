@@ -1,5 +1,88 @@
 <resources>
     <string name="app_name">Toolkit</string>
-
     <string name="test_string_with_arg">string %d</string>
+
+    <string name="sample_annotated_string">
+        This is a <b>sample</b> string with <font face="monospace">different</font> <font size="24">span</font> <span style="font-size: 200%">tags</span>.
+        You can use them to <del>strike</del> or <u>underline</u> text, or make it <sup>super</sup> or <sub>sub</sub> script.
+        You can also change the <font color="blue">foreground</font> or <span style="background-color: green">background</span> color of the text.
+    </string>
+
+    <!--https://android-review.googlesource.com/c/platform/frameworks/support/+/2504055/8/compose/foundation/foundation/integration-tests/foundation-demos/src/main/res/values/donottranslate-strings.xml-->
+    <string name="styled_from_android_source">
+        <b>bold</b>
+        <i>italic</i>
+        <big>big</big>
+        <small>small</small>
+        <font face="monospace">monospace</font>
+        <font face="serif">serif</font>
+        <font face="sans_serif">sans_serif</font>
+        <font face="cursive">cursive</font>
+        <font color="#00ff00">green</font>
+        <tt>tt</tt>
+        <strike>strike</strike>
+        <u>underline</u>
+        <sup>sup</sup>
+        <sub>sub</sub>
+        <span style="color: #ff0000; background-color: #00ff00; text-decoration: line-through">span</span>
+        <p dir="rtl">rtl</p>
+        <p dir="ltr">ltr</p>
+        <div>div</div>
+        <br/>
+      <!--  <a href="https://alphabetworkersunion.org/">link</a> (use TalkBack to see link)-->
+    </string>
+
+    <string name="styled_with_args">
+          <b>%d bold</b>
+        <i>italic</i>
+        <big>big</big>
+        <small>small</small>
+        <font face="monospace">monospace</font>
+        <font face="serif">serif</font>
+        <font face="sans_serif">sans_serif</font>
+        <font face="cursive">cursive</font>
+        <font color="#00ff00">green</font>
+        <tt>tt</tt>
+        <strike>strike</strike>
+        <u>underline</u>
+        <sup>sup</sup>
+        <sub>sub</sub>
+        <span style="color: #ff0000; background-color: #00ff00; text-decoration: line-through">span</span>
+        <p dir="rtl">rtl</p>
+        <p dir="ltr">ltr</p>
+        <div>div</div>
+        <br/>
+        <!--  <a href="https://alphabetworkersunion.org/">link</a> (use TalkBack to see link)-->
+    </string>
+
+    <plurals name="plural_string_with_args">
+        <item quantity="one">1 item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
+    <plurals name="plural_styled_string_with_args">
+        <item quantity="one">1 item</item>
+        <item quantity="other">
+              <b>%d bold</b>
+        <i>italic</i>
+        <big>big</big>
+        <small>small</small>
+        <font face="monospace">monospace</font>
+        <font face="serif">serif</font>
+        <font face="sans_serif">sans_serif</font>
+        <font face="cursive">cursive</font>
+        <font color="#00ff00">green</font>
+        <tt>tt</tt>
+        <strike>strike</strike>
+        <u>underline</u>
+        <sup>sup</sup>
+        <sub>sub</sub>
+        <span style="color: #ff0000; background-color: #00ff00; text-decoration: line-through">span</span>
+        <p dir="rtl">rtl</p>
+        <p dir="ltr">ltr</p>
+        <div>div</div>
+        <br/>
+            <!--  <a href="https://alphabetworkersunion.org/">link</a> (use TalkBack to see link)-->
+        </item>
+    </plurals>
 </resources>
