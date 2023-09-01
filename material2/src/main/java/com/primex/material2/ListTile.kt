@@ -96,6 +96,7 @@ fun ListTile(
     headline: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.surface,
+    onColor: Color = contentColorFor(backgroundColor = color),
     enabled: Boolean = true,
     shape: Shape = RectangleShape,
     subtitle: (@Composable () -> Unit)? = null,
@@ -108,7 +109,6 @@ fun ListTile(
     // Provide color and style to the composable.
     // Also, control the enabling and disabling of this composable.
     val content = @Composable {
-        val onColor = contentColorFor(backgroundColor = color)
         val typography = MaterialTheme.typography
         // Style the compatibles
         CompositionLocalProvider(

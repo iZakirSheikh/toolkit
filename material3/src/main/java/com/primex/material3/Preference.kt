@@ -3,21 +3,16 @@ package com.primex.material3
 
 import android.util.Log
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,14 +20,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.TextButton
@@ -183,6 +175,7 @@ fun SwitchPreference(
     enabled: Boolean = true,
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
+    shape: Shape = DefaultPreferenceShape,
     icon: ImageVector? = null,
     summery: CharSequence? = null,
 ) {
@@ -195,6 +188,7 @@ fun SwitchPreference(
         singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
+        shape = shape,
         summery = summery,
         widget = {
             Switch(enabled = enabled, checked = checked, onCheckedChange = null)
@@ -326,6 +320,7 @@ fun SliderPreference(
     singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
+    shape: Shape = DefaultPreferenceShape,
     summery: CharSequence? = null,
     forceVisible: Boolean = false,
     iconChange: ImageVector? = null,
@@ -395,6 +390,7 @@ fun SliderPreference(
         singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
+        shape = shape,
         forceVisible = forceVisible,
         summery = summery,
         widget = preview,
@@ -418,6 +414,7 @@ fun TextFieldPreference(
     summery: CharSequence? = null,
     forceVisible: Boolean = false,
     maxLines: Int = 1,
+    shape: Shape = DefaultPreferenceShape,
     leadingFieldIcon: ImageVector? = null,
     label: CharSequence? = null,
     placeholder: CharSequence? = null,
@@ -471,6 +468,7 @@ fun TextFieldPreference(
         singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
+        shape = shape,
         forceVisible = forceVisible,
         summery = summery,
         widget = preview,

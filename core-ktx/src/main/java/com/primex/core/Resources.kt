@@ -12,19 +12,22 @@ import android.text.style.StyleSpan
 import android.text.style.SubscriptSpan
 import android.text.style.SuperscriptSpan
 import android.text.style.TypefaceSpan
+import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
 import androidx.annotation.ArrayRes
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.UrlAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -87,7 +90,7 @@ private inline val StyleSpan.toSpanStyle: SpanStyle
  */
 
 @ExperimentalTextApi
-private fun Spanned.toAnnotatedString() =
+internal fun Spanned.toAnnotatedString() =
     buildAnnotatedString {
         val text = this@toAnnotatedString
         // append the string and
@@ -114,7 +117,12 @@ private fun Spanned.toAnnotatedString() =
                 is ForegroundColorSpan -> SpanStyle(color = Color(span.foregroundColor))
                 // no idea wh this not works with html
                 is BackgroundColorSpan -> SpanStyle(background = Color(span.backgroundColor))
-                else -> /*SpanStyle()*/ error("$span not supported")
+                is URLSpan -> {
+                    UrlAnnotation(span.url)
+                    SpanStyle(color = Color.SkyBlue, textDecoration = TextDecoration.Underline)
+                }
+
+                else -> /*SpanStyle()*/ SpanStyle() // FixMe - unsupported span_ just ignore.
             }
             addStyle(style, start, end)
         }
@@ -132,7 +140,7 @@ private fun Spanned.toAnnotatedString() =
  * @throws IllegalStateException If the receiver is an unsupported type of char sequence.
  */
 @ExperimentalTextApi
-private fun CharSequence.format(vararg args: Any): CharSequence {
+internal fun CharSequence.format(vararg args: Any): CharSequence {
     // if args is empty early return
     if (args.isEmpty()) return this
     return when (val text = this) {
@@ -151,10 +159,33 @@ private fun CharSequence.format(vararg args: Any): CharSequence {
 }
 
 /**
- * An extension function on [Resources] that allows to dynamically insert arguments into raw as well
- * as styled strings.
- * This function uses [CharSequence.format] to format the string resource with the given arguments,
- * and then converts it to an [AnnotatedString] if it is a [Spanned] object.
+ * An extension function that returns a formatted string with the given arguments and preserves the style information.
+ * This function is useful for creating dynamic texts with formatting from string resources.
+ * @param id The resource id of the string to format.
+ * @param args The arguments to replace the format specifiers in the string.
+ * @return A spanned or a string that contains the formatted text with the style information.
+ */
+@ExperimentalTextApi
+fun Resources.getText(@StringRes id: Int, vararg args: Any): CharSequence =
+    getText(id).format(*args)
+
+/**
+ * An extension function that returns a formatted string for the given quantity and arguments and preserves the style information.
+ * This function is useful for creating dynamic texts with formatting from plural resources.
+ * @param id The resource id of the plural to format.
+ * @param quantity The number used to select the correct string for the current language's plural rules.
+ * @param args The arguments to replace the format specifiers in the plural string.
+ * @return A spanned or a string that contains the formatted text with the style information.
+ */
+@OptIn(ExperimentalTextApi::class)
+fun Resources.getQuantityText(@PluralsRes id: Int, quantity: Int, vararg args: Any): CharSequence =
+    getQuantityText(id, quantity).format(*args)
+
+/**
+ * An extension function on [Resources] that returns [AnnotatedString] or [String] provided if the resource is [String] or [Spanned].
+ *
+ * The following HTML tags are currently supported by this function, others are ignored:
+ *
  * ```
  * <string name="styled_with_args">
  *         <b>bold</b>
@@ -176,13 +207,28 @@ private fun CharSequence.format(vararg args: Any): CharSequence {
  *         <p dir="ltr">ltr</p>
  *         <div>div</div>
  *         <br/>
- *         <!--  <a href="https://alphabetworkersunion.org/">link</a> (use TalkBack to see link)-->
+ *         This is a text with a <a href="https://www.bing.com">URL</a> span.
  *     </string>
  * ```
  * @receiver The [Resources] object to get the string resource from.
  * @param id The resource ID of the string to be formatted.
+ * @return A formatted [CharSequence], either a [String] or an [AnnotatedString], depending on the type of the string resource.
+ * @throws Resources.NotFoundException If the given ID does not exist
+ */
+@ExperimentalTextApi
+fun Resources.getText2(@StringRes id: Int): CharSequence =
+    when (val formatted = getText(id)) {
+        is String -> formatted
+        is Spanned -> formatted.toAnnotatedString()
+        else -> error("$formatted is some other type of string.")
+    }
+
+/**
+ * @see getText2
+ * @receiver The [Resources] object to get the string resource from.
+ * @param id The resource ID of the string to be formatted.
  * @param args The arguments to be used in the format string, or empty if none.
- * @return A formatted char sequence, either a [String] or an [AnnotatedString], depending on the type of the string resource.
+ * @return A formatted [CharSequence], either a [String] or an [AnnotatedString], depending on the type of the string resource.
  * @throws Resources.NotFoundException If the given ID does not exist.
  * @throws IllegalArgumentException If the formatted char sequence is neither a [String] nor a [Spanned].
  */
@@ -195,40 +241,14 @@ fun Resources.getText2(@StringRes id: Int, vararg args: Any): CharSequence =
     }
 
 /**
- * @see getText2
- */
-@OptIn(ExperimentalTextApi::class)
-fun Resources.getText2(@StringRes id: Int): CharSequence =
-    when (val formatted = getText(id)) {
-        is String -> formatted
-        is Spanned -> formatted.toAnnotatedString()
-        else -> error("$formatted is some other type of string.")
-    }
-
-/**
- * An extension function on [Resources] that allows to dynamically insert arguments into raw as well
- * as styled strings.
- * This function uses [CharSequence.format] to format the string resource with the given arguments,
- * and then converts it to an [AnnotatedString] if it is a [Spanned] object.
+ * An extension function on [Resources] that returns styled [AnnotatedString] or simple string based on if the original is [Spanned] or simple string.
  *
  * @receiver The [Resources] object to get the string resource from.
  * @param id The resource ID of the string to be formatted.
  * @param quantity The number used to select the correct string for the current language's plural rules.
- * @param args The arguments to be used in the format string, or empty if none.
- * @return A formatted CharSequence, either a [String] or an [AnnotatedString], depending on the type of the string resource.
+ * @return A formatted [CharSequence], either a [String] or an [AnnotatedString], depending on the type of the string resource.
  * @throws Resources.NotFoundException If the given ID does not exist.
  * @throws IllegalStateException If the formatted char sequence is neither a [String] nor a [Spanned].
- */
-@ExperimentalTextApi
-fun Resources.getQuantityText2(@PluralsRes id: Int, quantity: Int, vararg args: Any): CharSequence =
-    when (val text = getQuantityText(id, quantity).format(*args)) {
-        is String -> text
-        is Spanned -> text.toAnnotatedString()
-        else -> error("$text is some other type of string.")
-    }
-
-/**
- * @see getQuantityText2
  */
 @ExperimentalTextApi
 fun Resources.getQuantityText2(@PluralsRes id: Int, quantity: Int): CharSequence =
@@ -238,6 +258,31 @@ fun Resources.getQuantityText2(@PluralsRes id: Int, quantity: Int): CharSequence
         else -> error("$text is some other type of string.")
     }
 
+/**
+ * @param args The arguments to be used in the format string, or empty if none.
+ * @see getQuantityText2
+ */
+@ExperimentalTextApi
+fun Resources.getQuantityText2(@PluralsRes id: Int, quantity: Int, vararg args: Any): CharSequence =
+    when (val text = getQuantityText(id, quantity).format(*args)) {
+        is String -> text
+        is Spanned -> text.toAnnotatedString()
+        else -> error("$text is some other type of string.")
+    }
+
+@ExperimentalTextApi
+fun Resources.getTextArray2(@ArrayRes id: Int): Array<CharSequence> {
+    val array = getTextArray(id)
+    for (i in array.indices) {
+        array[i] = when (val text = array[i]) {
+            is String -> text
+            is Spanned -> text.toAnnotatedString()
+            else -> error("$text is some other type of string.")
+        }
+    }
+    return array
+}
+
 @Composable
 @ReadOnlyComposable
 private fun resources(): Resources {
@@ -246,64 +291,77 @@ private fun resources(): Resources {
 }
 
 /**
+ * @see getText2
+ * @param id The resource ID of the string to be formatted.
+ * @return A formatted char sequence, either a [String] or an [AnnotatedString], depending on the type of the string resource.
+ */
+@Composable
+@ExperimentalTextApi
+@NonRestartableComposable
+fun textResource(@StringRes id: Int): CharSequence {
+    val resources = resources()
+    return when (val formatted = resources.getText(id)) {
+        is String -> formatted
+        is Spanned -> remember(key1 = id, calculation = formatted::toAnnotatedString)
+        else -> error("$formatted is some other type of string.")
+    }
+}
+
+
+/**
  * Gets a string resource with the given ID and formats it with the given arguments.
- * This function is a composable version of [Resources.getText2] that supports both raw and styled strings.
- * If the string resource is a [Spanned] object, it converts it to an [AnnotatedString] using [Spanned.toAnnotatedString].
- *
- * @param id The resource ID of the string to be formatted.
  * @param args The arguments to be used in the format string, or empty if none.
- * @return A formatted char sequence, either a [String] or an [AnnotatedString], depending on the type of the string resource.
+ * @see textResource
+ * @see getText2
  */
 @Composable
-@ReadOnlyComposable
+@NonRestartableComposable
 @ExperimentalTextApi
-fun stringResource2(@StringRes id: Int, vararg args: Any): CharSequence {
+fun textResource(@StringRes id: Int, vararg args: Any): CharSequence {
     val resources = resources()
-    return resources.getText2(id, *args)
+    return when (val formatted = resources.getText(id).format(*args)) {
+        is String -> formatted
+        is Spanned -> remember(key1 = id, key2 = args, calculation = formatted::toAnnotatedString)
+        else -> error("$formatted is some other type of string.")
+    }
 }
 
-/**
- * @see stringResource2
- */
 @Composable
-@ReadOnlyComposable
+@NonRestartableComposable
 @ExperimentalTextApi
-fun stringResource2(@StringRes id: Int): CharSequence {
+fun pluralTextResource(@PluralsRes id: Int, quantity: Int, vararg args: Any): CharSequence {
     val resources = resources()
-    return resources.getText2(id)
+    return when (val text = resources.getQuantityText(id, quantity).format(*args)) {
+        is String -> text
+        is Spanned -> remember(
+            key1 = id,
+            key2 = quantity,
+            key3 = args,
+            calculation = text::toAnnotatedString
+        )
+
+        else -> error("$text is some other type of string.")
+    }
 }
 
-/**
- * Gets a quantity string resource with the given ID and quantity and formats it with the given arguments.
- * This function is a composable version of [Resources.getQuantityString2] that supports both raw and styled strings.
- * If the string resource is a [Spanned] object, it converts it to an [AnnotatedString] using [Spanned.toAnnotatedString].
- *
- * @param id The resource ID of the string to be formatted.
- * @param quantity The number used to select the correct string for the current language's plural rules.
- * @param args The arguments to be used in the format string, or empty if none.
- * @return A formatted char sequence, either a [String] or an [AnnotatedString], depending on the type of the string resource.
- */
 @Composable
+@NonRestartableComposable
 @ExperimentalTextApi
-fun pluralStringResource2(@PluralsRes id: Int, quantity: Int, vararg args: Any): CharSequence {
+fun pluralTextResource(@PluralsRes id: Int, quantity: Int): CharSequence {
     val resources = resources()
-    return resources.getQuantityText2(id, quantity, *args)
+    return when (val text = resources.getQuantityText(id, quantity)) {
+        is String -> text
+        is Spanned -> remember(key1 = id, key2 = quantity, calculation = text::toAnnotatedString)
+        else -> error("$text is some other type of string.")
+    }
 }
 
-/**
- * @see pluralStringResource2
- */
 @Composable
+@NonRestartableComposable
 @ExperimentalTextApi
-fun pluralStringResource2(@PluralsRes id: Int, quantity: Int): CharSequence {
+fun textArrayResource(@ArrayRes id: Int): Array<CharSequence> {
     val resources = resources()
-    return resources.getQuantityText2(id, quantity)
+    return remember(id) {
+        resources.getTextArray2(id)
+    }
 }
-
-/**
- * This might be replaced in future with new that takes vargar and returns styled strings.
- */
-@Composable
-@ReadOnlyComposable
-inline fun stringArrayResource2(@ArrayRes id: Int): Array<String> = stringArrayResource(id = id)
-

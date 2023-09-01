@@ -28,8 +28,8 @@
         <p dir="rtl">rtl</p>
         <p dir="ltr">ltr</p>
         <div>div</div>
-        <br/>
-      <!--  <a href="https://alphabetworkersunion.org/">link</a> (use TalkBack to see link)-->
+        <br />
+        <!--  <a href="https://alphabetworkersunion.org/">link</a> (use TalkBack to see link)-->
     </string>
 
     <string name="styled_with_args">
@@ -51,7 +51,7 @@
         <p dir="rtl">rtl</p>
         <p dir="ltr">ltr</p>
         <div>div</div>
-        <br/>
+        <br />
         <!--  <a href="https://alphabetworkersunion.org/">link</a> (use TalkBack to see link)-->
     </string>
 
@@ -60,10 +60,8 @@
         <item quantity="other">%d items</item>
     </plurals>
 
-    <plurals name="plural_styled_string_with_args">
-        <item quantity="one">1 item</item>
-        <item quantity="other">
-              <b>%d bold</b>
+    <string name="styled_string">
+            <b>%d bold</b>
         <i>italic</i>
         <big>big</big>
         <small>small</small>
@@ -77,12 +75,29 @@
         <u>underline</u>
         <sup>sup</sup>
         <sub>sub</sub>
-        <span style="color: #ff0000; background-color: #00ff00; text-decoration: line-through">span</span>
+        <span style="color: #ff0000; background-color: #00ffff; text-decoration: line-through">span</span>
         <p dir="rtl">rtl</p>
         <p dir="ltr">ltr</p>
         <div>div</div>
-        <br/>
-            <!--  <a href="https://alphabetworkersunion.org/">link</a> (use TalkBack to see link)-->
-        </item>
+        <br />
+        <!--  <a href="https://alphabetworkersunion.org/">link</a> (use TalkBack to see link)-->
+        This is a text with a <a href="https://www.bing.com">URL</a> span.
+    </string>
+    <plurals name="plural_styled_string_with_args">
+        <item quantity="one">1 item</item>
+        <item quantity="other">@string/styled_string</item>
     </plurals>
+
+    <!-- Define a string array resource named "colors" -->
+    <string-array name="colors">
+        <!-- Add the values for the string array -->
+        <item>@string/styled_string</item>
+        <item>Green</item>
+        <item>Blue</item>
+    </string-array>
+
+    <string name="text_with_url">This is a text with a <a href="https://www.bing.com">URL</a> span.</string>
+
+    <string name="snackbar_msg"><b><big>Title</big>\n</b><br/>This is a desc of the fake snackbar message, please follow the good practices for creating avalid <font color="#00ff00">snackbar</font> message. You can also use styles in the message to make it even more fun.</string>
+    <string name="snackbar_msg_short"><b><big>Title</big>\n</b><br/>This is a short sample message</string>
 </resources>

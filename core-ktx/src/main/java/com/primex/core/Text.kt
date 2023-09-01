@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTextApi::class)
+
 package com.primex.core
 
 import android.content.res.Resources
@@ -7,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.buildAnnotatedString
 
 
@@ -196,23 +199,21 @@ val Text.raw: Any
  */
 val Text.value: CharSequence
     @Composable
-    @ReadOnlyComposable
     @NonRestartableComposable
     get() = when (this) {
-        is HtmlResource -> stringHtmlResource(id = this.id)
+        is HtmlResource -> textResource(id = this.id)
         is PluralResource ->
-            pluralStringResource(id = this.id, count = this.quantity)
+            pluralTextResource(id = this.id, quantity = this.quantity)
 
-        is PluralResource2 -> pluralStringResource(this.id, this.quantity, *this.formatArgs)
+        is PluralResource2 -> pluralTextResource(this.id, this.quantity, *this.formatArgs)
         is Raw -> this.value
-        is StringResource -> stringResource(id = id)
-        is StringResource2 -> stringResource(id, *formatArgs)
+        is StringResource -> textResource(id = id)
+        is StringResource2 -> textResource(id, *formatArgs)
     }
 
 @Deprecated("Use value Text.value instead.")
 inline val Text.get: CharSequence
     @Composable
-    @ReadOnlyComposable
     @NonRestartableComposable
     inline get() = value
 
@@ -221,7 +222,6 @@ inline val Text.get: CharSequence
  * @see Text.value
  */
 @Composable
-@ReadOnlyComposable
 @NonRestartableComposable
 @Deprecated("Use direcly correcponding resource extension funs")
 fun stringResource(value: Text) = value.value
@@ -230,7 +230,6 @@ fun stringResource(value: Text) = value.value
  * @see Text.value
  */
 @Composable
-@ReadOnlyComposable
 @NonRestartableComposable
 @JvmName("stringResource1")
 @Deprecated("Use direcly correcponding resource extension funs")
@@ -241,7 +240,7 @@ fun stringResource(value: Text?) = value?.value
  * @param text: The [Text] to collect.
  */
 @Deprecated("Use direcly correcponding resource extension funs")
-fun Resources.resolve(text: Text): CharSequence =
+private fun Resources.resolve(text: Text): CharSequence =
     when (text) {
         is HtmlResource -> error("Not supported when collecting from Resource")
         is PluralResource -> getQuantityString(text.id, text.quantity)
@@ -256,7 +255,7 @@ fun Resources.resolve(text: Text): CharSequence =
  */
 @JvmName("resolve2")
 @Deprecated("Use direcly correcponding resource extension funs")
-fun Resources.resolve(text: Text?): CharSequence? =
+private fun Resources.resolve(text: Text?): CharSequence? =
     if (text == null) null else resolve(text)
 
 /**
