@@ -1,14 +1,13 @@
 package com.primex.material2
 
 import android.R
+import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,33 +18,48 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Checkbox
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Slider
 import androidx.compose.material.Switch
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.primex.core.acquireFocusOnInteraction
 import com.primex.core.composableOrNull
 import com.primex.core.rememberState
 
@@ -88,14 +102,32 @@ fun Preference(
     revealable: (@Composable () -> Unit)? = null,
     forceVisible: Boolean = false,
 ) {
-    // The only difference is that we are using the new ListTile.
-    val interactionSource = remember(::MutableInteractionSource)
-    val listModifier = when (forceVisible || !enabled) {
+    var focusable by remember { mutableStateOf(forceVisible) }
+    val manager = LocalFocusManager.current
+    // Use normal modifier when
+    // forceVisible = true.
+    // Not enabled
+    // revealable == null
+    val listModifier = when (forceVisible || !enabled || revealable == null) {
         true -> modifier
-        else -> Modifier
-            .acquireFocusOnInteraction(interactionSource, LocalIndication.current)
-            .then(modifier)
-            .animateContentSize()
+        else -> {
+            val requester = remember(::FocusRequester)
+            Modifier
+                .focusRequester(requester)
+                .onFocusChanged { focusable = it.hasFocus }
+                .focusTarget()
+                // .pointerInput(Unit) { detectTapGestures {  } }
+                .onPreviewKeyEvent {
+                    Log.d(TAG, "Preference: $it")
+                    if (it.key != Key.Back)
+                        return@onPreviewKeyEvent false
+                    manager.clearFocus()
+                    true
+                }
+                .clickable { requester.requestFocus() }
+                .then(modifier)
+                .animateContentSize()
+        }
     }
     ListTile(
         modifier = listModifier,
@@ -127,11 +159,7 @@ fun Preference(
         },
         // show footer in case available.
         footer = composableOrNull(revealable != null) {
-            val expanded by when (forceVisible) {
-                true -> rememberState(initial = true)
-                else -> interactionSource.collectIsFocusedAsState()
-            }
-            Crossfade(targetState = expanded, label = TAG) { value ->
+            Crossfade(targetState = focusable, label = TAG) { value ->
                 if (value) revealable?.invoke()
             }
         }
@@ -359,7 +387,6 @@ private fun TextButtons(
         TextButton(onClick = onCancelClick) {
             Label(text = stringResource(id = R.string.cancel))
         }
-
         TextButton(onClick = onConfirmClick) {
             Label(text = stringResource(id = R.string.ok))
         }
@@ -381,6 +408,7 @@ fun SliderPreference(
     summery: CharSequence? = null,
     forceVisible: Boolean = false,
     iconChange: ImageVector? = null,
+    preview: (@Composable () -> Unit)? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
 ) {
 
@@ -448,7 +476,82 @@ fun SliderPreference(
         icon = icon,
         forceVisible = forceVisible,
         summery = summery,
-        widget = null,
+        widget = preview,
+        revealable = revealable
+    )
+}
+
+private val TextFieldShape = RoundedCornerShape(10)
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun TextFieldPreference(
+    title: CharSequence,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    singleLineTitle: Boolean = true,
+    iconSpaceReserved: Boolean = true,
+    icon: ImageVector? = null,
+    summery: CharSequence? = null,
+    forceVisible: Boolean = false,
+    maxLines: Int = 1,
+    leadingFieldIcon: ImageVector? = null,
+    label: CharSequence? = null,
+    placeholder: CharSequence? = null,
+    preview: (@Composable () -> Unit)? = null,
+) {
+    val manager = LocalFocusManager.current
+    val revealable = @Composable {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .padding(start = (if (iconSpaceReserved) 24.dp + 8.dp else 8.dp) + 8.dp, end = 8.dp)
+                .fillMaxWidth(),
+            maxLines = maxLines,
+            label = composableOrNull(label != null) {
+                Label(text = label ?: "")
+            },
+            placeholder = composableOrNull(placeholder != null) {
+                Text(text = placeholder ?: "")
+            },
+            shape = TextFieldShape,
+            singleLine = maxLines == 1,
+            leadingIcon = composableOrNull(leadingFieldIcon != null) {
+                Icon(
+                    imageVector = leadingFieldIcon ?: Icons.Default.Create,
+                    contentDescription = null
+                )
+            },
+            trailingIcon = {
+                IconButton(
+                    imageVector = Icons.Default.Close,
+                    onClick = {
+                        if (value.text.isEmpty())
+                            if (!forceVisible) manager.clearFocus(true)
+                            else onValueChange(TextFieldValue(""))
+                    }
+                )
+            },
+            keyboardActions = KeyboardActions(
+                onDone = { if (!forceVisible) manager.clearFocus(true) }
+            ),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+        )
+    }
+    // Actual Host
+    Preference(
+        modifier = modifier,
+        title = title,
+        enabled = enabled,
+        singleLineTitle = singleLineTitle,
+        iconSpaceReserved = iconSpaceReserved,
+        icon = icon,
+        forceVisible = forceVisible,
+        summery = summery,
+        widget = preview,
         revealable = revealable
     )
 }

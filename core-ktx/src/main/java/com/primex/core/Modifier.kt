@@ -185,7 +185,7 @@ fun Modifier.gradient(
  * @since 1.0.0
  * @author Zakir Sheikh
  */
-fun Modifier.rotate(
+fun Modifier.rotateTransform(
     clockwise: Boolean
 ): Modifier {
     val transform = Modifier.layout { measurable, constraints ->
@@ -220,6 +220,8 @@ fun Modifier.rotate(
         .then(rotated)
 }
 
+@Deprecated("Use the rotateTransform instead.")
+inline fun Modifier.rotate(clockwise: Boolean) = rotateTransform(clockwise)
 
 /**
  * This modifier acquires focus to this widget as soon as the user clicks on it.
@@ -402,6 +404,7 @@ fun Modifier.drawVerticalDivider(
  * @since 1.0.0
  */
 @Stable
+@Deprecated("Don't use it as it casues confusion.")
 fun Modifier.padding(horizontal: Dp, top: Dp = 0.dp, bottom: Dp = 0.dp) =
     this.then(
         Modifier.padding(

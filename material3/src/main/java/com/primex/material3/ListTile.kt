@@ -23,7 +23,7 @@ private const val TAG = "ListTile"
 
 private val LIST_TILE_START_PADDING = 16.dp
 private val LIST_TILE_VERTICAL_PADDING = 8.dp
-private val LIST_TILE_END_PADDING = 24.dp
+private val LIST_TILE_END_PADDING = 16.dp
 private val LIST_ITEM_THREE_LINE_VERTICAL_PADDING = 12.dp
 
 // Icon related defaults.

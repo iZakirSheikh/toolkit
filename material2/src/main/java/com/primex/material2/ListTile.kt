@@ -57,7 +57,7 @@ inline fun ListTile(
 
 private val LIST_TILE_START_PADDING = 16.dp
 private val LIST_TILE_VERTICAL_PADDING = 8.dp
-private val LIST_TILE_END_PADDING = 24.dp
+private val LIST_TILE_END_PADDING = 16.dp
 private val LIST_ITEM_THREE_LINE_VERTICAL_PADDING = 12.dp
 
 // Icon related defaults.
@@ -96,6 +96,7 @@ fun ListTile(
     headline: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.surface,
+    onColor: Color = contentColorFor(backgroundColor = color),
     enabled: Boolean = true,
     shape: Shape = RectangleShape,
     subtitle: (@Composable () -> Unit)? = null,
@@ -108,7 +109,6 @@ fun ListTile(
     // Provide color and style to the composable.
     // Also, control the enabling and disabling of this composable.
     val content = @Composable {
-        val onColor = contentColorFor(backgroundColor = color)
         val typography = MaterialTheme.typography
         // Style the compatibles
         CompositionLocalProvider(

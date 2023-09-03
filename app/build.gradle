@@ -54,6 +54,7 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation('androidx.compose.material3:material3:1.2.0-alpha06')
     implementation project(path: ':core-ktx')
     implementation project(path: ':material2')
     implementation project(path: ':preferences')
@@ -64,5 +65,4 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
-
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -22,7 +23,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-
+/*
 private inline val TypefaceSpan.toSpanStyle: SpanStyle
     get() = SpanStyle(
         fontFamily = when (family) {
@@ -48,9 +49,9 @@ private inline val StyleSpan.toSpanStyle: SpanStyle
         }
     }
 
-/**
+*//**
  * Helper function for converting [Spanned] to [AnnotatedString]
- */
+ *//*
 private fun Spanned.annotate(density: Density) =
     buildAnnotatedString {
         with(density) {
@@ -80,12 +81,12 @@ private fun Spanned.annotate(density: Density) =
                     is ForegroundColorSpan -> SpanStyle(color = Color(span.foregroundColor))
                     // no idea wh this not works with html
                     is BackgroundColorSpan -> SpanStyle(background = Color(span.backgroundColor))
-                    else -> /*SpanStyle()*/ error("$span not supported")
+                    else -> *//*SpanStyle()*//* SpanStyle()
                 }
                 addStyle(style, start, end)
             }
         }
-    }
+    }*/
 
 
 /**
@@ -110,22 +111,12 @@ private fun resources(): Resources {
  * @param id The resource ID of the string containing HTML content.
  * @return An [AnnotatedString] object representing the HTML content of the string resource.
  */
+@OptIn(ExperimentalTextApi::class)
 @Composable
 @ReadOnlyComposable
+@Deprecated("Use new funs called as textResource.")
 fun stringHtmlResource(@StringRes id: Int): AnnotatedString {
     val resources = resources()
-    val density = LocalDensity.current
     val text = resources.getText(id)
-    return if (text !is Spanned) AnnotatedString(text.toString()) else text.annotate(density)
-}
-
-
-/**
- * The fun is currently not supported.
- * @see stringHtmlResource
- */
-@Composable
-@ReadOnlyComposable
-fun stringHtmlResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString {
-    TODO(" Not Implemented Yet!")
+    return if (text !is Spanned) AnnotatedString(text.toString()) else text.toAnnotatedString()
 }
