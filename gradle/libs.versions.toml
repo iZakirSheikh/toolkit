@@ -1,0 +1,42 @@
+[versions]
+compose = "1.6.0-beta03"
+compose-compiler = "1.5.7"
+compose-material3 = "1.2.0-beta01"
+core-ktx = "1.12.0"
+koltin-version = "1.9.21"
+lifecycle-runtime-ktx = "2.6.2"
+compose-activity = "1.8.2"
+maven-publish = "0.0.0"
+agp = "8.2.1"
+material-view = "1.9.0"
+preferences = "1.0.0"
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "koltin-version" }
+maven-publish = { id = "maven-publish", version.ref = "maven-publish" }
+
+[libraries]
+compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose_material3" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
+compose-preview = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+compose-ui-util = { module = "androidx.compose.ui:ui-util", version.ref = "compose" }
+compose-foundation-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "compose" }
+
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
+material-view = { module = "com.google.android.material:material", version.ref = "material-view" }
+preferences = {module = "androidx.datastore:datastore-preferences", version.ref = "preferences"}
+#  // Text Dependencies
+#  // TODO: Implement proper tests in the future.
+#  //  Note: Due to current hardware limitations (low memory and processing power), this task can only be accomplished
+
+
+
+

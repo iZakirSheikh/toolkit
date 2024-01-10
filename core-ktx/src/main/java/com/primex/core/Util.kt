@@ -337,14 +337,14 @@ inline fun <R : Any> AnnotatedString.Builder.withSpanStyle(
  *  @see ParagraphStyle
  */
 inline fun <R : Any> AnnotatedString.Builder.withParagraphStyle(
-    textAlign: TextAlign? = null,
-    textDirection: TextDirection? = null,
+    textAlign: TextAlign = TextAlign.Unspecified,
+    textDirection: TextDirection = TextDirection.Unspecified,
     lineHeight: TextUnit = TextUnit.Unspecified,
     textIndent: TextIndent? = null,
     platformStyle: PlatformParagraphStyle? = null,
     lineHeightStyle: LineHeightStyle? = null,
-    lineBreak: LineBreak? = null,
-    hyphens: Hyphens? = null,
+    lineBreak: LineBreak = LineBreak.Unspecified,
+    hyphens: Hyphens = Hyphens.Unspecified,
     textMotion: TextMotion? = null,
     crossinline block: AnnotatedString.Builder.() -> R
 ): R = withStyle(

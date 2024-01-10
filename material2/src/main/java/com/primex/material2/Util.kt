@@ -91,7 +91,7 @@ inline fun ProvideTextStyle(
                 color = color.copy(alpha),
                 fontSize = fontSize,
                 fontWeight = fontWeight,
-                textAlign = textAlign,
+                textAlign = TextAlign.Unspecified,
                 lineHeight = lineHeight,
                 fontFamily = fontFamily,
                 textDecoration = textDecoration,
