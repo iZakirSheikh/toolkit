@@ -56,6 +56,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.composableOrNull
 import com.primex.core.rememberState
 
@@ -86,6 +87,7 @@ private val DefaultPreferenceShape = RectangleShape
  * @param revealable The content that is hide/show on users request.
  * @param forceVisible if true make [revealable] content show/hide.
  */
+@ExperimentalToolkitApi
 @Composable
 fun Preference(
     title: CharSequence,
@@ -166,6 +168,7 @@ fun Preference(
     )
 }
 
+@ExperimentalToolkitApi
 @Composable
 fun SwitchPreference(
     title: CharSequence,
@@ -196,6 +199,7 @@ fun SwitchPreference(
     )
 }
 
+@ExperimentalToolkitApi
 @Composable
 fun <T> DropDownPreference(
     title: CharSequence,
@@ -309,6 +313,7 @@ private fun TextButtons(
     }
 }
 
+@ExperimentalToolkitApi
 @Composable
 fun SliderPreference(
     title: CharSequence,
@@ -400,6 +405,7 @@ fun SliderPreference(
 
 private val TextFieldShape = RoundedCornerShape(10)
 
+@ExperimentalToolkitApi
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TextFieldPreference(

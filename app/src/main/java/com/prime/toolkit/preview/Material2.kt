@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalToolkitApi::class)
+
 package com.prime.toolkit.preview
 
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.rememberState
 import com.primex.material2.Label
 import com.primex.material2.SliderPreference

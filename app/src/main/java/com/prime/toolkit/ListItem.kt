@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalToolkitApi::class)
+
 package com.prime.toolkit
 
 import androidx.compose.foundation.clickable
@@ -15,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 import com.primex.material2.ListTile
 
 @Preview(widthDp = 360)

@@ -23,6 +23,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.shadow.SpotLight
 import com.primex.core.shadow.shadow
 
@@ -32,8 +33,10 @@ private val DefaultNeumorphicShape = RoundedCornerShape(0)
 internal val DefaultLightShadowColor = Color.White.copy(0.8f)
 internal val DefaultDarkShadowColor = Color(0xFFA6B4C8).copy(0.7f)
 
+@ExperimentalToolkitApi
 internal val DefaultSpotLight = SpotLight.TOP_LEFT
 
+@ExperimentalToolkitApi
 @Composable
 fun Neumorphic(
     modifier: Modifier = Modifier,
@@ -71,6 +74,7 @@ fun Neumorphic(
     }
 }
 
+@ExperimentalToolkitApi
 @ExperimentalMaterialApi
 @Composable
 fun Neumorphic(
@@ -117,6 +121,7 @@ fun Neumorphic(
     }
 }
 
+@ExperimentalToolkitApi
 @ExperimentalMaterialApi
 @Composable
 fun Neumorphic(
@@ -166,6 +171,7 @@ fun Neumorphic(
 }
 
 
+@ExperimentalToolkitApi
 @ExperimentalMaterialApi
 @Composable
 fun Neumorphic(

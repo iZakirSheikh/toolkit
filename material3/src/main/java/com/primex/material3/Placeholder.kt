@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 
 private const val TAG = "Placeholder"
 
@@ -29,6 +30,7 @@ private val PLACE_HOLDER_ICON_BOX_DEFAULT_SIZE = 56.dp
  * Composes a vertical [Placeholder] layout.
  */
 @Composable
+@ExperimentalToolkitApi
 private fun Vertical(
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
@@ -162,6 +164,7 @@ private fun Horizontal(
 
 @Composable
 @NonRestartableComposable
+@ExperimentalToolkitApi
 fun Placeholder(
     vertical: Boolean,
     modifier: Modifier = Modifier,

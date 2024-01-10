@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 
 private const val TAG = "ListTile"
 
@@ -29,6 +30,7 @@ private const val TAG = "ListTile"
  */
 @Composable
 @Deprecated("Use the new ListTile.")
+@ExperimentalToolkitApi
 inline fun ListTile(
     modifier: Modifier = Modifier,
     selected: Boolean = false,
@@ -92,6 +94,7 @@ private val LIST_ITEM_THREE_LINE_CONTAINER_HEIGHT = 88.0.dp
  *
  */
 @Composable
+@ExperimentalToolkitApi
 fun ListTile(
     headline: @Composable () -> Unit,
     modifier: Modifier = Modifier,

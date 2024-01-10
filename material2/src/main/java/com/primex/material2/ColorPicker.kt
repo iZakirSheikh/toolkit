@@ -9,9 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 
 
 @Composable
+@ExperimentalToolkitApi
 fun ColorPicker(
     entries: List<Color>,
     checked: Color,

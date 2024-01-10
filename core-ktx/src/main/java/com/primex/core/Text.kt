@@ -21,6 +21,7 @@ import androidx.compose.ui.text.buildAnnotatedString
  */
 @Immutable
 @Stable
+@ExperimentalToolkitApi
 sealed interface Text {
     companion object {
         /**
@@ -81,6 +82,7 @@ sealed interface Text {
 /**
  * A Raw text. i.e., [String]
  */
+@ExperimentalToolkitApi
 @JvmInline
 @Immutable
 private value class Raw(val value: CharSequence) : Text
@@ -88,6 +90,7 @@ private value class Raw(val value: CharSequence) : Text
 /**
  * Constructs an [StringResource] String [Text] wrapper.
  */
+@ExperimentalToolkitApi
 @JvmInline
 @Immutable
 private value class StringResource(val id: Int) : Text
@@ -95,6 +98,7 @@ private value class StringResource(val id: Int) : Text
 /**
  * A data class holding [Resource] String with [formatArgs]
  */
+@ExperimentalToolkitApi
 private data class StringResource2(val id: Int, val formatArgs: Array<out Any>) : Text {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -121,6 +125,7 @@ private data class StringResource2(val id: Int, val formatArgs: Array<out Any>) 
  */
 @JvmInline
 @Immutable
+@ExperimentalToolkitApi
 private value class HtmlResource(@StringRes val id: Int) : Text
 
 /**
@@ -128,6 +133,7 @@ private value class HtmlResource(@StringRes val id: Int) : Text
  */
 @JvmInline
 @Immutable
+@ExperimentalToolkitApi
 private value class PluralResource(val packedValue: Long) : Text {
 
     @Stable
@@ -143,6 +149,7 @@ private value class PluralResource(val packedValue: Long) : Text {
 /**
  * A data class holds [Plural] resource [String]s. with [formatArgs]
  */
+@ExperimentalToolkitApi
 private data class PluralResource2(
     val id: Int,
     val quantity: Int,
@@ -173,6 +180,7 @@ private data class PluralResource2(
  * A simple function that returns the [Bundle] value inside this wrapper.
  *  It is either resource id from which this Wrapper was created or the raw text [String]
  */
+@ExperimentalToolkitApi
 val Text.raw: Any
     get() = when (this) {
         is HtmlResource -> id
@@ -189,6 +197,7 @@ val Text.raw: Any
  *
  * @return The unpacked `CharSequence` result.
  */
+@ExperimentalToolkitApi
 val Text.value: CharSequence
     @Composable
     @NonRestartableComposable
@@ -201,6 +210,7 @@ val Text.value: CharSequence
         is StringResource2 -> textResource(id, *formatArgs)
     }
 
+@ExperimentalToolkitApi
 @Deprecated("Use value Text.value instead.")
 inline val Text.get: CharSequence
     @Composable
@@ -213,6 +223,7 @@ inline val Text.get: CharSequence
  */
 @Composable
 @NonRestartableComposable
+@ExperimentalToolkitApi
 fun stringResource(value: Text) = value.value
 
 /**
@@ -221,6 +232,7 @@ fun stringResource(value: Text) = value.value
 @Composable
 @NonRestartableComposable
 @JvmName("stringResource1")
+@ExperimentalToolkitApi
 fun stringResource(value: Text?) = value?.value
 
 /**
@@ -228,6 +240,7 @@ fun stringResource(value: Text?) = value?.value
  * @param text: The [Text] to collect.
  */
 @ExperimentalTextApi
+@ExperimentalToolkitApi
 private fun Resources.resolve(text: Text): CharSequence =
     when (text) {
         is HtmlResource -> getText2(text.id)
@@ -242,6 +255,7 @@ private fun Resources.resolve(text: Text): CharSequence =
  * @see resolve
  */
 @JvmName("resolve2")
+@ExperimentalToolkitApi
 private fun Resources.resolve(text: Text?): CharSequence? =
     if (text == null) null else resolve(text)
 
@@ -249,25 +263,33 @@ private fun Resources.resolve(text: Text?): CharSequence? =
 A builder fun that builds a raw [Text] wrapper.
  */
 
+@ExperimentalToolkitApi
 fun buildText(value: String): Text = Raw(value)
 
+@ExperimentalToolkitApi
 fun buildText(value: AnnotatedString): Text = Raw(value)
 
 
+@ExperimentalToolkitApi
 fun buildText(builder: (AnnotatedString.Builder).() -> Unit): Text =
     Raw(buildAnnotatedString(builder))
 
+@ExperimentalToolkitApi
 fun buildTextResource(@StringRes id: Int): Text =
     StringResource(id)
 
+@ExperimentalToolkitApi
 fun buildTextResource(@StringRes id: Int, vararg formatArgs: Any): Text =
     StringResource2(id, formatArgs)
 
+@ExperimentalToolkitApi
 fun buildHtmlResource(@StringRes id: Int): Text =
     HtmlResource(id)
 
+@ExperimentalToolkitApi
 fun buildPluralResource(@PluralsRes id: Int, quantity: Int): Text =
     PluralResource(packInts(id, quantity))
 
+@ExperimentalToolkitApi
 fun buildPluralResource(id: Int, quantity: Int, vararg formatArgs: Any): Text =
     PluralResource2(id, quantity, formatArgs)

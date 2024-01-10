@@ -64,6 +64,10 @@ import androidx.compose.ui.unit.TextUnit
  * @see mutableStateOf
  */
 @Composable
+@Deprecated(
+    "Use 'remember { mutableStateOf(value)}' instead.'",
+    ReplaceWith("remember { mutableStateOf(value = )}", "androidx.compose.runtime.remember", "androidx.compose.runtime.mutableStateOf"),
+)
 inline fun <T> rememberState(initial: T): MutableState<T> = remember {
     mutableStateOf(initial)
 }
@@ -72,6 +76,10 @@ inline fun <T> rememberState(initial: T): MutableState<T> = remember {
 /**
  * @see findActivity
  */
+@Deprecated(
+    "Use 'findActivity' instead.'",
+    ReplaceWith("findActivity()"),
+)
 val Context.activity: Activity get() = findActivity()
 
 /**
@@ -80,7 +88,7 @@ val Context.activity: Activity get() = findActivity()
  * @return The [Activity] instance associated with the current [Context].
  * @throws IllegalStateException if the current [Context] is not an [Activity] context.
  */
-private tailrec fun Context.findActivity(): Activity =
+tailrec fun Context.findActivity(): Activity =
     when (this) {
         is Activity -> this
         is ContextWrapper -> this.baseContext.findActivity()
@@ -98,6 +106,7 @@ private tailrec fun Context.findActivity(): Activity =
  */
 @Suppress("NOTHING_TO_INLINE")
 @Composable
+@ExperimentalToolkitApi
 inline fun LockScreenOrientation(orientation: Int) {
     val context = LocalContext.current
     DisposableEffect(Unit) {
@@ -212,6 +221,7 @@ inline fun <reified T> castTo(anything: Any): T {
 /**
  * Provides/finds a [Activity] that is wrapped inside the [LocalContext]
  */
+
 val ProvidableCompositionLocal<Context>.activity
     @ReadOnlyComposable
     @Composable
@@ -337,14 +347,14 @@ inline fun <R : Any> AnnotatedString.Builder.withSpanStyle(
  *  @see ParagraphStyle
  */
 inline fun <R : Any> AnnotatedString.Builder.withParagraphStyle(
-    textAlign: TextAlign? = null,
-    textDirection: TextDirection? = null,
+    textAlign: TextAlign = TextAlign.Unspecified,
+    textDirection: TextDirection = TextDirection.Unspecified,
     lineHeight: TextUnit = TextUnit.Unspecified,
     textIndent: TextIndent? = null,
     platformStyle: PlatformParagraphStyle? = null,
     lineHeightStyle: LineHeightStyle? = null,
-    lineBreak: LineBreak? = null,
-    hyphens: Hyphens? = null,
+    lineBreak: LineBreak = LineBreak.Unspecified,
+    hyphens: Hyphens = Hyphens.Unspecified,
     textMotion: TextMotion? = null,
     crossinline block: AnnotatedString.Builder.() -> R
 ): R = withStyle(

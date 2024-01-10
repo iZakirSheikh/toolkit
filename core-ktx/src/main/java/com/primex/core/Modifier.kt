@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
  * @since 1.0.0
  * @author [Your name]
  */
+@Deprecated("Use the official ones")
 inline fun Modifier.gradient(
     colors: List<Color>,
     crossinline provider: (Size) -> Brush
@@ -99,6 +100,8 @@ inline fun Modifier.gradient(
  *
  * @return A modified [Modifier] with the gradient effect applied.
  */
+
+@Deprecated("Use the official ones")
 fun Modifier.gradient(
     vertical: Boolean,
     colors: List<Color> = listOf(
@@ -148,6 +151,8 @@ fun Modifier.gradient(
  * @since 1.0.0
  * @see [Brush.radialGradient]
  */
+
+@Deprecated("Use the official ones")
 fun Modifier.gradient(
     radius: Float,
     colors: List<Color> = listOf(
@@ -185,6 +190,8 @@ fun Modifier.gradient(
  * @since 1.0.0
  * @author Zakir Sheikh
  */
+
+@ExperimentalToolkitApi
 fun Modifier.rotateTransform(
     clockwise: Boolean
 ): Modifier {
@@ -220,7 +227,12 @@ fun Modifier.rotateTransform(
         .then(rotated)
 }
 
-@Deprecated("Use the rotateTransform instead.")
+
+@Deprecated(
+    "Use the new function name 'rotateTransform' instead.",
+    ReplaceWith("rotateTransform(clockwise)")
+)
+@ExperimentalToolkitApi
 inline fun Modifier.rotate(clockwise: Boolean) = rotateTransform(clockwise)
 
 /**
@@ -244,6 +256,8 @@ inline fun Modifier.rotate(clockwise: Boolean) = rotateTransform(clockwise)
  * @since 1.0.0
  * @author [Your name]
  */
+
+@Deprecated("Not good solution.")
 fun Modifier.acquireFocusOnInteraction(
     interactionSource: MutableInteractionSource? = null,
     indication: Indication? = null
@@ -299,6 +313,8 @@ fun Modifier.acquireFocusOnInteraction(
  * @see [Divider]
  * @see [DividerVertical]
  */
+
+@ExperimentalToolkitApi
 fun Modifier.drawHorizontalDivider(
     color: Color,
     thickness: Dp = 1.dp,
@@ -344,6 +360,8 @@ private const val DividerAlpha = 0.12f
  * Draws vertical [Divider] at the end of the composable
  * @see drawHorizontalDivider
  */
+
+@ExperimentalToolkitApi
 fun Modifier.drawVerticalDivider(
     color: Color,
     thickness: Dp = 1.dp,
@@ -404,7 +422,7 @@ fun Modifier.drawVerticalDivider(
  * @since 1.0.0
  */
 @Stable
-@Deprecated("Don't use it as it casues confusion.")
+@Deprecated("Don't use it as it cases confusion.", level = DeprecationLevel.HIDDEN)
 fun Modifier.padding(horizontal: Dp, top: Dp = 0.dp, bottom: Dp = 0.dp) =
     this.then(
         Modifier.padding(
