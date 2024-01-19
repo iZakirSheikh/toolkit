@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 
 private val PLACE_HOLDER_ICON_BOX_SIZE = 192.dp
 private val PLACE_HOLDER_ICON_BOX_DEFAULT_SIZE = 56.dp
 
 @Composable
+@ExperimentalToolkitApi
 private fun Vertical(
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
@@ -153,6 +155,7 @@ private fun Horizontal(
 
 @Composable
 @NonRestartableComposable
+@ExperimentalToolkitApi
 fun Placeholder(
     title: @Composable (() -> Unit),
     modifier: Modifier = Modifier,

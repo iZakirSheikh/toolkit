@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.DialogProperties
+import com.primex.core.ExperimentalToolkitApi
 import com.primex.material2.dialog.BottomSheetDialogProperties
 
 
@@ -324,6 +325,7 @@ inline fun Dialog(
 }
 
 
+@ExperimentalToolkitApi
 @Composable
 @ExperimentalComposeUiApi
 inline fun BottomSheetDialog(
@@ -340,6 +342,7 @@ inline fun BottomSheetDialog(
         )
 }
 
+@ExperimentalMaterialApi
 @Composable
 inline fun OutlinedButton2(
     label: CharSequence,
@@ -374,6 +377,7 @@ inline fun OutlinedButton2(
     },
 )
 
+@ExperimentalMaterialApi
 @Composable
 inline fun TextButton2(
     label: CharSequence,
@@ -415,6 +419,7 @@ inline fun TextButton2(
  * @param label The string label.
  * @param crown The top icon.
  */
+@ExperimentalMaterialApi
 @Composable
 inline fun Button2(
     label: CharSequence,

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 
 
 private inline val Offset.mirror get() = copy(-x, -y)
@@ -147,6 +148,38 @@ internal inline fun ContentDrawScope.foreground(
 private const val POINT_60 = 0.6f
 private const val POINT_95 = 0.95f
 
+/**
+ * Applies a customizable shadow effect to the content decorated by this modifier.
+ *
+ *
+ * @param shape The shape of the shadow, defining its outline and corners.
+ * @param lightShadowColor The color of the lighter part of the shadow.
+ * @param darkShadowColor The color of the darker part of the shadow.
+ * @param elevation The apparent distance between the content and the surface casting the shadow.
+ * @param intensity Controls the contrast between the light and dark parts of the shadow. A value
+ *                  of 0.0 produces a faint, subtle shadow, while a value of 1.0 produces a strong,
+ *                  high-contrast shadow. Default value is NaN, which uses a reasonable default
+ *                  intensity based on the elevation.
+ * @param spotLight Configures a spotlight for directional lighting effects.
+ * @param border An optional border stroke to apply around the content, visually enhancing the
+ *                shadow effect.
+ *
+ * @throws IllegalArgumentException If [intensity] is not within the valid range of 0.0 to 1.0.
+ * @see SpotLight
+ *
+ * **Example:**
+ * ```kotlin
+ * Text(
+ *     modifier = Modifier.shadow(
+ *         shape = MaterialTheme.shapes.small,
+ *         lightShadowColor = Color.Gray.withOpacity(0.5f),
+ *         darkShadowColor = Color.Black.withOpacity(0.3f),
+ *         elevation = 4.dp,
+ *     )
+ * )
+ * ```
+ */
+@ExperimentalToolkitApi
 fun Modifier.shadow(
     shape: CornerBasedShape,
     lightShadowColor: Color,
@@ -180,6 +213,10 @@ fun Modifier.shadow(
 }
 
 
+/**
+ * @see shadow
+ */
+@ExperimentalToolkitApi
 private fun Modifier.shadow(
     shape: CornerBasedShape,
     offset: Offset,

@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 
 /**
  * A widget that provides a user interface for the user to enter a search query and submit a request
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
  * user to pick a suggestion or result to launch into.
  */
 @Composable
+@ExperimentalToolkitApi
 fun Search(
     query: String,
     onQueryChanged: (query: String) -> Unit,

@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
+@ExperimentalMaterialApi
 fun Button2(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,6 +63,7 @@ fun Button2(
 }
 
 
+@ExperimentalMaterialApi
 @Composable
 @NonRestartableComposable
 fun TextButton2(
@@ -92,6 +94,7 @@ fun TextButton2(
  * A alternative of [OutlinedButton] with column space.
  * @see OutlinedButton
  */
+@ExperimentalMaterialApi
 @Composable
 @NonRestartableComposable
 fun OutlinedButton2(

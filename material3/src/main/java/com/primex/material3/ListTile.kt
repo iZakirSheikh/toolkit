@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 
 private const val TAG = "ListTile"
 
@@ -61,6 +62,7 @@ private const val ListItemDisabledIconOpacity = 0.38f
  *
  */
 @Composable
+@ExperimentalToolkitApi
 fun ListTile(
     headline: @Composable () -> Unit,
     modifier: Modifier = Modifier,

@@ -58,6 +58,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.Text
 import com.primex.core.padding
 
@@ -216,6 +217,7 @@ inline fun Button(
     )
 }
 
+@ExperimentalToolkitApi
 @Composable
 inline fun Button2(
     label: CharSequence,
@@ -283,6 +285,7 @@ inline fun OutlinedButton(
 }
 
 
+@ExperimentalToolkitApi
 @Composable
 inline fun OutlinedButton2(
     label: CharSequence,
@@ -345,6 +348,7 @@ inline fun TextButton(
     }
 }
 
+@ExperimentalToolkitApi
 @Composable
 inline fun TextButton2(
     label: CharSequence,
@@ -376,6 +380,7 @@ inline fun TextButton2(
     }
 }
 
+@ExperimentalToolkitApi
 @Composable
 inline fun FilledTonalButton(
     label: CharSequence,
@@ -407,6 +412,7 @@ inline fun FilledTonalButton(
     }
 }
 
+@ExperimentalToolkitApi
 @Composable
 inline fun FilledTonalButton2(
     label: CharSequence,
@@ -470,6 +476,7 @@ inline fun ElevatedButton(
     }
 }
 
+@ExperimentalToolkitApi
 @Composable
 inline fun ElevatedButton2(
     label: CharSequence,

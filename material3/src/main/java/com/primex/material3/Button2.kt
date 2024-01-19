@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import com.primex.core.ExperimentalToolkitApi
 
 // FixMe: Instead of depending on Button, Built own once required fun which are internal are made public.
 
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Shape
  * A variant style of [Button] which exposes [ColumnScope] instead of [RowScope]
  */
 @Composable
+@ExperimentalToolkitApi
 inline fun Button2(
     noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -61,6 +63,7 @@ inline fun Button2(
     }
 )
 
+@ExperimentalToolkitApi
 @Composable
 inline fun ElevatedButton2(
     noinline onClick: () -> Unit,
@@ -87,6 +90,7 @@ inline fun ElevatedButton2(
 )
 
 
+@ExperimentalToolkitApi
 @Composable
 inline fun FilledTonalButton2(
     noinline onClick: () -> Unit,
@@ -112,6 +116,7 @@ inline fun FilledTonalButton2(
     content = content
 )
 
+@ExperimentalToolkitApi
 @Composable
 inline fun OutlinedButton2(
     noinline onClick: () -> Unit,
@@ -137,6 +142,7 @@ inline fun OutlinedButton2(
     content = content
 )
 
+@ExperimentalToolkitApi
 @Composable
 inline fun TextButton2(
     noinline onClick: () -> Unit,

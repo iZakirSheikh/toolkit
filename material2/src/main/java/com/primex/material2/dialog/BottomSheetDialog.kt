@@ -32,6 +32,7 @@ import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.google.android.material.bottomsheet.BottomSheetBehavior.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.primex.core.ExperimentalToolkitApi
 import com.primex.material2.R
 import java.util.*
 
@@ -252,7 +253,7 @@ private val BlackScrimmed: (Color) -> Color = { original ->
  * @param content The content to be displayed inside the dialog.
  */
 @Composable
-@ExperimentalComposeUiApi
+@ExperimentalToolkitApi
 fun BottomSheetDialog(
     onDismissRequest: () -> Unit,
     properties: BottomSheetDialogProperties = BottomSheetDialogProperties(),

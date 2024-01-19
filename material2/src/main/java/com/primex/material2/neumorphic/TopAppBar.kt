@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.shadow.SpotLight
 
 // TODO: this should probably be part of the touch target of the start and end icons, clarify this
@@ -112,6 +113,7 @@ private fun TopAppBar(
 }
 
 
+@ExperimentalToolkitApi
 @Composable
 @NonRestartableComposable
 fun NeumorphicTopAppBar(

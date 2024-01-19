@@ -89,7 +89,8 @@ private inline val StyleSpan.toSpanStyle: SpanStyle
  * Note: The size in [AbsoluteSizeSpan] is taken as Sp no matter what.
  */
 
-@ExperimentalTextApi
+@OptIn(ExperimentalTextApi::class)
+@ExperimentalToolkitApi
 internal fun Spanned.toAnnotatedString() =
     buildAnnotatedString {
         val text = this@toAnnotatedString
@@ -139,7 +140,7 @@ internal fun Spanned.toAnnotatedString() =
  * @return A formatted char sequence with the same type as the receiver.
  * @throws IllegalStateException If the receiver is an unsupported type of char sequence.
  */
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 internal fun CharSequence.format(vararg args: Any): CharSequence {
     // if args is empty early return
     if (args.isEmpty()) return this
@@ -165,7 +166,7 @@ internal fun CharSequence.format(vararg args: Any): CharSequence {
  * @param args The arguments to replace the format specifiers in the string.
  * @return A spanned or a string that contains the formatted text with the style information.
  */
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun Resources.getText(@StringRes id: Int, vararg args: Any): CharSequence =
     getText(id).format(*args)
 
@@ -178,6 +179,7 @@ fun Resources.getText(@StringRes id: Int, vararg args: Any): CharSequence =
  * @return A spanned or a string that contains the formatted text with the style information.
  */
 @OptIn(ExperimentalTextApi::class)
+@ExperimentalToolkitApi
 fun Resources.getQuantityText(@PluralsRes id: Int, quantity: Int, vararg args: Any): CharSequence =
     getQuantityText(id, quantity).format(*args)
 
@@ -215,7 +217,7 @@ fun Resources.getQuantityText(@PluralsRes id: Int, quantity: Int, vararg args: A
  * @return A formatted [CharSequence], either a [String] or an [AnnotatedString], depending on the type of the string resource.
  * @throws Resources.NotFoundException If the given ID does not exist
  */
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun Resources.getText2(@StringRes id: Int): CharSequence =
     when (val formatted = getText(id)) {
         is String -> formatted
@@ -232,7 +234,7 @@ fun Resources.getText2(@StringRes id: Int): CharSequence =
  * @throws Resources.NotFoundException If the given ID does not exist.
  * @throws IllegalArgumentException If the formatted char sequence is neither a [String] nor a [Spanned].
  */
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun Resources.getText2(@StringRes id: Int, vararg args: Any): CharSequence =
     when (val formatted = getText(id).format(*args)) {
         is String -> formatted
@@ -250,7 +252,7 @@ fun Resources.getText2(@StringRes id: Int, vararg args: Any): CharSequence =
  * @throws Resources.NotFoundException If the given ID does not exist.
  * @throws IllegalStateException If the formatted char sequence is neither a [String] nor a [Spanned].
  */
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun Resources.getQuantityText2(@PluralsRes id: Int, quantity: Int): CharSequence =
     when (val text = getQuantityText(id, quantity)) {
         is String -> text
@@ -262,7 +264,7 @@ fun Resources.getQuantityText2(@PluralsRes id: Int, quantity: Int): CharSequence
  * @param args The arguments to be used in the format string, or empty if none.
  * @see getQuantityText2
  */
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun Resources.getQuantityText2(@PluralsRes id: Int, quantity: Int, vararg args: Any): CharSequence =
     when (val text = getQuantityText(id, quantity).format(*args)) {
         is String -> text
@@ -270,7 +272,7 @@ fun Resources.getQuantityText2(@PluralsRes id: Int, quantity: Int, vararg args: 
         else -> error("$text is some other type of string.")
     }
 
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun Resources.getTextArray2(@ArrayRes id: Int): Array<CharSequence> {
     val array = getTextArray(id)
     for (i in array.indices) {
@@ -296,7 +298,7 @@ private fun resources(): Resources {
  * @return A formatted char sequence, either a [String] or an [AnnotatedString], depending on the type of the string resource.
  */
 @Composable
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 @NonRestartableComposable
 fun textResource(@StringRes id: Int): CharSequence {
     val resources = resources()
@@ -316,7 +318,7 @@ fun textResource(@StringRes id: Int): CharSequence {
  */
 @Composable
 @NonRestartableComposable
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun textResource(@StringRes id: Int, vararg args: Any): CharSequence {
     val resources = resources()
     return when (val formatted = resources.getText(id).format(*args)) {
@@ -328,7 +330,7 @@ fun textResource(@StringRes id: Int, vararg args: Any): CharSequence {
 
 @Composable
 @NonRestartableComposable
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun pluralTextResource(@PluralsRes id: Int, quantity: Int, vararg args: Any): CharSequence {
     val resources = resources()
     return when (val text = resources.getQuantityText(id, quantity).format(*args)) {
@@ -346,7 +348,7 @@ fun pluralTextResource(@PluralsRes id: Int, quantity: Int, vararg args: Any): Ch
 
 @Composable
 @NonRestartableComposable
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun pluralTextResource(@PluralsRes id: Int, quantity: Int): CharSequence {
     val resources = resources()
     return when (val text = resources.getQuantityText(id, quantity)) {
@@ -358,7 +360,7 @@ fun pluralTextResource(@PluralsRes id: Int, quantity: Int): CharSequence {
 
 @Composable
 @NonRestartableComposable
-@ExperimentalTextApi
+@ExperimentalToolkitApi
 fun textArrayResource(@ArrayRes id: Int): Array<CharSequence> {
     val resources = resources()
     return remember(id) {

@@ -1,28 +1,15 @@
 package com.primex.core
 
 import android.content.res.Resources
-import android.graphics.Typeface
 import android.text.Spanned
 import android.text.style.*
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.BaselineShift
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
+
 /*
 private inline val TypefaceSpan.toSpanStyle: SpanStyle
     get() = SpanStyle(
@@ -49,7 +36,8 @@ private inline val StyleSpan.toSpanStyle: SpanStyle
         }
     }
 
-*//**
+*/
+/**
  * Helper function for converting [Spanned] to [AnnotatedString]
  *//*
 private fun Spanned.annotate(density: Density) =
@@ -111,10 +99,10 @@ private fun resources(): Resources {
  * @param id The resource ID of the string containing HTML content.
  * @return An [AnnotatedString] object representing the HTML content of the string resource.
  */
-@OptIn(ExperimentalTextApi::class)
+@ExperimentalToolkitApi
 @Composable
 @ReadOnlyComposable
-@Deprecated("Use new funs called as textResource.")
+@Deprecated("Use new 'textResource' instead.", ReplaceWith("textResource(id)"))
 fun stringHtmlResource(@StringRes id: Int): AnnotatedString {
     val resources = resources()
     val text = resources.getText(id)

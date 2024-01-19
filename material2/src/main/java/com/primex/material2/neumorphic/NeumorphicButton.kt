@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.shadow.SpotLight
 
 /**
@@ -199,6 +200,7 @@ object NeumorphicButtonDefaults {
 }
 
 
+@ExperimentalToolkitApi
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NeumorphicButton(
