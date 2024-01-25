@@ -415,3 +415,13 @@ inline fun rememberVectorPainter(
     autoMirror = autoMirror,
     content = { _, _ -> RenderVectorGroup(group = image.root) }
 )
+
+/**
+ * Whether we are running in a preview or not, to control using the native vs the common ripple
+ * implementation. We check this way instead of using [View.isInEditMode] or LocalInspectionMode so
+ * this can be called from outside composition.
+ * @see [source](https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material/material-ripple/src/androidMain/kotlin/androidx/compose/material/ripple/Ripple.android.kt;l=81;bpv=0)
+ */
+// TODO(b/188112048): Remove in the future when more versions of Studio support previewing native
+//  ripples
+internal val IsRunningInPreview = android.os.Build.DEVICE == "layoutlib"

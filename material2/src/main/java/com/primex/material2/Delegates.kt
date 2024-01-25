@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.DialogProperties
 import com.primex.core.ExperimentalToolkitApi
+import com.primex.core.withSpanStyle
 import com.primex.material2.dialog.BottomSheetDialogProperties
 
 
@@ -103,7 +105,7 @@ inline fun IconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentDescription: String? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = null,
     tint: Color? = Color.Unspecified,
 ) {
     IconButton(
@@ -114,7 +116,7 @@ inline fun IconButton(
     ) {
         val color = tint?.takeOrElse {
             if (enabled)
-                LocalContentColor.current.copy(ContentAlpha.medium)
+                LocalContentColor.current
             else
                 LocalContentColor.current.copy(ContentAlpha.disabled)
         } ?: Color.Unspecified
@@ -129,7 +131,7 @@ inline fun IconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentDescription: String? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = null,
     tint: Color? = Color.Unspecified,
 ) {
     IconButton(
@@ -140,7 +142,7 @@ inline fun IconButton(
     ) {
         val color = tint?.takeOrElse {
             if (enabled)
-                LocalContentColor.current.copy(ContentAlpha.medium)
+                LocalContentColor.current
             else
                 LocalContentColor.current.copy(ContentAlpha.disabled)
         } ?: Color.Unspecified
@@ -155,7 +157,7 @@ inline fun IconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentDescription: String? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = null,
     tint: Color? = Color.Unspecified,
 ) {
     IconButton(
@@ -166,7 +168,7 @@ inline fun IconButton(
     ) {
         val color = tint?.takeOrElse {
             if (enabled)
-                LocalContentColor.current.copy(ContentAlpha.medium)
+                LocalContentColor.current
             else
                 LocalContentColor.current.copy(ContentAlpha.disabled)
         } ?: Color.Unspecified
@@ -174,15 +176,38 @@ inline fun IconButton(
     }
 }
 
+
+/**
+ * A composable function for creating a menu item with optional title, subtitle, icon, and click action.
+ *
+ * @param title The main text content of the menu item.
+ * @param onClick The callback to be invoked when the menu item is clicked.
+ * @param modifier Optional [Modifier] to apply to the menu item.
+ * @param subtitle Optional secondary text content of the menu item.
+ * @param icon Optional [ImageVector] icon to be displayed alongside the menu item.
+ * @param enabled Whether the menu item is interactive and can be clicked.
+ *
+ * @sample MenuItem(
+ *     title = "Settings",
+ *     onClick = { /* Handle click action */ },
+ *     modifier = Modifier.padding(8.dp),
+ *     subtitle = "Configure app preferences",
+ *     icon = Icons.Default.Settings,
+ *     enabled = true
+ * )
+ *
+ * @see Composable
+ */
 @Composable
 inline fun DropDownMenuItem(
     title: CharSequence,
     noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    leading: Painter? = null,
+    subtitle: CharSequence? = null,
+    icon: Painter? = null,
     enabled: Boolean = true,
     contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource? = null,
 ) {
     DropdownMenuItem(
         onClick = onClick,
@@ -191,19 +216,29 @@ inline fun DropDownMenuItem(
         contentPadding = contentPadding,
         interactionSource = interactionSource
     ) {
-        if (leading != null)
+        if (icon != null)
             Icon(
-                painter = leading,
+                painter = icon,
                 contentDescription = null,
                 //  modifier = Modifier.padding(start = 16.dp)
             )
 
         // the text
         Text(
-            text = title,
+            text = buildAnnotatedString {
+                append(title)
+                if (subtitle == null) return@buildAnnotatedString
+                withSpanStyle(
+                    color = LocalContentColor.current.copy(ContentAlpha.disabled),
+                    fontSize = 11.sp,
+                    block = {
+                        append("\n" + subtitle)
+                    }
+                )
+            },
             modifier = Modifier.padding(horizontal = 16.dp),
             fontWeight = FontWeight.Medium,
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
     }
@@ -214,7 +249,7 @@ inline fun Button(
     label: CharSequence,
     noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    leading: Painter? = null,
+    icon: Painter? = null,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = ButtonDefaults.elevation(),
@@ -232,9 +267,9 @@ inline fun Button(
     colors = colors,
     contentPadding = contentPadding,
     content = {
-        if (leading != null)
+        if (icon != null)
             Icon(
-                painter = leading,
+                painter = icon,
                 contentDescription = null,
                 modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
             )
@@ -247,7 +282,7 @@ inline fun OutlinedButton(
     label: CharSequence,
     noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    leading: Painter? = null,
+    icon: Painter? = null,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = null,
@@ -266,9 +301,9 @@ inline fun OutlinedButton(
     colors = colors,
     contentPadding = contentPadding,
     content = {
-        if (leading != null)
+        if (icon != null)
             Icon(
-                painter = leading,
+                painter = icon,
                 contentDescription = null,
                 modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
             )
@@ -281,7 +316,7 @@ inline fun TextButton(
     label: CharSequence,
     noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    leading: Painter? = null,
+    icon: Painter? = null,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = null,
@@ -299,30 +334,15 @@ inline fun TextButton(
     colors = colors,
     contentPadding = contentPadding,
     content = {
-        if (leading != null)
+        if (icon != null)
             Icon(
-                painter = leading,
+                painter = icon,
                 contentDescription = null,
                 modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
             )
         Label(text = label)
     }
 )
-
-@Composable
-inline fun Dialog(
-    expanded: Boolean,
-    noinline onDismissRequest: () -> Unit,
-    properties: DialogProperties = DialogProperties(),
-    noinline content: @Composable () -> Unit
-) {
-    if (expanded)
-        androidx.compose.ui.window.Dialog(
-            onDismissRequest = onDismissRequest,
-            properties = properties,
-            content = content
-        )
-}
 
 
 @ExperimentalToolkitApi
@@ -527,4 +547,51 @@ inline fun Text(
 
         else -> error("$text must be either AnnotatedString or String!!")
     }
+}
+
+
+/**
+ * Creates a customizable dialog with extended features beyond the standard Material dialog.
+ *
+ * This composable allows you to create dialogs with custom shapes, borders, and other
+ * visual properties, providing more control over their appearance.
+ *
+ * @param expanded [Boolean] Whether the dialog is currently expanded and visible.
+ * @param onDismissRequest [() -> Unit] A callback function invoked when the user dismisses the dialog.
+ * @param modifier [Modifier] Optional modifier to apply to the dialog's layout.
+ * @param properties [DialogProperties] Configuration for the dialog's behavior and appearance.
+ * @param backgroundColor [Color] The background color of the dialog.
+ * @param contentColor [Color] The color of the content within the dialog.
+ * @param shape [Shape] The shape of the dialog's container.
+ * @param border [BorderStroke?] Optional border to apply to the dialog's edges.
+ * @param content [() -> Unit] The content of the dialog, defined as a composable function.
+ */
+@Composable
+inline fun Dialog(
+    expanded: Boolean,
+    noinline onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    properties: DialogProperties = DialogProperties(),
+    backgroundColor: Color = MaterialTheme.colors.surface,
+    contentColor: Color = MaterialTheme.colors.onSurface,
+    shape: Shape = MaterialTheme.shapes.small,
+    border: BorderStroke? = null,
+    noinline content: @Composable () -> Unit
+) {
+
+    if (expanded)
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = properties,
+            content = {
+                Surface(
+                    modifier = modifier,
+                    color = backgroundColor,
+                    contentColor = contentColor,
+                    shape = shape,
+                    border = border,
+                    content = content
+                )
+            },
+        )
 }

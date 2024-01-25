@@ -18,83 +18,8 @@
 
 package com.primex.core
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.ImageShader
-import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.ContentDrawScope
-import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
-import androidx.compose.ui.node.DrawModifierNode
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.node.currentValueOf
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.graphics.drawable.toBitmap
-import com.primex.core.R
-
-private const val TAG = "ModifierNoise"
-
-// TODO - Add various kinds of noise options like Perlin, Simplex, Fractal noise etc.
-
-/**
- * NoiseNode is a DrawModifierNode that implements the noise effect.
- *
- * It creates a ShaderBrush from a noise drawable and draws a rectangle with that brush on top of the content.
- * The alpha and blend mode can be adjusted to control the intensity and blending of the noise effect.
- */
-private class NoiseNode(var alpha: Float) : Modifier.Node(), DrawModifierNode,
-    CompositionLocalConsumerModifierNode {
-
-    /**
-     * The ShaderBrush used to paint the noise effect.
-     */
-    lateinit var shader: ShaderBrush
-
-    /**
-     * Initializes the ShaderBrush with a tiled noise pattern when attached to a LayoutNode.
-     */
-    @SuppressLint("SuspiciousCompositionLocalModifierRead")
-    override fun onAttach() {
-        super.onAttach()
-        // construct the shader that is going to be used in the drawing of the noies
-        val drawable =
-            currentValueOf(LocalContext).getDrawable(R.drawable.noise_wndows)!!.toBitmap().asImageBitmap()
-        shader = ShaderBrush(
-            ImageShader(
-                drawable, TileMode.Repeated, TileMode.Repeated,
-            )
-        )
-    }
-
-
-    override fun ContentDrawScope.draw() {
-        // draw the content
-        drawContent()
-        // after the content is drawn; draw the shader.
-        drawRect(
-            brush = shader, alpha = alpha, blendMode = BlendMode.Hardlight
-        )
-    }
-}
-
-
-private data class ModifierNoiseElement(val alpha: Float) : ModifierNodeElement<NoiseNode>() {
-    override fun create(): NoiseNode = NoiseNode(alpha)
-
-    override fun update(node: NoiseNode) {
-        node.alpha = alpha
-        Log.d(TAG, "update: $alpha")
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        name = "NoiseModifier"
-        properties["alpha"] = alpha
-    }
-}
 
 /**
  * A Style Modifier that applies a noise effect to the content using a Shader.
@@ -110,4 +35,6 @@ private data class ModifierNoiseElement(val alpha: Float) : ModifierNodeElement<
  * @constructor Creates a NoiseModifier with the specified alpha value.
  */
 @ExperimentalToolkitApi
-fun Modifier.noise(alpha: Float) = this then ModifierNoiseElement(alpha)
+@Deprecated("Use visualEffect", replaceWith = ReplaceWith("visualEffect"))
+fun Modifier.noise(alpha: Float) =
+    this then visualEffect(ImageBrush.NoiseBrush, alpha, true, BlendMode.Hardlight)

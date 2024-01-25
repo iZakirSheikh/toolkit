@@ -31,6 +31,8 @@ import android.view.View
 import android.view.ViewTreeObserver.OnPreDrawListener
 import androidx.annotation.FloatRange
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.runtime.internal.isLiveLiteralsEnabled
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -48,10 +50,15 @@ import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.inspectable
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.withSave
 import com.primex.core.ExperimentalToolkitApi
+import com.primex.core.IsRunningInPreview
 import com.primex.core.findActivity
+import com.primex.core.foreground
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -380,8 +387,8 @@ private data class RsBlurElement(
  *
  * **Known limitations and considerations:**
  * - **Compatibility:** Might not work correctly with hardware bitmaps from Coil or Glide.
-To avoid issues, disable hardware bitmaps for these libraries.
- * - **Preview:** Doesn't work with Compose preview. Use a placeholder until a workaround is released.
+ * To avoid issues, disable hardware bitmaps for these libraries.
+ * - **Preview:** In Preview; the **modifier** shows **Bluish Scrim Modifier** instead of *Blur*
  * - **Future plans:** An alternative implementation using PixelCopy is planned for better performance
 and compatibility with hardware bitmaps.
  *
@@ -417,5 +424,18 @@ and compatibility with hardware bitmaps.
 fun Modifier.legacyBackgroundBlur(
     @FloatRange(from = 0.0, to = 25.0) radius: Float = 25f,
     @FloatRange(from = 0.0, to = 1.0, fromInclusive = false) downsample: Float = 1.0f,
-) = this then RsBlurElement(radius, downsample)
+) = this then if (IsRunningInPreview) ScrimModifier(radius, downsample) else RsBlurElement(
+    radius,
+    downsample
+)
 
+private fun Modifier.ScrimModifier(radius: Float, downsample: Float) = inspectable(
+    inspectorInfo = debugInspectorInfo {
+        name = "legacyBackgroundBlur"
+        properties["radius"] = radius
+        properties["downsample"] = downsample
+    },
+    factory = {
+        background(androidx.compose.ui.graphics.Color.Blue.copy(0.4f))
+    }
+)
