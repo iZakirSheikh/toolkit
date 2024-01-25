@@ -1,5 +1,9 @@
 ![header](https://github.com/iZakirSheikh/toolkit/assets/46754437/abe0c9b6-9dd2-498f-9cd7-9d835893ee2e)
-[![](https://jitpack.io/v/prime-zs/toolkit.svg)](https://jitpack.io/#prime-zs/toolkit)
+![JitPack](https://img.shields.io/jitpack/version/com.github.prime-zs/toolkit)
+
+## Toolkit
+
+Check out the website for more information: https://medium.com/proandroiddev/blurring-the-lines-how-to-achieve-a-glassmorphic-design-with-jetpack-compose-0225560c2d64
 
 Toolkit is a collection of libraries that enhance the power and flexibility of [Jetpack Compose][compose] with features that are not officially supported.
 
