@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalToolkitApi::class)
+
 package com.primex.material2
 
 import android.R
@@ -5,7 +7,6 @@ import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -91,7 +92,6 @@ object PreferenceDefaults {
  * @param forceVisible if true make [revealable] content show/hide.
  */
 @Composable
-@ExperimentalToolkitApi
 fun Preference(
     title: CharSequence,
     modifier: Modifier = Modifier,
@@ -169,7 +169,6 @@ fun Preference(
 }
 
 @Composable
-@ExperimentalToolkitApi
 fun SwitchPreference(
     title: CharSequence,
     checked: Boolean,
@@ -199,7 +198,6 @@ fun SwitchPreference(
 
 
 @Composable
-@ExperimentalToolkitApi
 fun CheckBoxPreference(
     title: CharSequence,
     checked: Boolean,
@@ -229,7 +227,6 @@ fun CheckBoxPreference(
 
 
 @Composable
-@ExperimentalToolkitApi
 fun <T> DropDownPreference(
     title: CharSequence,
     defaultValue: T,
@@ -303,8 +300,8 @@ fun <T> DropDownPreference(
 }
 
 
+@OptIn(ExperimentalToolkitApi::class)
 @Composable
-@ExperimentalToolkitApi
 fun ColorPickerPreference(
     title: CharSequence,
     defaultEntry: Color,
@@ -379,7 +376,6 @@ fun ColorPickerPreference(
 }
 
 @Composable
-@ExperimentalToolkitApi
 private fun TextButtons(
     modifier: Modifier = Modifier,
     onConfirmClick: () -> Unit,
@@ -402,7 +398,6 @@ private fun TextButtons(
 
 
 @Composable
-@ExperimentalToolkitApi
 fun SliderPreference(
     title: CharSequence,
     defaultValue: Float,
@@ -491,9 +486,7 @@ fun SliderPreference(
 
 private val TextFieldShape = RoundedCornerShape(10)
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-@ExperimentalToolkitApi
 fun TextFieldPreference(
     title: CharSequence,
     value: TextFieldValue,
