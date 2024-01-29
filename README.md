@@ -3,11 +3,15 @@
 
 ## Toolkit
 
-Check out the website for more information: https://medium.com/proandroiddev/blurring-the-lines-how-to-achieve-a-glassmorphic-design-with-jetpack-compose-0225560c2d64
+Check out the website for more
+information: https://medium.com/proandroiddev/blurring-the-lines-how-to-achieve-a-glassmorphic-design-with-jetpack-compose-0225560c2d64
 
-Toolkit is a collection of libraries that enhance the power and flexibility of [Jetpack Compose][compose] with features that are not officially supported.
+Toolkit is a collection of libraries that enhance the power and flexibility
+of [Jetpack Compose][compose] with features that are not officially supported.
 
-Toolkit is a playground for new Compose APIs, where you can explore new possibilities and solutions with Compose. Toolkit was originally created for personal use, but now it is open to the public so that everyone can contribute and benefit from it.
+Toolkit is a playground for new Compose APIs, where you can explore new possibilities and solutions
+with Compose. Toolkit was originally created for personal use, but now it is open to the public so
+that everyone can contribute and benefit from it.
 
 ## License
 

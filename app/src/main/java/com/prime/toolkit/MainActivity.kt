@@ -24,7 +24,10 @@ import com.prime.toolkit.preview.BlurPreview
 import com.prime.toolkit.ui.theme.ToolkitTheme
 import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.rememberState
+import com.primex.material2.DropDownPreference
+import com.primex.material2.Placeholder
 import com.primex.material2.Preference
+import com.primex.material2.SliderPreference
 import com.primex.material2.SwitchPreference
 
 class MainActivity : ComponentActivity() {
@@ -32,7 +35,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ToolkitTheme(false) { // A surface container using the 'background' color from the theme
-                BlurPreview()
+                PLaceholder()
             }
         }
     }
@@ -52,12 +55,28 @@ fun PLaceholder() {
            Preference(
                title = "App Version",
                summery = buildAnnotatedString {
-                   append("2.2.5-debug")
-                   append("\nHave feedback we would like to here, but please dont share sensitive information.\nTap to open feedback dialog.")
+                   appendLine("2.2.5-debug")
+                   appendLine("Have feedback we would like to here, but please dont share sensitive information.\nTap to open feedback dialog.")
                },
                icon = Icons.Outlined.Info,
 
                )
+
+           DropDownPreference(
+               title = "DropdownPref",
+               defaultValue = 0,
+               onRequestChange = {},
+               entries = listOf(
+                   "Zero" to 0,
+                   "one" to 1
+               )
+           )
+
+           SliderPreference(
+               title = "Slider Pref",
+               defaultValue = 0.5f,
+               onValueChange = {}
+           )
 
            var checked by remember { mutableStateOf(value = false) }
            SwitchPreference(

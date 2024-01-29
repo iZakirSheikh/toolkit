@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.composableOrNull
 import com.primex.core.rememberState
+import com.primex.material2.menu.DropDownMenu2
 
 private const val TAG = "Preference"
 
@@ -253,7 +254,7 @@ fun <T> DropDownPreference(
                     contentDescription = null,
                 )
 
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                DropDownMenu2(expanded = expanded, onDismissRequest = { expanded = false }) {
                     entries.forEach { (placeHolder, value) ->
                         val onEntryClick = {
                             if (value != defaultValue) {
