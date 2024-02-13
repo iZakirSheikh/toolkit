@@ -47,6 +47,8 @@ dependencies {
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.compose.material3)
     implementation(libs.coil)
+    implementation(libs.material.icons.core)
+    implementation(libs.material.icons.extended)
     // FIXME: Tests are disabled for now.
     //  Why?
     //  Because my PC/laptop is old and slow and it can't handle that many dependencies; this makes

@@ -49,6 +49,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -250,10 +251,10 @@ object TopAppBarDefaults {
     @OptIn(ExperimentalToolkitApi::class)
     @Composable
     fun largeAppBarStyle(
-        containerColor: Color = MaterialTheme.colors.primary,
-        scrolledContainerColor: Color = MaterialTheme.colors.background,
-        contentColor: Color = MaterialTheme.colors.onPrimary,
-        scrolledContentColor: Color = MaterialTheme.colors.onBackground,
+        containerColor: Color = MaterialTheme.colors.background,
+        scrolledContainerColor: Color = MaterialTheme.colors.primary,
+        contentColor: Color = MaterialTheme.colors.onBackground,
+        scrolledContentColor: Color = MaterialTheme.colors.onPrimary,
         titleTextStyle: TextStyle = MaterialTheme.typography.body1,
         scrolledTitleTextStyle: TextStyle = MaterialTheme.typography.h4,
         height: Dp = TopBarHeight,
@@ -391,15 +392,18 @@ fun LargeTopAppBar(
     height = style.height,
     maxHeight = style.maxHeight,
     insets = windowInsets,
-    modifier = modifier,
+    modifier = modifier.clipToBounds(),
     scrollBehavior = scrollBehavior
 ) {
-    val appBarContentColor = style.contentColor(fraction)
+    require(style.height < style.maxHeight){
+        "LargeTopAppBar maxHeight (${style.maxHeight}) must be greater than height (${style.height})"
+    }
+    val appBarContentColor = style.contentColor(1 - fraction)
     val textStyle = style.titleTextStyle(fraction)
     ProvideTextStyle(style = textStyle, color = appBarContentColor) {
         // Background; zIndex determines which is stacked where.
         // so this will be at the bottom.
-        val containerColor = style.containerColor(fraction)
+        val containerColor = style.containerColor(1 - fraction)
         Spacer(
             modifier = Modifier
                 .background(containerColor)
@@ -457,7 +461,7 @@ fun TopAppBar(
     height = style.height,
     maxHeight = style.height,
     insets = windowInsets,
-    modifier = modifier,
+    modifier = modifier.clipToBounds(),
     scrollBehavior = scrollBehavior
 ) {
     // TODO: Add this property to TopAppBarState.

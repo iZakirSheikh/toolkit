@@ -1,13 +1,13 @@
 [versions]
-compose = "1.7.0-alpha01"
-compose-compiler = "1.5.8"
-compose-material3 = "1.2.0-rc01"
+compose = "1.7.0-alpha02"
+compose-compiler = "1.5.9"
+compose-material3 = "1.2.0"
 core-ktx = "1.12.0"
 koltin-version = "1.9.22"
 lifecycle-runtime-ktx = "2.6.2"
 compose-activity = "1.8.2"
 maven-publish = "0.0.0"
-agp = "8.2.2"
+agp = "8.3.0-rc01"
 # FixMe: This dependency is currently required in material2 for BottomSheetDialog. Updating this cause
 #  Some issue in the Dialog; Don't update it'
 #noinspection GradleDependency
@@ -38,6 +38,9 @@ lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", v
 material-view = { module = "com.google.android.material:material", version.ref = "material-view" }
 preferences = {module = "androidx.datastore:datastore-preferences", version.ref = "preferences"}
 coil = {module = "io.coil-kt:coil-compose", version.ref = "coil"}
+# Material Icons: Core and extended sets of Material Design icons for use in Compose UIs.
+material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "compose" }
+material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose" }
 #  // Text Dependencies
 #  // TODO: Implement proper tests in the future.
 #  //  Note: Due to current hardware limitations (low memory and processing power), this task can only be accomplished
