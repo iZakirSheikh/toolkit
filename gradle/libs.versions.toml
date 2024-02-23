@@ -1,13 +1,13 @@
 [versions]
-compose = "1.7.0-alpha02"
-compose-compiler = "1.5.9"
+compose = "1.7.0-alpha03"
+compose-compiler = "1.5.10"
 compose-material3 = "1.2.0"
 core-ktx = "1.12.0"
 koltin-version = "1.9.22"
 lifecycle-runtime-ktx = "2.6.2"
 compose-activity = "1.8.2"
 maven-publish = "0.0.0"
-agp = "8.3.0-rc01"
+agp = "8.4.0-alpha10"
 # FixMe: This dependency is currently required in material2 for BottomSheetDialog. Updating this cause
 #  Some issue in the Dialog; Don't update it'
 #noinspection GradleDependency
