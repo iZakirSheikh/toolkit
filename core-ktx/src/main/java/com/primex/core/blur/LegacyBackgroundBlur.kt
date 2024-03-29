@@ -20,19 +20,16 @@ package com.primex.core.blur
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.os.Build
 import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
-import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver.OnPreDrawListener
 import androidx.annotation.FloatRange
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.runtime.internal.isLiveLiteralsEnabled
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -47,18 +44,16 @@ import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.LayoutAwareModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.currentValueOf
-import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
-import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.withSave
 import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.IsRunningInPreview
+import com.primex.core.debug.loggers.logD
 import com.primex.core.findActivity
-import com.primex.core.foreground
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -104,6 +99,7 @@ internal infix fun View.relativeTo(other: View): Offset {
 private class RsBlurNode(
     var radius: Float = 25f,
     var downscale: Float = 1.0f,
+    val debugLogger: Boolean,
 ) : Modifier.Node(),
     DrawModifierNode,
     CompositionLocalConsumerModifierNode,
@@ -185,7 +181,7 @@ private class RsBlurNode(
         // If bounds are empty, no need to continue.
         if (bounds.isEmpty)
             return
-        Log.d(TAG, "reset: $bounds $downscale")
+        logD(tag = TAG, message = "reset: $bounds $downscale", isDebug = debugLogger)
 
         // Recreate the bitmap with adjusted dimensions based on the current configuration.
         bitmap = Bitmap.createBitmap(
@@ -209,11 +205,16 @@ private class RsBlurNode(
 
     override fun onPlaced(coordinates: LayoutCoordinates) {
         // calculate new bound
-        val new = coordinates.boundsInWindow()
-        // Get coordinates of the view relative to the backdrop.
-        val (x, y) = view relativeTo window.decorView
+        val modifierRectBounds = coordinates.boundsInWindow()
+        // Get coordinates of the view relative to the backdrop offset.
+        val (x: Float, y: Float) = view relativeTo window.decorView
         // calculate bounds relative to root
-        val relative = Rect(x + new.left, y + new.top, x + new.right, y + new.bottom)
+        val relative = Rect(
+            x + modifierRectBounds.left,
+            y + modifierRectBounds.top,
+            x + modifierRectBounds.right,
+            y + modifierRectBounds.bottom
+        )
         if (this::bounds.isInitialized && relative == bounds)
             return
         bounds = relative
@@ -228,7 +229,7 @@ private class RsBlurNode(
     //  when coil is used with allowHardware = true
     private fun capture() {
         canvas.setBitmap(bitmap)
-        bitmap.eraseColor(Color.TRANSPARENT)
+//        bitmap.eraseColor(Color.TRANSPARENT)
         canvas.withSave {
             // First, make sure that the subsequent drawing steps are
             // done in the correct coordinates
@@ -242,7 +243,7 @@ private class RsBlurNode(
             // This code seems to iterate over all the descendants of the
             // view's root view and draw them on the canvas
             window.decorView.draw(this)
-            Log.d(TAG, "captured: ")
+            logD(tag = TAG, message = "captured: ", isDebug = debugLogger)
         }
     }
 
@@ -261,7 +262,7 @@ private class RsBlurNode(
         rsBlurScript.forEach(outAllocation);
         // Copy the output allocation to the output bitmap
         outAllocation.copyTo(this@RsBlurNode.bitmap)
-        Log.d(TAG, "bulred: ")
+        logD(tag = TAG, message = "bulred: ", isDebug = debugLogger)
     }
 
     private val runnable: suspend CoroutineScope.() -> Unit = launch@{
@@ -273,10 +274,9 @@ private class RsBlurNode(
         val captureMills = measureTimeMillis(::capture)
         // Measure the time taken for applying the blur effect.
         val blurMills = measureTimeMillis(::blur)
-        Log.d(TAG, "onPreDraw: CaptureMills: $captureMills BlurMills: $blurMills")
+        logD(tag = TAG, message = "onPreDraw: CaptureMills: $captureMills BlurMills: $blurMills", isDebug = debugLogger)
         // source - https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/foundation/foundation/src/androidMain/kotlin/androidx/compose/foundation/Magnifier.android.kt
         withFrameMillis { }
-        invalidateDraw()
         // Add the listener back for the next draw pass.
         view.viewTreeObserver.addOnPreDrawListener(this@RsBlurNode)
     }
@@ -289,6 +289,7 @@ private class RsBlurNode(
      */
     // TODO - Find something that is good for compose
     override fun onPreDraw(): Boolean {
+        logD(tag = TAG, message = "onPreDraw: ", isDebug = debugLogger)
         // Just return if the blur algorithm is already running.
         if (job?.isActive == true) return false
         job?.cancel()
@@ -307,7 +308,7 @@ private class RsBlurNode(
             dstSize = IntSize(size.width.roundToInt(), size.height.roundToInt())
         )
         // Log the drawing of the blurred image for debugging purposes.
-        Log.d(TAG, "draw: bitmap")
+        logD(tag = TAG, message = "draw: bitmap", isDebug = debugLogger)
         // Draw any additional content on top of the blurred image.
         drawContent()
     }
@@ -334,7 +335,8 @@ private class RsBlurNode(
  */
 private data class RsBlurElement(
     var radius: Float,
-    var downscale: Float
+    var downscale: Float,
+    val debugLogger: Boolean
 ) : ModifierNodeElement<RsBlurNode>() {
 
     /**
@@ -343,7 +345,7 @@ private data class RsBlurElement(
      * @return The created [RsBlurNode] instance.
      */
     override fun create(): RsBlurNode =
-        RsBlurNode(radius, downscale)
+        RsBlurNode(radius, downscale, debugLogger)
 
     /**
      * Updates the properties of the given [RsBlurNode].
@@ -357,7 +359,7 @@ private data class RsBlurElement(
             node.reset()
         }
         //TODO -  Call reset manually maybe.
-        Log.d(TAG, "onUpdate: $node")
+        logD(tag = TAG, message = "onUpdate: $node", isDebug = debugLogger)
     }
 
     /**
@@ -424,9 +426,11 @@ and compatibility with hardware bitmaps.
 fun Modifier.legacyBackgroundBlur(
     @FloatRange(from = 0.0, to = 25.0) radius: Float = 25f,
     @FloatRange(from = 0.0, to = 1.0, fromInclusive = false) downsample: Float = 1.0f,
+    debugLogger: Boolean = true
 ) = this then if (IsRunningInPreview) ScrimModifier(radius, downsample) else RsBlurElement(
     radius,
-    downsample
+    downsample,
+    debugLogger
 )
 
 private fun Modifier.ScrimModifier(radius: Float, downsample: Float) = inspectable(

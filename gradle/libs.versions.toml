@@ -7,7 +7,7 @@ koltin-version = "1.9.22"
 lifecycle-runtime-ktx = "2.6.2"
 compose-activity = "1.8.2"
 maven-publish = "0.0.0"
-agp = "8.4.0-alpha10"
+agp = "8.3.1"
 # FixMe: This dependency is currently required in material2 for BottomSheetDialog. Updating this cause
 #  Some issue in the Dialog; Don't update it'
 #noinspection GradleDependency
