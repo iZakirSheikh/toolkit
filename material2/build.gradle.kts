@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id(libs.plugins.maven.publish.get().getPluginId())
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -32,7 +33,6 @@ android {
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-Xcontext-receivers")
     }
     buildFeatures { compose = true }
-    composeOptions { kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get() }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
 }
 
@@ -40,14 +40,8 @@ dependencies {
     implementation(project(path = ":core-ktx"))
     compileOnly(libs.compose.foundation)
     compileOnly(libs.compose.ui)
-    compileOnly(libs.compose.material)
-
-    // currently required for BottomSheetDialog
-    implementation(libs.material.view)
-    //implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.compose.ui.util)
-    //implementation "androidx.compose.ui:ui-tooling:$compose_version"
-    //implementation "androidx.core:core-ktx:1.9.0"
+    compileOnly(libs.compose.material)
 }
 
 // Because the components are created only during the afterEvaluate phase, you must

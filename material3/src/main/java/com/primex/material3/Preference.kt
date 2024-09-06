@@ -31,6 +31,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,7 +59,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.composableOrNull
-import com.primex.core.rememberState
 
 private const val TAG = "Preference"
 
@@ -219,7 +219,7 @@ fun <T> DropDownPreference(
     require(entries.isNotEmpty())
 
     // control the expanded state of the dropDownMenu.
-    var expanded by rememberState(initial = false)
+    var expanded by remember { mutableStateOf(false) }
     // calculate eh default value of these entries
     val default = remember(defaultValue) {
         entries.find { (_, value) -> value == defaultValue }!!.first
@@ -342,7 +342,9 @@ fun SliderPreference(
                     .padding(start = startPadding)
             ) {
                 // place slider
-                var value by rememberState(initial = defaultValue)
+                var value by remember {
+                    mutableFloatStateOf( defaultValue)
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth(),

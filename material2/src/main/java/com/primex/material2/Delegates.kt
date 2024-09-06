@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.painter.Painter
@@ -27,9 +26,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.DialogProperties
-import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.withSpanStyle
-import com.primex.material2.dialog.BottomSheetDialogProperties
 
 
 @Composable
@@ -345,22 +342,6 @@ inline fun TextButton(
 )
 
 
-@ExperimentalToolkitApi
-@Composable
-@ExperimentalComposeUiApi
-inline fun BottomSheetDialog(
-    expanded: Boolean,
-    noinline onDismissRequest: () -> Unit,
-    properties: BottomSheetDialogProperties = BottomSheetDialogProperties(dismissWithAnimation = true),
-    noinline content: @Composable () -> Unit
-) {
-    if (expanded)
-        com.primex.material2.dialog.BottomSheetDialog(
-            onDismissRequest = onDismissRequest,
-            properties = properties,
-            content = content,
-        )
-}
 
 @ExperimentalMaterialApi
 @Composable

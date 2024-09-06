@@ -28,7 +28,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.primex.core.JetBlack
 import com.primex.core.SignalWhite
-import com.primex.core.rememberState
 import com.primex.material2.Caption
 import com.primex.material2.Label
 
@@ -241,12 +240,14 @@ fun TextInputDialog(
     vectorIcon: ImageVector? = null,
     onDismissRequest: (String?) -> Unit,
 ) {
-    var text by rememberState(
-        initial = TextFieldValue(
-            defaultValue,
-            selection = TextRange(0, defaultValue.length)
+    var text by remember {
+        mutableStateOf(
+            TextFieldValue(
+                defaultValue,
+                selection = TextRange(0, defaultValue.length)
+            )
         )
-    )
+    }
 
     PrimeDialog(
         title = title,

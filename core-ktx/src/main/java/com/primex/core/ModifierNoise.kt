@@ -18,6 +18,7 @@
 
 package com.primex.core
 
+import androidx.annotation.FloatRange
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
 
@@ -36,5 +37,5 @@ import androidx.compose.ui.graphics.BlendMode
  */
 @ExperimentalToolkitApi
 @Deprecated("Use visualEffect", replaceWith = ReplaceWith("visualEffect"))
-fun Modifier.noise(alpha: Float) =
+fun Modifier.noise(@FloatRange(from = 0.0, to = 1.0) alpha: Float) =
     this then visualEffect(ImageBrush.NoiseBrush, alpha, true, BlendMode.Hardlight)

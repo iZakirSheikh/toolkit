@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.TextUnit
     "Use 'remember { mutableStateOf(value)}' instead.'",
     ReplaceWith("remember { mutableStateOf(value = )}", "androidx.compose.runtime.remember", "androidx.compose.runtime.mutableStateOf"),
 )
-inline fun <T> rememberState(initial: T): MutableState<T> = remember {
+internal inline fun <T> rememberState(initial: T): MutableState<T> = remember {
     mutableStateOf(initial)
 }
 
@@ -222,7 +222,7 @@ inline fun <reified T> castTo(anything: Any): T {
  * Provides/finds a [Activity] that is wrapped inside the [LocalContext]
  */
 
-val ProvidableCompositionLocal<Context>.activity
+internal val ProvidableCompositionLocal<Context>.activity
     @ReadOnlyComposable
     @Composable
     get() = current.findActivity()
@@ -230,7 +230,7 @@ val ProvidableCompositionLocal<Context>.activity
 /**
  * Returns a Resources instance for the application's package.
  */
-val ProvidableCompositionLocal<Context>.resources: Resources
+internal val ProvidableCompositionLocal<Context>.resources: Resources
     @ReadOnlyComposable
     @Composable
     inline get() = current.resources

@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.dp
  * @author [Your name]
  */
 @Deprecated("Use the official ones")
-inline fun Modifier.gradient(
+private inline fun Modifier.gradient(
     colors: List<Color>,
     crossinline provider: (Size) -> Brush
 ): Modifier = composed {
@@ -102,7 +102,7 @@ inline fun Modifier.gradient(
  */
 
 @Deprecated("Use the official ones")
-fun Modifier.gradient(
+private fun Modifier.gradient(
     vertical: Boolean,
     colors: List<Color> = listOf(
         Color.Transparent,
@@ -153,7 +153,7 @@ fun Modifier.gradient(
  */
 
 @Deprecated("Use the official ones")
-fun Modifier.gradient(
+private fun Modifier.gradient(
     radius: Float,
     colors: List<Color> = listOf(
         Color.Transparent,
@@ -432,3 +432,14 @@ fun Modifier.padding(horizontal: Dp, top: Dp = 0.dp, bottom: Dp = 0.dp) =
             bottom = bottom
         )
     )
+
+
+/**
+ * Conditionally applies another [Modifier] if the given [condition] is true.
+ *
+ * @param condition The condition to evaluate.
+ * @param other The [Modifier] to apply if the condition is true.
+ * @return This [Modifier] if the condition is false, otherwise this [Modifier] combined with [other].
+ */
+inline fun Modifier.thenIf(condition: Boolean, other: Modifier.() -> Modifier) =
+    if (condition) this then other() else this
