@@ -92,6 +92,7 @@ val Color.Companion.TrafficBlack
  * @return [Color.White] if luminance < 0.3 otherwise [Color.Black]
  */
 
+@Deprecated("This mustn't be used; as this is not good enough for all scenarios.")
 fun suggestContentColorFor(backgroundColor: Color): Color {
     return if (backgroundColor.luminance() < 0.3f) Color.White else Color.Black
 }
@@ -104,7 +105,6 @@ fun Color.contrastAgainst(background: Color): Float {
 
     return max(fgLuminance, bgLuminance) / min(fgLuminance, bgLuminance)
 }
-
 
 /**
  * Blend between two [Color]s using the given ratio.
@@ -140,7 +140,6 @@ fun Color.hsl(
 ): Color {
     val hsl = FloatArray(3)
     ColorUtils.colorToHSL(toArgb(), hsl)
-
     // use value or default.
     return Color.hsl(
         hue = hue ?: hsl[0],
@@ -149,3 +148,4 @@ fun Color.hsl(
         alpha = alpha ?: this.alpha,
     )
 }
+

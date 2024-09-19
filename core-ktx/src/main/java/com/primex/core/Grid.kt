@@ -15,6 +15,7 @@ private const val TAG = "Grid"
  * @param content The content to be laid out in the grid.
  */
 @Composable
+@Deprecated("This was meant to be used in early days of compose.")
 fun VerticalGrid(
     modifier: Modifier = Modifier,
     columns: Int,
@@ -66,6 +67,7 @@ fun VerticalGrid(
  * @param content The content to be laid out in the grid.
  */
 @Composable
+@Deprecated("This was meant to be used in early days of compose.")
 fun StaggeredGrid(
     modifier: Modifier = Modifier,
     rows: Int,

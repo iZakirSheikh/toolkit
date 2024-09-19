@@ -42,6 +42,7 @@ dependencies {
     compileOnly(libs.compose.ui)
     implementation(libs.compose.ui.util)
     compileOnly(libs.compose.material)
+    compileOnly(libs.material.icons.core)
 }
 
 // Because the components are created only during the afterEvaluate phase, you must

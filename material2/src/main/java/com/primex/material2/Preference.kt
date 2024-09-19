@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalToolkitApi::class)
+@file:OptIn(ExperimentalToolkitApi::class, ExperimentalMaterialApi::class)
 
 package com.primex.material2
 
@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Checkbox
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -301,7 +302,6 @@ fun <T> DropDownPreference(
 }
 
 
-@OptIn(ExperimentalToolkitApi::class)
 @Composable
 fun ColorPickerPreference(
     title: CharSequence,

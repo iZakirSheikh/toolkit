@@ -1,13 +1,12 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package com.primex.material3
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
@@ -21,49 +20,31 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.RenderVectorGroup
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.PlatformParagraphStyle
-import androidx.compose.ui.text.PlatformSpanStyle
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.LocaleList
-import androidx.compose.ui.text.style.BaselineShift
-import androidx.compose.ui.text.style.Hyphens
-import androidx.compose.ui.text.style.LineBreak
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextDirection
-import androidx.compose.ui.text.style.TextGeometricTransform
-import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.primex.core.ExperimentalToolkitApi
-import com.primex.core.Text
-import com.primex.core.padding
 
 private const val TAG = "Delegates"
 
+/**
+ * Creates a simple label with a maximum of one line, using the [LocalTextStyle] and truncating
+ * overflowing text with an ellipsis.
+ * @see Text
+ */
 @Composable
 inline fun Label(
     text: CharSequence,
@@ -169,9 +150,48 @@ inline fun Text(
     noinline onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
-    when(text){
-        is String -> Text(text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, maxLines, minLines, onTextLayout, style)
-        is AnnotatedString -> Text(text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, maxLines, minLines, inlineContent, onTextLayout, style)
+    when (text) {
+        is String -> Text(
+            text,
+            modifier,
+            color,
+            fontSize,
+            fontStyle,
+            fontWeight,
+            fontFamily,
+            letterSpacing,
+            textDecoration,
+            textAlign,
+            lineHeight,
+            overflow,
+            softWrap,
+            maxLines,
+            minLines,
+            onTextLayout,
+            style
+        )
+
+        is AnnotatedString -> Text(
+            text,
+            modifier,
+            color,
+            fontSize,
+            fontStyle,
+            fontWeight,
+            fontFamily,
+            letterSpacing,
+            textDecoration,
+            textAlign,
+            lineHeight,
+            overflow,
+            softWrap,
+            maxLines,
+            minLines,
+            inlineContent,
+            onTextLayout,
+            style
+        )
+
         else -> error("$text must be either AnnotatedString or String!!")
     }
 }
@@ -279,7 +299,11 @@ inline fun OutlinedButton(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null, modifier = Modifier.padding(end = ButtonDefaults.IconSpacing))
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
+            )
         Label(text = label)
     }
 }
@@ -312,7 +336,11 @@ inline fun OutlinedButton2(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null, modifier = Modifier.padding(bottom = ButtonDefaults.IconSpacing))
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                modifier = Modifier.padding(bottom = ButtonDefaults.IconSpacing)
+            )
         Label(text = label)
     }
 }
@@ -343,7 +371,11 @@ inline fun TextButton(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null,   Modifier.padding(end = ButtonDefaults.IconSpacing))
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                Modifier.padding(end = ButtonDefaults.IconSpacing)
+            )
         Label(text = label)
     }
 }
@@ -375,7 +407,11 @@ inline fun TextButton2(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null,   Modifier.padding(bottom = ButtonDefaults.IconSpacing))
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                Modifier.padding(bottom = ButtonDefaults.IconSpacing)
+            )
         Label(text = label)
     }
 }
@@ -407,7 +443,11 @@ inline fun FilledTonalButton(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null,   Modifier.padding(end = ButtonDefaults.IconSpacing))
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                Modifier.padding(end = ButtonDefaults.IconSpacing)
+            )
         Label(text = label)
     }
 }
@@ -439,7 +479,11 @@ inline fun FilledTonalButton2(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null,   Modifier.padding(bottom = ButtonDefaults.IconSpacing))
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                Modifier.padding(bottom = ButtonDefaults.IconSpacing)
+            )
         Text(text = label)
     }
 }
@@ -471,7 +515,11 @@ inline fun ElevatedButton(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null,   Modifier.padding(end = ButtonDefaults.IconSpacing))
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                Modifier.padding(end = ButtonDefaults.IconSpacing)
+            )
         Label(text = label)
     }
 }
@@ -503,7 +551,11 @@ inline fun ElevatedButton2(
         interactionSource
     ) {
         if (icon != null)
-            Icon(painter = icon, contentDescription = null,   Modifier.padding(bottom = ButtonDefaults.IconSpacing))
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                Modifier.padding(bottom = ButtonDefaults.IconSpacing)
+            )
         Label(text = label)
     }
 }
@@ -515,9 +567,9 @@ inline fun ElevatedButton2(
  * @param content The composable function to be returned if the condition is true.
  * @return The composable function if the condition is true, otherwise null.
  */
-internal inline fun composableOrNull(condition: Boolean, noinline content: @Composable () -> Unit) = when (condition) {
-    true -> content
-    else -> null
-}
+internal inline fun composableOrNull(
+    condition: Boolean,
+    noinline content: @Composable () -> Unit
+) = if (condition) content else null
 
 

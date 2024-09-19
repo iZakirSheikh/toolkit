@@ -90,7 +90,7 @@ fun M2(dark: Boolean, onBack: () -> Unit) {
                             .background( MaterialTheme.colors.primary.blend(
                                 MaterialTheme.colors.background, 0.91f
                             ).copy(0.7f))
-                            .legacyBackgroundBlur(25f, 0.3f)
+                            //.legacyBackgroundBlur(25f, 0.3f)
                             .visualEffect(ImageBrush.NoiseBrush, 0.3f),
                         // The actions of Bottom app abr.
                         content = {

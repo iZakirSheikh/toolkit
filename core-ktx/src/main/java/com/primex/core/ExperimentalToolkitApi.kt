@@ -19,9 +19,7 @@
 package com.primex.core
 
 
-@RequiresOptIn(
-    "This toolkit API is experimental and is likely to change or to be removed in the future."
-)
+@RequiresOptIn("This toolkit API is experimental and is likely to change or to be removed in the future.")
 @Retention(AnnotationRetention.BINARY)
 annotation class ExperimentalToolkitApi
 

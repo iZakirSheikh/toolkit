@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package com.primex.material2
 
 import androidx.compose.foundation.background
@@ -10,17 +12,19 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.takeOrElse
 import com.primex.core.ExperimentalToolkitApi
+import com.primex.core.thenIf
 
 private const val TAG = "ListTile"
 
@@ -73,34 +77,45 @@ private val LIST_ITEM_TWO_LINE_CONTAINER_HEIGHT = 72.0.dp
 private val LIST_ITEM_THREE_LINE_CONTAINER_HEIGHT = 88.0.dp
 
 /**
- * Advanced Fast/Light version of [ListItem].
+ * A lightweight and customizable list item composable.
  *
- * **Known Issues:**
- *  - The [modifier] pass is not properly clipped with the provided [shape]
+ * This composable provides a streamlined alternative to the standard [ListItem], offering greater
+ * flexibility in styling and content arrangement.
+ * It allows you to define the headline, subtitle, overline, leading and trailing icons, and a footer section.
  *
  * **Note:**
- *  - The [headline] composable is a must; passing an empty value might result in serious crashes.
- *  - Please pass null if the other composables are not available.
- *  - Additionally, each composable should contain only one child.
+ * - The `headline` composable is required. Passing an empty value may lead to unexpected behavior.
+ * - Pass `null` for optional compatibles (`subtitle`, `overline`, `leading`, `trailing`, `footer`)
+ * if they are not needed.
+ * - Each composable slot should ideally contain only one direct child.
  *
- * @param color The color of the background of the composable. Pass different values for different states like "selected," etc.
- * @param enabled This doesn't do anything special except changing the color of the text.
- * @param shape The shape of this list item.
- * @param footer The optional composable to be drawn at the bottom of the list item, between the leading and end sections.
- * @param centerAlign Pass true to align the leading/trailing with the text section at centre
- * otherwise allow the layout decide.
+ * @param headline The primary text content of the list item. **Required.**
+ * @param modifier The modifier to apply to the list item.
+ * @param color The background color of the list item.
+ * @param onColor The content color used for text and icons on the list item.
+ * @param enabled Whether the list item is enabled. This primarily affects the color of the text.
+ * @param padding The content padding of the list item. Uses default padding if not specified.
+ * @param spacing The spacing between the leading/trailing icons and the text content. Uses default spacing if not specified.
+ * @param shape The shape of the list item. Defaults to [RectangleShape].
+ * @param subtitle Optional secondary text content displayed below the headline.
+ * @param overline Optional text content displayed above the headline.
+ * @param leading Optional composable for displaying an icon or other content at the start of the list item.
+ * @param trailing Optional composable for displaying an icon or other content at the end of the list item.
+ * @param footer Optional composable for displaying content at the bottom of the list item, between the leading and trailing sections.
+ * @param centerAlign Whether to vertically center-align the leading/trailing icons with the text content. Defaults to `false`.
  *
- * @see ListItem
- *
+ * @see androidx.compose.material.ListItem
  */
 @Composable
 @ExperimentalToolkitApi
 fun ListTile(
     headline: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.surface,
-    onColor: Color = contentColorFor(backgroundColor = color),
+    color: Color = Color.Transparent,
+    onColor: Color = LocalContentColor.current,
     enabled: Boolean = true,
+    padding: PaddingValues? = null,
+    spacing: Dp = Dp.Unspecified,
     shape: Shape = RectangleShape,
     subtitle: (@Composable () -> Unit)? = null,
     overline: (@Composable () -> Unit)? = null,
@@ -162,15 +177,17 @@ fun ListTile(
     // Actual layout
     Layout(
         content = content,
-        modifier = modifier
-            .background(color, shape)
+        modifier = Modifier
+            .thenIf(shape !== RectangleShape) { clip(shape) }
+            .background(color)
+            .then(modifier)
             .fillMaxWidth()
             .heightIn(minHeight)
-            .padding(outerPaddingValues)
+            .padding(padding ?: outerPaddingValues)
     ) { measurables, constraints ->
         val width = constraints.maxWidth
-        val leadingPaddingPx = LEADING_CONTENT_END_PADDING.roundToPx()
-        val trailingPaddingPx = TRAILING_CONTENT_START_PADDING.roundToPx()
+        val leadingPaddingPx = spacing.takeOrElse { LEADING_CONTENT_END_PADDING }.roundToPx()
+        val trailingPaddingPx = spacing.takeOrElse { TRAILING_CONTENT_START_PADDING }.roundToPx()
         // Leading Placeable.
         // The leading placeable has same index since headline is never null.
         // Leading placeable will be placed at the start of the screen.
@@ -235,6 +252,4 @@ fun ListTile(
         }
     }
 }
-
-
 

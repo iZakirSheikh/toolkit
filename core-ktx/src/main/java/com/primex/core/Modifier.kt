@@ -59,7 +59,7 @@ import androidx.compose.ui.unit.dp
  * @since 1.0.0
  * @author [Your name]
  */
-@Deprecated("Use the official ones")
+@Deprecated("This is too much over-engineering.")
 private inline fun Modifier.gradient(
     colors: List<Color>,
     crossinline provider: (Size) -> Brush
@@ -227,14 +227,6 @@ fun Modifier.rotateTransform(
         .then(rotated)
 }
 
-
-@Deprecated(
-    "Use the new function name 'rotateTransform' instead.",
-    ReplaceWith("rotateTransform(clockwise)")
-)
-@ExperimentalToolkitApi
-inline fun Modifier.rotate(clockwise: Boolean) = rotateTransform(clockwise)
-
 /**
  * This modifier acquires focus to this widget as soon as the user clicks on it.
  *
@@ -401,39 +393,6 @@ fun Modifier.drawVerticalDivider(
     )
 }
 
-
-/**
- * Adds padding to the composable in a shorthand way.
- *
- * @param horizontal The horizontal padding value.
- * @param top The top padding value.
- * @param bottom The bottom padding value.
- * @return A modified [Modifier] instance with added padding.
- *
- * Usage example:
- * ```
- * Box(
- *     modifier = Modifier.padding(horizontal = 16.dp, top = 8.dp, bottom = 8.dp)
- * ) {
- *     Text(text = "Hello world")
- * }
- * ```
- *
- * @since 1.0.0
- */
-@Stable
-@Deprecated("Don't use it as it cases confusion.", level = DeprecationLevel.HIDDEN)
-fun Modifier.padding(horizontal: Dp, top: Dp = 0.dp, bottom: Dp = 0.dp) =
-    this.then(
-        Modifier.padding(
-            start = horizontal,
-            end = horizontal,
-            top = top,
-            bottom = bottom
-        )
-    )
-
-
 /**
  * Conditionally applies another [Modifier] if the given [condition] is true.
  *
@@ -442,4 +401,4 @@ fun Modifier.padding(horizontal: Dp, top: Dp = 0.dp, bottom: Dp = 0.dp) =
  * @return This [Modifier] if the condition is false, otherwise this [Modifier] combined with [other].
  */
 inline fun Modifier.thenIf(condition: Boolean, other: Modifier.() -> Modifier) =
-    if (condition) this then other() else this
+    if (condition) this then Modifier.other() else this
