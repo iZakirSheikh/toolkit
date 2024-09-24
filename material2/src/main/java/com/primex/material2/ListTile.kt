@@ -91,12 +91,9 @@ private val LIST_ITEM_THREE_LINE_CONTAINER_HEIGHT = 88.0.dp
  *
  * @param headline The primary text content of the list item. **Required.**
  * @param modifier The modifier to apply to the list item.
- * @param color The background color of the list item.
  * @param onColor The content color used for text and icons on the list item.
- * @param enabled Whether the list item is enabled. This primarily affects the color of the text.
  * @param padding The content padding of the list item. Uses default padding if not specified.
  * @param spacing The spacing between the leading/trailing icons and the text content. Uses default spacing if not specified.
- * @param shape The shape of the list item. Defaults to [RectangleShape].
  * @param subtitle Optional secondary text content displayed below the headline.
  * @param overline Optional text content displayed above the headline.
  * @param leading Optional composable for displaying an icon or other content at the start of the list item.
@@ -111,12 +108,9 @@ private val LIST_ITEM_THREE_LINE_CONTAINER_HEIGHT = 88.0.dp
 fun ListTile(
     headline: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    color: Color = Color.Transparent,
     onColor: Color = LocalContentColor.current,
-    enabled: Boolean = true,
     padding: PaddingValues? = null,
     spacing: Dp = Dp.Unspecified,
-    shape: Shape = RectangleShape,
     subtitle: (@Composable () -> Unit)? = null,
     overline: (@Composable () -> Unit)? = null,
     leading: (@Composable () -> Unit)? = null,
@@ -131,7 +125,6 @@ fun ListTile(
         // Style the compatibles
         CompositionLocalProvider(
             LocalContentColor provides onColor,
-            LocalContentAlpha provides if (enabled) ContentAlpha.high else ContentAlpha.disabled,
         ) {
             // Headline
             ProvideTextStyle(typography.subtitle1) {
@@ -146,7 +139,7 @@ fun ListTile(
             }
             // Support Text
             CompositionLocalProvider(
-                LocalContentAlpha provides if (enabled) ContentAlpha.medium else ContentAlpha.disabled,
+                LocalContentAlpha provides ContentAlpha.medium,
                 content = {
                     ProvideTextStyle(value = typography.body2) {
                         subtitle?.invoke() // 4
@@ -177,10 +170,7 @@ fun ListTile(
     // Actual layout
     Layout(
         content = content,
-        modifier = Modifier
-            .thenIf(shape !== RectangleShape) { clip(shape) }
-            .background(color)
-            .then(modifier)
+        modifier = modifier
             .fillMaxWidth()
             .heightIn(minHeight)
             .padding(padding ?: outerPaddingValues)
@@ -200,7 +190,7 @@ fun ListTile(
         val trailingPlaceable =
             if (trailing != null) measurables[++index].measure(unrestricted) else null
         // The space remained for text part of this composable.
-        var remaining = width -
+        val remaining = width -
                 (if (leadingPlaceable == null) 0 else leadingPlaceable.width + leadingPaddingPx) -
                 (if (trailingPlaceable == null) 0 else trailingPlaceable.width + trailingPaddingPx)
         // fill-space between leading and trailing placeable.
@@ -253,3 +243,41 @@ fun ListTile(
     }
 }
 
+/** @see ListTile */
+@Deprecated("Use the new ListTile. This version of ListTile will be removed shortly.")
+@ExperimentalToolkitApi
+@Composable
+inline fun ListTile(
+    noinline headline: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Transparent,
+    onColor: Color = LocalContentColor.current,
+    enabled: Boolean = true,
+    padding: PaddingValues? = null,
+    spacing: Dp = Dp.Unspecified,
+    shape: Shape = RectangleShape,
+    noinline subtitle: (@Composable () -> Unit)? = null,
+    noinline overline: (@Composable () -> Unit)? = null,
+    noinline leading: (@Composable () -> Unit)? = null,
+    noinline trailing: (@Composable () -> Unit)? = null,
+    noinline footer: (@Composable () -> Unit)? = null,
+    centerAlign: Boolean = false
+){
+    CompositionLocalProvider(LocalContentAlpha provides  if (enabled) ContentAlpha.high else ContentAlpha.disabled) {
+        ListTile(
+            headline = headline,
+            modifier = Modifier
+                .thenIf(shape !== RectangleShape){clip(shape)}
+                .background(color).then(modifier),
+            onColor = onColor,
+            padding = padding,
+            spacing = spacing,
+            subtitle = subtitle,
+            overline = overline,
+            leading = leading,
+            trailing = trailing,
+            footer = footer,
+            centerAlign = centerAlign
+        )
+    }
+}
