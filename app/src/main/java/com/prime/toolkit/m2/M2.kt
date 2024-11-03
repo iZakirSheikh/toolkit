@@ -48,6 +48,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -55,6 +56,7 @@ import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.ImageBrush
 import com.primex.core.blend
 import com.primex.core.blur.legacyBackgroundBlur
+import com.primex.core.blur.newBackgroundBlur
 import com.primex.core.foreground
 import com.primex.core.visualEffect
 import com.primex.material2.Label
@@ -90,7 +92,7 @@ fun M2(dark: Boolean, onBack: () -> Unit) {
                             .background( MaterialTheme.colors.primary.blend(
                                 MaterialTheme.colors.background, 0.91f
                             ).copy(0.7f))
-                            //.legacyBackgroundBlur(25f, 0.3f)
+                            .newBackgroundBlur(50.dp)
                             .visualEffect(ImageBrush.NoiseBrush, 0.3f),
                         // The actions of Bottom app abr.
                         content = {

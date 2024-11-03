@@ -67,7 +67,7 @@ private fun Game(
             content = {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                         .allowHardware(false)
+                         .allowHardware(true)
                         .data(url)
                         .build(),
                     contentScale = ContentScale.Crop,

@@ -1,7 +1,7 @@
 /*
  * Copyright 2024 Zakir Sheikh
  *
- * Created by Zakir Sheikh on 11-01-2024.
+ * Created by Zakir Sheikh on 03-11-2024.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,25 @@
 package com.primex.core.blur
 
 import android.graphics.Bitmap
-import android.graphics.Color
+import android.graphics.HardwareRenderer
 import android.graphics.Picture
+import android.graphics.PixelFormat
+import android.graphics.RenderEffect
+import android.graphics.RenderNode
+import android.hardware.HardwareBuffer
+import android.media.ImageReader
 import android.os.Build
-import android.renderscript.Allocation
-import android.renderscript.Element
-import android.renderscript.RenderScript
-import android.renderscript.ScriptIntrinsicBlur
 import android.util.Log
 import android.view.Window
-import androidx.annotation.DeprecatedSinceApi
 import androidx.annotation.FloatRange
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.NativeCanvas
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.toAndroidTileMode
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
@@ -46,7 +48,9 @@ import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.record
 import com.primex.core.ExperimentalToolkitApi
@@ -57,119 +61,22 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.system.measureTimeMillis
 
-private const val TAG = "LegacyBackgroundBlur"
+private const val TAG = "NewBackgroundBlur"
 
 /**
- * Represents a modifier element for applying an RS (RenderScript) blur effect.
+ * Implementation of a blur modifier using RenderEffect.
  *
- * @see RsBlurNode
+ * @property radiusX Horizontal blur radius in Dp.
+ * @property radiusY Vertical blur radius in Dp.
+ * @property downscale Factor to scale down the captured bitmap.
+ * @property edgeTreatment How the edge of the blur effect should be treated (TileMode).
  */
-private data class RsBlurElement(
-    var radius: Float,
-    var downscale: Float
-) : ModifierNodeElement<RsBlurNode>() {
-
-    /**
-     * Creates a new instance of [RsBlurNode] with the specified radius and factor.
-     *
-     * @return The created [RsBlurNode] instance.
-     */
-    override fun create(): RsBlurNode =
-        RsBlurNode(radius, downscale)
-
-    /**
-     * Updates the properties of the given [RsBlurNode].
-     *
-     * @param node The [RsBlurNode] to be updated.
-     */
-    override fun update(node: RsBlurNode) {
-        node.radius = radius
-        if (node.downscale != downscale) {
-            node.downscale = downscale
-        }
-        node.onReset()
-        //TODO -  Call reset manually maybe.
-        Log.d(TAG, "onUpdate: $node")
-    }
-
-    /**
-     * Provides the inspectable properties for the [RsBlurElement].
-     *
-     * @receiver The [InspectorInfo] instance to populate with the properties.
-     */
-    override fun InspectorInfo.inspectableProperties() {
-        name = "RsBlur"
-        properties["radius"] = radius
-        properties["downscale"] = downscale
-    }
-}
-
-/**
- * Applies a background blur modifier to the composable using RenderScript.
- *
- * **Important:** This modifier is intended for API levels below 33. For API 33 and above, use the
- * [backgroundBlur] modifier for better performance and compatibility.
- *
- * **Key features:**
- * - Applies a blur effect to the composable's content using RenderScript.
- * - Captures the view's content, downscales it, and blurs it using RenderScript.
- * - Supports API levels 21 (Lollipop) to 32 (Android 12).
- * - Works flawlessly in API Level 34
- * - **Works flawlessly with dialogs and popups.**
- *
- * **Known limitations and considerations:**
- * - **Compatibility:** Might not work correctly with hardware bitmaps from Coil or Glide.
- * To avoid issues, disable hardware bitmaps for these libraries.
- * - **Preview:** In Preview; the **modifier** shows **Bluish Scrim Modifier** instead of *Blur*
- * - **Future plans:** An alternative implementation using PixelCopy is planned for better performance
-and compatibility with hardware bitmaps.
- *
- * **Usage:**
- *
- * ```kotlin
- * Scaffold(
- *     topBar = {
- *         Row(
- *             modifier = Modifier
- *                 .statusBarsPadding()
- *                 .legacyBackgroundBlur(radius = 25f, downsample = 0.4f)
- *                 // ... other modifiers
- *         ) {
- *             // ... composable content
- *         }
- *     },
- *     // ... other content
- * )
- * ```
- *
- *
- * @param radius The radius of the blur effect in pixels, capped at 25f.
- * @param downscale The downscale factor used to downscale the captured bitmap, capped at 1.0
- *
- * **@see [RsBlurNode] for the underlying implementation.
- * @author Zakir Sheikh
- * @author Bard (enhanced documentation)
- */
-//@ChecksSdkIntAtLeast(Build.VERSION_CODES.R)
-@DeprecatedSinceApi(Build.VERSION_CODES.R, "This fun works flawlessly above api 30; but use cautiously")
-@ExperimentalToolkitApi
-fun Modifier.legacyBackgroundBlur(
-    @FloatRange(from = 0.0, to = 25.0) radius: Float = 25f,
-    @FloatRange(from = 0.0, to = 1.0, fromInclusive = false) downsample: Float = 1.0f,
-) = this then when {
-    IsRunningInPreview -> ScrimModifier(radius, downsample)
-    else -> RsBlurElement(radius, downsample)
-}
-
-/**
- * Implementation of a blur modifier using RenderScript for API levels below 33.
- *
- * @param radius The radius of the blur effect in pixels, capped at 25f.
- * @param downscale The downscale factor used to downscale the captured bitmap, capped at 1.0
- */
-private class RsBlurNode(
-    var radius: Float = 25f,
-    var downscale: Float = 1.0f,
+@RequiresApi(Build.VERSION_CODES.S)
+private class ReBlurNode(
+    var radiusX: Dp,
+    var radiusY: Dp,
+    var downscale: Float,
+    var edgeTreatment: TileMode,
 ) : Modifier.Node(),
     DrawModifierNode,
     CompositionLocalConsumerModifierNode,
@@ -189,37 +96,28 @@ private class RsBlurNode(
 
     override val shouldAutoInvalidate: Boolean get() = false
 
-    // Required global values for blurring the bitmap
-    // A RenderScript instance used to create and execute the blur script
-    private lateinit var rs: RenderScript
-    private lateinit var rsBlurScript: ScriptIntrinsicBlur
-
-    // An Allocation that holds the output/input bitmap of the blur effect,
-    // initialized with the changing bounds of the bitmap.
-    private lateinit var outAllocation: Allocation
-    private lateinit var inAllocation: Allocation
-
     // The cached bitmap and canvas; used to capture the background content
     // The bitmap used to draw on the screen;
     // this bitmap is not initialized if [bounds] is zero.
     // The associated canvas for drawing on the bitmap
     private lateinit var bitmap: Bitmap
     private val picture = Picture()
-    private val canvas by lazy { NativeCanvas() } // not required if view is hardware accelerated.
 
     // The root window for of this app
     private lateinit var window: Window
     private lateinit var bounds: Rect
 
+    //
+    private val renderNode = RenderNode("BlurEffect")
+    private val hardwareRenderer = HardwareRenderer()
+    private lateinit var imageReader: ImageReader
+
     override fun onAttach() {
         // Get the current view from the local composition.
         val ctx = currentValueOf(LocalContext)
         window = ctx.findActivity().window
-        // Create a RenderScript instance from the current composition's context.
-        rs = RenderScript.create(ctx)
-        // Create a ScriptIntrinsicBlur instance using the RenderScript instance and the element type.
-        rsBlurScript = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs))
     }
+
 
     override fun onPlaced(coordinates: LayoutCoordinates) {
         // calculate new bound
@@ -236,22 +134,19 @@ private class RsBlurNode(
         onReset()
     }
 
-    // cleanup.
+    // Clean up resources when detached
     override fun onDetach() {
         job?.cancel()
-        rs.destroy()
-        bitmap.recycle()
-        rsBlurScript.destroy()
-        if (this::outAllocation.isInitialized)
-            outAllocation.destroy()
-        if (this::inAllocation.isInitialized)
-            inAllocation.destroy()
+        if (this::bitmap.isInitialized) bitmap.recycle()
+        if (this::imageReader.isInitialized) imageReader.close()
+        renderNode.discardDisplayList()
+        hardwareRenderer.destroy()
     }
 
     /**
-     * Captures the current view content.
+     * Captures the current view at [bounds] on [bitmap].
      */
-    fun capture() {
+    private fun capture() {
         val width = (bounds.width * downscale).roundToInt()
         val height = (bounds.height * downscale).roundToInt()
         picture.record(width, height) {
@@ -270,38 +165,30 @@ private class RsBlurNode(
             Log.d(TAG, "captured: ")
         }
         picture.endRecording()
-        when {
-            // recycle old bitmap and create new one
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && picture.requiresHardwareAcceleration() -> {
-                bitmap.recycle()
-                bitmap = Bitmap.createBitmap(picture).copy(Bitmap.Config.ARGB_8888, true)
-            }
-            // use created bitmap to save memory
-            else -> {
-                canvas.drawColor(Color.TRANSPARENT)
-                canvas.drawPicture(picture)
-                canvas.setBitmap(bitmap)
-                bitmap
-            }
-        }
+        bitmap.recycle()
+        bitmap = Bitmap.createBitmap(picture)
     }
 
     /**
-     * Applies blur to the captured bitmap.
+     *  Blurs the current [bitmap]
      */
-    fun blur() {
-        // Set the radius and the input of the blur script
-        inAllocation.copyFrom(bitmap)
-        // If the bitmap size has changed, create a new output allocation
-        rsBlurScript.setRadius(radius)
-        rsBlurScript.setInput(inAllocation)
-        // Apply the blur script to the output allocation
-        // Note: Do not use input Allocation in forEach. it will cause visual artifacts on blurred Bitmap
-        rsBlurScript.forEach(outAllocation)
-        // Copy the output allocation to the output bitmap
-        outAllocation.copyTo(this@RsBlurNode.bitmap)
+    private fun blur() {
+        val renderCanvas = renderNode.beginRecording()
+        renderCanvas.drawBitmap(bitmap, 0f, 0f, null)
+        renderNode.endRecording()
+        hardwareRenderer.createRenderRequest()
+            .setWaitForPresent(true)
+            .syncAndDraw()
+        val image = imageReader.acquireNextImage() ?: throw RuntimeException("No Image")
+        val hardwareBuffer = image.hardwareBuffer ?: throw RuntimeException("No HardwareBuffer")
+        bitmap.recycle()
+        bitmap = Bitmap.wrapHardwareBuffer(hardwareBuffer, null)
+            ?: throw RuntimeException("Create Bitmap Failed")
+        image.close()
     }
 
+
+    // Resets the blur node, cancelling any ongoing job and reinitializing resources.
     override fun onReset() {
         job?.cancel()
         // If bounds are empty, no need to continue.
@@ -314,15 +201,20 @@ private class RsBlurNode(
             (bounds.height * downscale).roundToInt(),
             Bitmap.Config.ARGB_8888
         )
-        // Create Allocation objects from the recreated bitmap for the blur effect.
-        inAllocation =
-            Allocation.createFromBitmap(
-                rs,
-                bitmap,
-                Allocation.MipmapControl.MIPMAP_NONE,
-                Allocation.USAGE_SCRIPT
-            )
-        outAllocation = Allocation.createTyped(rs, inAllocation.type)
+        imageReader = ImageReader.newInstance(
+            bitmap.width, bitmap.height,
+            PixelFormat.RGBA_8888, 1,
+            HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE or HardwareBuffer.USAGE_GPU_COLOR_OUTPUT
+        )
+        val density = currentValueOf(LocalDensity)
+        hardwareRenderer.setSurface(imageReader.surface)
+        hardwareRenderer.setContentRoot(renderNode)
+        renderNode.setPosition(0, 0, imageReader.width, imageReader.height)
+        val blurRenderEffect = RenderEffect.createBlurEffect(
+            with(density) { radiusX.toPx() }, with(density) { radiusY.toPx() },
+            edgeTreatment.toAndroidTileMode()
+        )
+        renderNode.setRenderEffect(blurRenderEffect)
         // launch the job
         val _onFrame: (frameTimeMillis: Long) -> Unit = {}
         job = coroutineScope.launch {
@@ -350,12 +242,13 @@ private class RsBlurNode(
         }
     }
 
+
     override fun ContentDrawScope.draw() {
         // Skip drawing any content for this component while blurring,
         // as we only need the content behind it.
         if (processing) return
         // Draw the blurred image on the canvas.
-        if (this@RsBlurNode::bitmap.isInitialized)
+        if (this@ReBlurNode::bitmap.isInitialized)
             drawImage(
                 bitmap.asImageBitmap(),
                 dstSize = IntSize(size.width.roundToInt(), size.height.roundToInt())
@@ -365,4 +258,94 @@ private class RsBlurNode(
         // Draw any additional content on top of the blurred image.
         drawContent()
     }
+}
+
+/**
+ * Represents a modifier element for applying an RS (RenderScript) blur effect.
+ *
+ * @see RsBlurNode
+ */
+@RequiresApi(Build.VERSION_CODES.S)
+private data class ReBlurElement(
+    var radiusX: Dp,
+    var radiusY: Dp,
+    var downscale: Float,
+    var edgeTreatment: TileMode,
+) : ModifierNodeElement<ReBlurNode>() {
+
+    /**
+     * Creates a new instance of [RsBlurNode] with the specified radius and factor.
+     *
+     * @return The created [RsBlurNode] instance.
+     */
+    override fun create(): ReBlurNode =
+        ReBlurNode(radiusX, radiusY, downscale, edgeTreatment)
+
+    /**
+     * Updates the properties of the given [RsBlurNode].
+     *
+     * @param node The [RsBlurNode] to be updated.
+     */
+    override fun update(node: ReBlurNode) {
+        node.radiusX = radiusX
+        node.radiusY = radiusY
+        node.edgeTreatment = edgeTreatment
+        node.downscale = downscale
+        //TODO -  Call reset manually maybe.
+        node.onReset()
+        Log.d(TAG, "onUpdate: $node")
+    }
+
+    /**
+     * Provides the inspectable properties for the [RsBlurElement].
+     *
+     * @receiver The [InspectorInfo] instance to populate with the properties.
+     */
+    override fun InspectorInfo.inspectableProperties() {
+        name = "RsBlur"
+        properties["radiusX"] = radiusX
+        properties["radiusY"] = radiusY
+        properties["downscale"] = downscale
+        properties["edgeTreatment"] = edgeTreatment
+    }
+}
+
+/**
+ * Applies a new background blur effect to a Modifier.
+ *
+ * @param radius The radius of the blur effect.
+ * @param edgeTreatment How the edges of the blur should be treated.
+ * @param downsample The factor by which the image should be downsampled.
+ * @return The modified Modifier with the blur effect applied.
+ */
+//@ChecksSdkIntAtLeast(Build.VERSION_CODES.R)
+@RequiresApi(Build.VERSION_CODES.S)
+@ExperimentalToolkitApi
+fun Modifier.newBackgroundBlur(
+    radius: Dp,
+    edgeTreatment: TileMode = TileMode.Clamp,
+    @FloatRange(from = 0.0, to = 1.0, fromInclusive = false) downsample: Float = 1.0f,
+) = this then newBackgroundBlur(radius, radius, edgeTreatment, downsample)
+
+/**
+ * Applies a new background blur effect to a Modifier with separate horizontal and vertical radii.
+ *
+ * @param radiusX The horizontal radius of the blur effect.
+ * @param radiusY The vertical radius of the blur effect.
+ * @param edgeTreatment How the edges of the blur should be treated.
+ * @param downsample The factor by which the image should be downsampled.
+ * @return The modified Modifier with the blur effect applied.
+ */
+@RequiresApi(Build.VERSION_CODES.S)
+@ExperimentalToolkitApi
+fun Modifier.newBackgroundBlur(
+    radiusX: Dp,
+    radiusY: Dp,
+    edgeTreatment: TileMode = TileMode.Clamp,
+    @FloatRange(from = 0.0, to = 1.0, fromInclusive = false) downsample: Float = 1.0f,
+) = this then when {
+    // Use ScrimModifier during preview for better visual fidelity
+    IsRunningInPreview -> ScrimModifier(radiusX.value, downsample)
+    // Apply ReBlurElement for actual running environments
+    else -> ReBlurElement(radiusX, radiusY, downsample, edgeTreatment)
 }

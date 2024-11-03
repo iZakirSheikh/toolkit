@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
         var selected by mutableIntStateOf(0)
         val onNavigateBack = { selected = 0 }
         setContent {
-            val isDark = /*isSystemInDarkTheme()*/ false
+            val isDark = isSystemInDarkTheme()
             Crossfade(targetState = selected, label = "", modifier = Modifier.fillMaxSize()) {
                 when (it) {
                     0 -> Launcher(isDark) { selected = it }
