@@ -35,6 +35,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.prime.toolkit.core.Game
+import com.primex.core.blur.legacyContentBlur
 import com.primex.material2.Label
 
 @Composable
@@ -59,15 +61,14 @@ private fun Game(
         Surface(
             shape = RoundedCornerShape(8),
             elevation = 6.dp,
-            modifier = modifier
+            modifier = Modifier
                 .scale(0.90f)
                 .padding(2.dp)
-                .weight(1f)
-                .aspectRatio(1 / 1.5f),
+                .aspectRatio(1 / 1.6f),
             content = {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                         .allowHardware(true)
+                        .allowHardware(true)
                         .data(url)
                         .build(),
                     contentScale = ContentScale.Crop,
@@ -100,12 +101,12 @@ fun LazyGameGrid(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding
     ) {
-        items(list, key = { it }) {
+        items(list, key = { it.first }) {
             Game(
                 value = it,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .animateItemPlacement(),
+                    .animateItem(),
             )
         }
     }
