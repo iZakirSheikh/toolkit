@@ -8,11 +8,8 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
@@ -20,155 +17,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-
-
-/**
- * Overlays the content with the gradient provided by the [Brush].
- *
- * @param colors The list of colors to use in the gradient.
- * @param provider The function to provide the [Brush] to use in the gradient, based on the [Size] of the content.
- * @return A modified [Modifier] with the gradient effect applied.
- *
- * Usage example:
- * ```
- * Box(
- *     modifier = Modifier
- *         .fillMaxSize()
- *         .gradient(
- *             colors = listOf(Color.Red, Color.Yellow, Color.Green),
- *             provider = { size ->
- *                 Brush.linearGradient(
- *                     colors = colors,
- *                     start = Offset.Zero,
- *                     end = Offset(size.width, size.height)
- *                 )
- *             }
- *         )
- * ) {
- *     // content here
- * }
- * ```
- *
- * @since 1.0.0
- * @author [Your name]
- */
-@Deprecated("This is too much over-engineering.")
-private inline fun Modifier.gradient(
-    colors: List<Color>,
-    crossinline provider: (Size) -> Brush
-): Modifier = composed {
-    var size by rememberState(initial = Size.Zero)
-    val gradient = remember(colors, size) { provider(size) }
-    drawWithContent {
-        size = this.size
-        drawContent()
-        drawRect(brush = gradient)
-    }
-}
-
-/**
- * Adds a gradient effect to the content with the provided [Brush].
- *
- * @param vertical `true` if the gradient should be applied vertically, `false` if horizontally.
- * @param colors The colors to use in the [Brush]. The first color is the top color if `vertical`
- * is `true`, or the left color if `vertical` is `false`. The last color is the bottom color if
- * `vertical` is `true`, or the right color if `vertical` is `false`.
- *
- * Usage example:
- * ```
- * Box(
- *     modifier = Modifier
- *         .fillMaxSize()
- *         .gradient(
- *             vertical = true,
- *             colors = listOf(Color.Transparent, Color.Red, Color.Black)
- *         )
- * ) {
- *     // content here
- * }
- * ```
- *
- * @since 1.0.0
- * @author Zakir Sheikh
- *
- * @return A modified [Modifier] with the gradient effect applied.
- */
-
-@Deprecated("Use the official ones")
-private fun Modifier.gradient(
-    vertical: Boolean,
-    colors: List<Color> = listOf(
-        Color.Transparent,
-        Color.Black,
-    ),
-) = gradient(colors) { size ->
-    if (vertical)
-        Brush.verticalGradient(
-            colors = colors,
-            startY = 0f,
-            endY = size.height
-        )
-    else
-        Brush.horizontalGradient(
-            colors = colors,
-            startX = 0f,
-            endX = size.width
-        )
-}
-
-/**
- * Adds a radial gradient effect to the content with the provided [Brush].
- *
- * @param radius The radius of the radial gradient.
- * @param colors The colors to use in the [Brush]. The first color is the center color, and the last color is the outer color.
- * @param center The center of the radial gradient. If unspecified, the center is the center of the content.
- * @param tileMode The tile mode of the radial gradient.
- * @return A modified [Modifier] with the radial gradient effect applied.
- *
- * Usage example:
- * ```
- * Box(
- *     modifier = Modifier
- *         .fillMaxSize()
- *         .gradient(
- *             radius = 200f,
- *             colors = listOf(Color.Red, Color.Yellow, Color.Green),
- *             center = Offset(0.5f, 0.5f),
- *             tileMode = TileMode.Repeated
- *         )
- * ) {
- *     // content here
- * }
- * ```
- *
- * @since 1.0.0
- * @see [Brush.radialGradient]
- */
-
-@Deprecated("Use the official ones")
-private fun Modifier.gradient(
-    radius: Float,
-    colors: List<Color> = listOf(
-        Color.Transparent,
-        Color.Black
-    ),
-    center: Offset = Offset.Unspecified,
-    tileMode: TileMode = TileMode.Clamp
-) = gradient(colors) {
-    Brush.radialGradient(
-        colors = colors,
-        center = center,
-        radius = radius.coerceAtLeast(1f),
-        tileMode = tileMode
-    )
-}
 
 /**
  * Rotates/transforms the composable by 90 degrees in the clockwise or anti-clockwise direction.
@@ -249,7 +101,7 @@ fun Modifier.rotateTransform(
  * @author [Your name]
  */
 
-@Deprecated("Not good solution.")
+@Deprecated("Not good solution.", level = DeprecationLevel.HIDDEN)
 fun Modifier.acquireFocusOnInteraction(
     interactionSource: MutableInteractionSource? = null,
     indication: Indication? = null

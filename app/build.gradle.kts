@@ -45,7 +45,6 @@ dependencies {
     implementation(libs.compose.material)
     implementation(libs.compose.preview)
     implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.compose.material3)
     implementation(libs.coil)
     implementation(libs.material.icons.core)
     implementation(libs.material.icons.extended)
@@ -56,5 +55,4 @@ dependencies {
     implementation(project(path = ":core-ktx"))
     implementation(project(path = ":material2"))
     implementation(project(path = ":preferences"))
-    implementation(project(path = ":material3"))
 }

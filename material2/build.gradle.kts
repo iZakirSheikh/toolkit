@@ -7,11 +7,10 @@ plugins {
 
 android {
     namespace = "com.primex.material2"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 34
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("proguard-rules.pro")
     }

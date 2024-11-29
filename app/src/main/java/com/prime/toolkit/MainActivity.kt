@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -26,10 +23,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.prime.toolkit.m2.M2
-import com.prime.toolkit.m3.M3
 import com.primex.core.ExperimentalToolkitApi
-import com.primex.material3.Button2
-import com.primex.material3.Label
 
 private const val TAG = "MainActivity"
 
@@ -47,49 +41,9 @@ class MainActivity : ComponentActivity() {
         // Set the color of the navigation bar and the status bar to the determined color.
         controller.isAppearanceLightStatusBars = true
         controller.isAppearanceLightNavigationBars = true
-        var selected by mutableIntStateOf(0)
-        val onNavigateBack = { selected = 0 }
         setContent {
             val isDark = isSystemInDarkTheme()
-            Crossfade(targetState = selected, label = "", modifier = Modifier.fillMaxSize()) {
-                when (it) {
-                    0 -> Launcher(isDark) { selected = it }
-                    1 -> M2(dark = isDark, onBack = onNavigateBack)
-                    else -> M3(dark = isDark, onNavigateBack)
-                }
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalToolkitApi::class)
-@Composable
-private fun Launcher(
-    dark: Boolean,
-    onLaunch: (id: Int) -> Unit
-) {
-    MaterialTheme(
-        //colorScheme = if (dark) MaterialTheme.colorScheme
-    ) {
-        Surface(
-            color = MaterialTheme.colorScheme.background
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Button2(onClick = { onLaunch(1) }, shape = MaterialTheme.shapes.large) {
-                    Icon(imageVector = Icons.Outlined.Info, contentDescription = "")
-                    Label(text = "Material 2")
-                }
-                Spacer(modifier = Modifier.padding(16.dp))
-                Button2(onClick = { onLaunch(2) }, shape = MaterialTheme.shapes.large) {
-                    Icon(imageVector = Icons.Outlined.Info, contentDescription = "")
-                    Label(text = "Material 3")
-                }
-            }
+            PreviewM2()
         }
     }
 }

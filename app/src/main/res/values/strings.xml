@@ -100,4 +100,7 @@
 
     <string name="snackbar_msg"><b><big>Title</big>\n</b><br/>This is a desc of the fake snackbar message, please follow the good practices for creating avalid <font color="#00ff00">snackbar</font> message. You can also use styles in the message to make it even more fun.</string>
     <string name="snackbar_msg_short"><b><big>Title</big>\n</b><br/>This is a short sample message</string>
+    <string name="sample_preference_text"><b>Enable Trash can</b>
+          <font color = "gray" size = "15">\n<i><b>Only available on Android 11 and above</b></i>, when enabled, deleted tracks are moved to Trash Can folder instead of being permanently</font>
+    </string>
 </resources>

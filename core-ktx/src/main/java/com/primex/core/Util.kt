@@ -52,35 +52,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 
-/**
- * A composable function that creates a [MutableState] object which can be used to hold and update
- * a value in the composable's memory.
- *
- * @param initial The initial value for the state.
- *
- * @return A [MutableState] object initialized with the [initial] value.
- *
- * @see remember
- * @see mutableStateOf
- */
-@Composable
-@Deprecated(
-    "Use 'remember { mutableStateOf(value)}' instead.'",
-    ReplaceWith("remember { mutableStateOf(value = )}", "androidx.compose.runtime.remember", "androidx.compose.runtime.mutableStateOf"),
-)
-internal inline fun <T> rememberState(initial: T): MutableState<T> = remember {
-    mutableStateOf(initial)
-}
-
-
-/**
- * @see findActivity
- */
-@Deprecated(
-    "Use 'findActivity' instead.'",
-    ReplaceWith("findActivity()"),
-)
-val Context.activity: Activity get() = findActivity()
 
 /**
  * A utility function that recursively searches for and returns the [Activity] instance associated with the current [Context].
@@ -110,7 +81,7 @@ tailrec fun Context.findActivity(): Activity =
 inline fun LockScreenOrientation(orientation: Int) {
     val context = LocalContext.current
     DisposableEffect(Unit) {
-        val activity = context.activity ?: return@DisposableEffect onDispose {}
+        val activity = context.findActivity()
         val originalOrientation = activity.requestedOrientation
         activity.requestedOrientation = orientation
         onDispose {
@@ -185,21 +156,9 @@ inline fun <T : Closeable?, R> T.use(tag: String, block: (T) -> R): R? {
 /**
  * An alternative to [synchronized] using [Mutex]
  */
-@Deprecated("Not required. use the extension methods on lock.")
+@Deprecated("Not required. use the extension methods on lock.", level = DeprecationLevel.HIDDEN)
 suspend inline fun <T> synchronised(lock: Mutex, action: () -> T): T {
     return lock.withLock(action = action)
-}
-
-
-/**
- * A function meant to accompany composable without triggering whole composable recomposition
- */
-@SuppressLint("ComposableNaming")
-@Composable
-@ReadOnlyComposable
-@Deprecated("Not recommended to use.", level = DeprecationLevel.HIDDEN)
-fun calculate(calculation: () -> Unit) {
-    calculation.invoke()
 }
 
 /**
@@ -216,24 +175,6 @@ fun calculate(calculation: () -> Unit) {
 inline fun <reified T> castTo(anything: Any): T {
     return anything as T
 }
-
-
-/**
- * Provides/finds a [Activity] that is wrapped inside the [LocalContext]
- */
-
-internal val ProvidableCompositionLocal<Context>.activity
-    @ReadOnlyComposable
-    @Composable
-    get() = current.findActivity()
-
-/**
- * Returns a Resources instance for the application's package.
- */
-internal val ProvidableCompositionLocal<Context>.resources: Resources
-    @ReadOnlyComposable
-    @Composable
-    inline get() = current.resources
 
 /**
  * Returns a Composable function if the condition is true, otherwise returns null.

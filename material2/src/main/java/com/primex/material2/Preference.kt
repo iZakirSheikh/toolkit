@@ -14,16 +14,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Checkbox
-import androidx.compose.material.DropdownMenu
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -39,6 +41,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +49,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
@@ -70,49 +72,39 @@ import com.primex.material2.menu.DropDownMenu2
 private const val TAG = "Preference"
 
 /**
- * This is the container for some defaults of the preference composable.
+ * The padding required to save oif user wants leading icon space to be reserved.
  */
-object PreferenceDefaults {
-    /**
-     * The padding required to save oif user wants leading icon space to be reserved.
-     */
-    val IconSpaceReserved = 12.dp
-}
+val IconSpaceReserved = 12.dp
 
 /**
- * A General [Preference(title = )] representation.
+ * A General [Preference] representation.
  * The basic building block that represents an individual setting displayed to a user in the preference hierarchy.
- * @param modifier [Modifier] allows to modify the outer wrapper of this preference
- * @param enabled  [Boolean]  Sets whether this preference should disable its view when it gets disabled.
- * @param singleLineTitle  [Boolean] Sets whether to constrain the title of this preference to a single line instead of letting it wrap onto multiple lines.
- * @param iconSpaceReserved  [Boolean] Sets whether to reserve the space of this preference icon view when no icon is provided. If set to true, the preference will be offset as if it would have the icon and thus aligned with other preferences having icons.
- * @param icon -[ImageVector] Sets the icon for this preference with a [ImageVector].
- * @param summery [String] Sets the summary for this preference with a [String].
- * @param title  Sets the title for this preference with a [String].
+ *
+ * @param text The text to be displayed as the title of this preference. It is allowed up to 4 lines, with the first line representing the title. Use bold for the first line and gray color for the summary.
+ * @param modifier [Modifier] allows to modify the outer wrapper of this preference.
+ * @param iconSpaceReserved [Boolean] Sets whether to reserve the space of this preference icon view when no icon is provided. If set to true, the preference will be offset as if it would have the icon and thus aligned with other preferences having icons.
+ * @param icon [ImageVector] Sets the icon for this preference with an [ImageVector].
+ * @param enabled [Boolean] Sets whether this preference should disable its view when it gets disabled. It also triggers the text to lose alpha.
  * @param widget Sets the layout for the controllable widget portion of this preference.
- * @param revealable The content that is hide/show on users request.
- * @param forceVisible if true make [revealable] content show/hide.
+ * @param footer The content that is hide/show on user's request.
+ * @param forceVisible If true, makes [footer] content, if available, always shown.
  */
 @Composable
 fun Preference(
-    title: CharSequence,
+    text: CharSequence,
     modifier: Modifier = Modifier,
-    singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: CharSequence? = null,
     enabled: Boolean = true,
     widget: @Composable (() -> Unit)? = null,
-    revealable: (@Composable () -> Unit)? = null,
+    footer: (@Composable () -> Unit)? = null,
     forceVisible: Boolean = false,
 ) {
+    // State to manage the focusable state of the footer content
     var focusable by remember { mutableStateOf(forceVisible) }
     val manager = LocalFocusManager.current
-    // Use normal modifier when
-    // forceVisible = true.
-    // Not enabled
-    // revealable == null
-    val listModifier = when (forceVisible || !enabled || revealable == null) {
+    // Determine the appropriate modifier based on the state of forceVisible, enabled, and footer
+    val listModifier = when (forceVisible || !enabled || footer == null) {
         true -> modifier
         else -> {
             val requester = remember(::FocusRequester)
@@ -133,22 +125,20 @@ fun Preference(
                 .animateContentSize()
         }
     }
+    // Main layout for the preference item
     ListTile(
         modifier = listModifier,
-        color = Color.Transparent,
         trailing = widget,
-        enabled = enabled,
+        onColor = MaterialTheme.colors.onBackground.copy(if (enabled) ContentAlpha.high else ContentAlpha.disabled),
         headline = {
             Text(
-                text = title,
-                maxLines = if (singleLineTitle) 1 else 2,
-                overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.SemiBold
+                text = text,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis
             )
         },
-        subtitle = composableOrNull(!summery.isNullOrBlank()) {
-            Text(text = summery ?: "", maxLines = 4, overflow = TextOverflow.Ellipsis)
-        },
+        // Display the icon if provided or
+        // Preserve the space for the icon if requested
         leading = composableOrNull(icon != null || iconSpaceReserved) {
             when {
                 // non-null write the icon.
@@ -158,167 +148,172 @@ fun Preference(
                     modifier = Modifier.padding(top = 4.dp)
                 )
                 // preserve the space in case user requested.
-                iconSpaceReserved -> Spacer(Modifier.padding(PreferenceDefaults.IconSpaceReserved))
+                iconSpaceReserved -> Spacer(Modifier.padding(IconSpaceReserved))
             }
         },
-        // show footer in case available.
-        footer = composableOrNull(revealable != null) {
+        // Show footer content if available and focusable
+        footer = composableOrNull(footer != null) {
             Crossfade(targetState = focusable, label = TAG) { value ->
-                if (value) revealable?.invoke()
+                if (value) footer?.invoke()
             }
         }
     )
 }
 
+/**
+ * Represents a switch [Preference]
+ */
 @Composable
+@NonRestartableComposable
 fun SwitchPreference(
-    title: CharSequence,
+    text: CharSequence,
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit),
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: CharSequence? = null,
 ) {
     Preference(
         modifier = modifier.clickable(enabled = enabled) {
             onCheckedChange(!checked)
         },
-        title = title,
+        text = text,
         enabled = enabled,
-        singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
-        summery = summery,
-        widget = {
-            Switch(enabled = enabled, checked = checked, onCheckedChange = null)
-        },
+        widget = { Switch(enabled = enabled, checked = checked, onCheckedChange = null) },
     )
 }
 
-
+/**
+ * Represents a checkbox [Preference]
+ */
 @Composable
+@NonRestartableComposable
 fun CheckBoxPreference(
-    title: CharSequence,
+    text: CharSequence,
     checked: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: CharSequence? = null,
     onCheckedChange: ((Boolean) -> Unit)
 ) {
     Preference(
         modifier = modifier.clickable(enabled = enabled) {
             onCheckedChange(!checked)
         },
-        title = title,
+        text = text,
         enabled = enabled,
-        singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
-        summery = summery,
         widget = {
             Checkbox(enabled = enabled, checked = checked, onCheckedChange = null)
         }
     )
 }
 
-
+/**
+ * Represents a dropdown [Preference].
+ * @param value  current selected value.
+ * @param values  list of values.
+ * @param entries  list of corresponding text entries. must be equal in size to [values]
+ */
 @Composable
+@NonRestartableComposable
 fun <T> DropDownPreference(
-    title: CharSequence,
-    defaultValue: T,
-    onRequestChange: (T) -> Unit,
+    value: T,
+    text: CharSequence,
     modifier: Modifier = Modifier,
+    onRequestChange: (T) -> Unit,
     enabled: Boolean = true,
-    singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    entries: List<Pair<String, T>>,
+    values: Array<T>,
+    entries: Array<CharSequence>,
 ) {
-    require(entries.isNotEmpty())
-    var expanded by remember { mutableStateOf(false) }
-    val default = remember(defaultValue) {
-        entries.find { (_, value) -> value == defaultValue }!!.first
+    require(entries.isNotEmpty() && values.size == entries.size)
+    val (expanded, onDismissRequest) = remember { mutableStateOf(false) }
+    val widget = @Composable {
+        Box {
+            // Icon
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+            )
+
+            //
+            val topValue = value
+            DropDownMenu2(
+                expanded = expanded,
+                onDismissRequest = { onDismissRequest(false) },
+                content = {
+                    values.forEachIndexed { index, value ->
+                        val selected = value == topValue
+                        DropdownMenuItem(
+                            onClick = {
+                                if (selected)
+                                    return@DropdownMenuItem
+                                onRequestChange(value);
+                                onDismissRequest(false)
+                            },
+                            content = {
+                                RadioButton(
+                                    selected = selected,
+                                    // = null,
+                                    enabled = enabled,
+                                    onClick = null
+                                )
+
+                                Text(
+                                    text = entries[index],
+                                    fontWeight = if (!selected) FontWeight.Normal else FontWeight.Bold,
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp)
+                                        .fillMaxSize(),
+                                    maxLines = 2,
+                                    color = if (selected) MaterialTheme.colors.secondary else LocalContentColor.current
+                                )
+                            },
+                            modifier = Modifier.defaultMinSize(minWidth = 180.dp, minHeight = 36.dp)
+                        )
+                    }
+                },
+                elevation = 10.dp,
+            )
+        }
     }
 
-
-    val widget =
-        @Composable {
-            Box {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                )
-
-                DropDownMenu2(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    entries.forEach { (placeHolder, value) ->
-                        val onEntryClick = {
-                            if (value != defaultValue) {
-                                onRequestChange(value)
-                                expanded = false
-                            }
-                        }
-                        DropdownMenuItem(onClick = onEntryClick) {
-                            RadioButton(
-                                selected = value == defaultValue,
-                                // = null,
-                                enabled = enabled,
-                                onClick = null
-                            )
-
-                            Text(
-                                text = placeHolder,
-                                style = MaterialTheme.typography.body1,
-                                fontWeight = if (value != defaultValue) FontWeight.SemiBold else FontWeight.Bold,
-                                modifier = Modifier
-                                    .padding(start = 16.dp, end = 16.dp)
-                                    .fillMaxSize(),
-                                maxLines = 2,
-                                color = if (value == defaultValue) MaterialTheme.colors.secondary else LocalContentColor.current
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
     Preference(
-        modifier = modifier.clickable(enabled = enabled) {
-            expanded = true
-        },
-        title = title,
+        modifier = modifier.toggleable(
+            expanded,
+            enabled = enabled,
+            onValueChange = onDismissRequest
+        ),
+        text = text,
         enabled = enabled,
-        singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
-        summery = default,
         widget = widget
     )
 }
 
-
 @Composable
 fun ColorPickerPreference(
-    title: CharSequence,
-    defaultEntry: Color,
+    text: CharSequence,
+    value: Color,
     entries: List<Color>,
     onRequestValueChange: (Color) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: CharSequence? = null,
     forceVisible: Boolean = false,
 ) {
     val widget =
         @Composable {
-            val color by animateColorAsState(targetValue = defaultEntry)
+            val color by animateColorAsState(targetValue = value)
             Spacer(
                 modifier = Modifier
                     .background(color = color, shape = CircleShape)
@@ -326,7 +321,7 @@ fun ColorPickerPreference(
             )
         }
 
-    var checked by remember { mutableStateOf(defaultEntry) }
+    val (checked, onToggleChecked) = remember { mutableStateOf(value) }
 
     val revealable =
         @Composable {
@@ -342,7 +337,7 @@ fun ColorPickerPreference(
                 ColorPicker(
                     entries = entries,
                     checked = checked,
-                    onColorChecked = { checked = it },
+                    onColorChecked = onToggleChecked,
                     modifier = Modifier.padding(vertical = 10.dp)
                 )
 
@@ -364,15 +359,13 @@ fun ColorPickerPreference(
             }
         }
     Preference(
-        title = title,
+        text = text,
         icon = icon,
-        summery = summery,
-        singleLineTitle = singleLineTitle,
         enabled = enabled,
         modifier = modifier,
         forceVisible = forceVisible,
         widget = widget,
-        revealable = revealable
+        footer = revealable
     )
 }
 
@@ -398,24 +391,26 @@ private fun TextButtons(
 }
 
 
+/**
+ * Represents a slider [Preference].
+ */
 @Composable
 fun SliderPreference(
-    title: CharSequence,
-    defaultValue: Float,
+    text: CharSequence,
+    value: Float,
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     steps: Int = 0,
     enabled: Boolean = true,
-    singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: CharSequence? = null,
     forceVisible: Boolean = false,
-    iconChange: ImageVector? = null,
     preview: (@Composable () -> Unit)? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
 ) {
-
+    // This composable function defines a Preference that includes a Slider.
+    // revealable is a composable function that displays the slider and buttons.
+    // It is only invoked when the preference is expanded.
     val revealable =
         @Composable {
             val startPadding = (if (iconSpaceReserved) 24.dp + 16.dp else 0.dp) + 8.dp
@@ -424,80 +419,60 @@ fun SliderPreference(
                     .fillMaxWidth()
                     .padding(start = startPadding)
             ) {
-                // place slider
-                var value by remember { mutableFloatStateOf(defaultValue) }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    if (iconChange != null)
-                        Icon(
-                            imageVector = iconChange,
-                            contentDescription = null,
-                        )
-                    Slider(
-                        value = value,
-                        onValueChange = {
-                            value = it
-                        },
-                        valueRange = valueRange,
-                        steps = steps,
-                        modifier = Modifier.weight(1f)
-                    )
-                    if (iconChange != null) {
-                        Icon(
-                            imageVector = iconChange,
-                            contentDescription = null,
-                            modifier = Modifier.scale(1.5f)
-                        )
-                    }
-                }
+                // Place the Slider composable.
+                val (state, onChange) = remember { mutableFloatStateOf(value) }
+                Slider(
+                    value = state,
+                    onValueChange = onChange,
+                    valueRange = valueRange,
+                    steps = steps,
+                )
 
+                // Get the focus manager to control focus.
+                // Display confirmation and cancellation buttons.
+                // Clear focus when cancel/confirm is clicked, unless forceVisible is true.
                 val manager = LocalFocusManager.current
-                val onCancelClick = {
-                    if (!forceVisible)
-                        manager.clearFocus(true)
-                }
-                val onConfirmClick = {
-                    if (!forceVisible)
-                        manager.clearFocus(true)
-                    onValueChange(value)
-                }
                 TextButtons(
-                    onCancelClick = onCancelClick,
-                    onConfirmClick = onConfirmClick,
+                    onCancelClick = {
+                        if (!forceVisible)
+                            manager.clearFocus(true)
+                    },
+                    onConfirmClick = {
+                        if (!forceVisible)
+                            manager.clearFocus(true)
+                        onValueChange(value)
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         }
-
+// Display the main Preference composable.
     Preference(
         modifier = modifier,
-        title = title,
+        text = text,
         enabled = enabled,
-        singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
         forceVisible = forceVisible,
-        summery = summery,
         widget = preview,
-        revealable = revealable
+        footer = revealable
     )
 }
 
 private val TextFieldShape = RoundedCornerShape(10)
 
+/**
+ * Represents a text field [Preference].
+ */
 @Composable
 fun TextFieldPreference(
-    title: CharSequence,
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    text: CharSequence,
+    value: String,
+    onConfirmClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    singleLineTitle: Boolean = true,
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
-    summery: CharSequence? = null,
     forceVisible: Boolean = false,
     maxLines: Int = 1,
     leadingFieldIcon: ImageVector? = null,
@@ -506,10 +481,11 @@ fun TextFieldPreference(
     preview: (@Composable () -> Unit)? = null,
 ) {
     val manager = LocalFocusManager.current
+    val (state, onChange) = remember { mutableStateOf(TextFieldValue(text = value)) }
     val revealable = @Composable {
         OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
+            value = state,
+            onValueChange = onChange,
             modifier = Modifier
                 .padding(start = (if (iconSpaceReserved) 24.dp + 8.dp else 8.dp) + 8.dp, end = 8.dp)
                 .fillMaxWidth(),
@@ -532,14 +508,20 @@ fun TextFieldPreference(
                 IconButton(
                     imageVector = Icons.Default.Close,
                     onClick = {
-                        if (value.text.isEmpty())
-                            if (!forceVisible) manager.clearFocus(true)
-                            else onValueChange(TextFieldValue(""))
-                    }
+                        when {
+                            state.text.isNotEmpty() -> onChange(TextFieldValue(""))
+                            !forceVisible -> manager.clearFocus(true)
+                        }
+                    },
+                    tint = MaterialTheme.colors.primary
                 )
             },
             keyboardActions = KeyboardActions(
-                onDone = { if (!forceVisible) manager.clearFocus(true) }
+                onDone = {
+                    onConfirmClick(state.text)
+                    if (!forceVisible)
+                        manager.clearFocus(true)
+                }
             ),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
         )
@@ -547,14 +529,12 @@ fun TextFieldPreference(
     // Actual Host
     Preference(
         modifier = modifier,
-        title = title,
+        text = text,
         enabled = enabled,
-        singleLineTitle = singleLineTitle,
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
         forceVisible = forceVisible,
-        summery = summery,
         widget = preview,
-        revealable = revealable
+        footer = revealable
     )
 }

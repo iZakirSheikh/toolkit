@@ -20,13 +20,17 @@
 
 package com.prime.toolkit
 
+import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
@@ -35,12 +39,17 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.lightColors
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -50,58 +59,37 @@ import com.primex.core.MetroGreen
 import com.primex.core.SignalWhite
 import com.primex.core.plus
 import com.primex.core.shapes.SquircleShape
+import com.primex.core.textResource
+import com.primex.material2.Button
+import com.primex.material2.Button2
+import com.primex.material2.CheckBoxPreference
+import com.primex.material2.DropDownPreference
 import com.primex.material2.IconButton
 import com.primex.material2.Label
 import com.primex.material2.ListTile
+import com.primex.material2.Preference
+import com.primex.material2.SliderPreference
+import com.primex.material2.SwitchPreference
+import com.primex.material2.TextFieldPreference
 
-
-@Composable
-fun ListTilePreview(modifier: Modifier = Modifier) {
-        ListTile(
-            headline = {
-                Label("Headline")
-            },
-            overline = {
-                Label("Overline")
-            },
-            subtitle = {
-                Label("This is the supporting text line")
-            },
-            spacing = 0.dp,
-            shape = RoundedCornerShape(20),
-            color = Color.MetroGreen,
-            onColor = Color.SignalWhite,
-            modifier = Modifier.clickable(/*indication = ripple(color = Color.White, bounded = true), interactionSource = null*/) {
-
-            },
-            leading = {
-                Icon(Icons.Outlined.Language, contentDescription = null)
-            },
-            trailing = {
-                IconButton(Icons.Outlined.MoreVert, onClick = {})
-            }
-        )
-}
-
-@Preview(showBackground = true, widthDp = 360, backgroundColor = 0x00000000)
+private const val TAG = "Preview"
+@Preview(showBackground = false, widthDp = 360)
 @Composable
 fun PreviewM2() {
-    MaterialTheme(darkColors()) {
-        Scaffold(
-          topBar = {
-              TopAppBar(title = { Label("") })
-          }
-        ) {
-            Surface(modifier = Modifier.padding(it + PaddingValues(60.dp)), shape =  SquircleShape(0.6f)) {
-                AsyncImage(
-                    model = games[0].second,
-                    contentDescription = null,
-                    modifier = Modifier
-                        //.padding(30.dp)
-                        .widthIn(max = 200.dp).aspectRatio(1.0f),
-                    contentScale = ContentScale.Crop
-                )
-            }
+    MaterialTheme(lightColors()) {
+        Column(modifier = Modifier.statusBarsPadding()) {
+            Log.d(TAG, "PreviewM2: ${LocalTextStyle.current.fontSize}")
+           Surface {
+               val (def, onRequestChange) = remember { mutableStateOf(1) }
+               TextFieldPreference(
+                   text = textResource(R.string.sample_preference_text),
+                   icon = Icons.Outlined.Language,
+                   value = "",
+                   onConfirmClick = {},
+                   label = "Text",
+                   placeholder = "Enter text here."
+               )
+           }
         }
     }
 }
