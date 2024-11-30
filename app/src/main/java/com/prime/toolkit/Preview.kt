@@ -43,6 +43,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -80,15 +81,42 @@ fun PreviewM2() {
         Column(modifier = Modifier.statusBarsPadding()) {
             Log.d(TAG, "PreviewM2: ${LocalTextStyle.current.fontSize}")
            Surface {
-               val (def, onRequestChange) = remember { mutableStateOf(1) }
-               TextFieldPreference(
-                   text = textResource(R.string.sample_preference_text),
-                   icon = Icons.Outlined.Language,
-                   value = "",
-                   onConfirmClick = {},
-                   label = "Text",
-                   placeholder = "Enter text here."
-               )
+               val (def, onRequestChange) = remember { mutableFloatStateOf(0f) }
+               Column {
+                   TextFieldPreference(
+                       text = textResource(R.string.sample_preference_text),
+                       icon = Icons.Outlined.Language,
+                       value = "",
+                       onConfirmClick = {},
+                       label = "Text",
+                       placeholder = "Enter text here."
+                   )
+                   TextFieldPreference(
+                       text = textResource(R.string.sample_preference_text),
+                       icon = Icons.Outlined.Language,
+                       value = "",
+                       onConfirmClick = {},
+                       label = "Text",
+                       placeholder = "Enter text here."
+                   )
+                   TextFieldPreference(
+                       text = textResource(R.string.sample_preference_text),
+                       icon = Icons.Outlined.Language,
+                       value = "",
+                       onConfirmClick = {},
+                       label = "Text",
+                       placeholder = "Enter text here."
+                   )
+                   SliderPreference(
+                       text = textResource(R.string.sample_preference_text),
+                       icon = Icons.Outlined.Language,
+                       value = def,
+                       onValueChange = onRequestChange,
+                       preview = {
+                           Label("$it")
+                       }
+                   )
+               }
            }
         }
     }

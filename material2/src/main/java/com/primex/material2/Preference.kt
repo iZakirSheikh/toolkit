@@ -2,7 +2,6 @@
 
 package com.primex.material2
 
-import android.R
 import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
@@ -63,8 +62,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.primex.core.ExperimentalToolkitApi
 import com.primex.core.composableOrNull
 import com.primex.material2.menu.DropDownMenu2
@@ -134,7 +135,8 @@ fun Preference(
             Text(
                 text = text,
                 maxLines = 4,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.body2.copy(fontSize = 15.sp)
             )
         },
         // Display the icon if provided or
@@ -382,10 +384,10 @@ private fun TextButtons(
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(onClick = onCancelClick) {
-            Label(text = stringResource(id = R.string.cancel))
+            Label(text = stringResource(id = android.R.string.cancel))
         }
         TextButton(onClick = onConfirmClick) {
-            Label(text = stringResource(id = R.string.ok))
+            Label(text = stringResource(id = android.R.string.ok))
         }
     }
 }
@@ -405,12 +407,14 @@ fun SliderPreference(
     iconSpaceReserved: Boolean = true,
     icon: ImageVector? = null,
     forceVisible: Boolean = false,
-    preview: (@Composable () -> Unit)? = null,
+    preview: (@Composable (Float) -> Unit)? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
 ) {
     // This composable function defines a Preference that includes a Slider.
     // revealable is a composable function that displays the slider and buttons.
     // It is only invoked when the preference is expanded.
+    // Place the Slider composable.
+    val (state, onChange) = remember { mutableFloatStateOf(value) }
     val revealable =
         @Composable {
             val startPadding = (if (iconSpaceReserved) 24.dp + 16.dp else 0.dp) + 8.dp
@@ -419,8 +423,6 @@ fun SliderPreference(
                     .fillMaxWidth()
                     .padding(start = startPadding)
             ) {
-                // Place the Slider composable.
-                val (state, onChange) = remember { mutableFloatStateOf(value) }
                 Slider(
                     value = state,
                     onValueChange = onChange,
@@ -454,7 +456,9 @@ fun SliderPreference(
         iconSpaceReserved = iconSpaceReserved,
         icon = icon,
         forceVisible = forceVisible,
-        widget = preview,
+        widget = composableOrNull(preview != null){
+            preview?.invoke(state)
+        },
         footer = revealable
     )
 }
