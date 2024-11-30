@@ -134,7 +134,7 @@ fun Preference(
         headline = {
             Text(
                 text = text,
-                maxLines = 4,
+                maxLines = 5,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.body2.copy(fontSize = 15.sp)
             )

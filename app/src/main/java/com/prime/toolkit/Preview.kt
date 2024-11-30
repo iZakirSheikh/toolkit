@@ -50,6 +50,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +63,7 @@ import com.primex.core.SignalWhite
 import com.primex.core.plus
 import com.primex.core.shapes.SquircleShape
 import com.primex.core.textResource
+import com.primex.core.withSpanStyle
 import com.primex.material2.Button
 import com.primex.material2.Button2
 import com.primex.material2.CheckBoxPreference
@@ -108,10 +111,17 @@ fun PreviewM2() {
                        placeholder = "Enter text here."
                    )
                    SliderPreference(
-                       text = textResource(R.string.sample_preference_text),
+                       text = buildAnnotatedString {
+                           withSpanStyle(fontWeight = FontWeight.Bold) {
+                               append("Slider")
+                           }
+                           withSpanStyle(color = Color.LightGray) {
+                               append("\nThis is a sample pref")
+                           }
+                       },
                        icon = Icons.Outlined.Language,
                        value = def,
-                       onValueChange = onRequestChange,
+                       onRequestChange = onRequestChange,
                        preview = {
                            Label("$it")
                        }
