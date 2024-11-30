@@ -306,7 +306,7 @@ fun ColorPickerPreference(
     text: CharSequence,
     value: Color,
     entries: List<Color>,
-    onRequestValueChange: (Color) -> Unit,
+    onRequestChange: (Color) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     iconSpaceReserved: Boolean = true,
@@ -351,7 +351,7 @@ fun ColorPickerPreference(
                 val onConfirmClick = {
                     if (!forceVisible)
                         manager.clearFocus(true)
-                    onRequestValueChange(checked)
+                    onRequestChange(checked)
                 }
                 TextButtons(
                     onCancelClick = onCancelClick,
@@ -400,7 +400,7 @@ private fun TextButtons(
 fun SliderPreference(
     text: CharSequence,
     value: Float,
-    onValueChange: (Float) -> Unit,
+    onRequestChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     steps: Int = 0,
     enabled: Boolean = true,
@@ -442,7 +442,7 @@ fun SliderPreference(
                     onConfirmClick = {
                         if (!forceVisible)
                             manager.clearFocus(true)
-                        onValueChange(value)
+                        onRequestChange(state)
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
