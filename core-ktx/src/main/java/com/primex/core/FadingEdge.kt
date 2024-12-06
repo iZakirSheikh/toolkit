@@ -175,11 +175,11 @@ private class FadingEdgeNode(
 
     override fun ContentDrawScope.draw() {
 
+        // Calculate the actual fading edge lengths based on the scrollable state.
+        val lengthPx = length.toPx()
         // Use a layer to draw the fading edge on top of the content.
         layer.record {
             this@draw.drawContent()
-            // Calculate the actual fading edge lengths based on the scrollable state.
-            val lengthPx = length.toPx()
             val (first, last) = state.calculateFadingEdgeLengthPx(lengthPx)
             val (width, height) = size
             // Apply the fading edge based on the orientation (horizontal or vertical).
