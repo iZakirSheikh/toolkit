@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.zs.preferences"
+    namespace = "com.zs.compose.theme"
     compileSdk = 35
 
     defaultConfig {
@@ -28,6 +28,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions { jvmTarget = "11" }
+    buildFeatures { compose = true }
 }
 
-dependencies { implementation(libs.androidx.preferences) }
+dependencies {
+    implementation(project(":foundation"))
+    implementation(libs.androidx.foundation)
+}

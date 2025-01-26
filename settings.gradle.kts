@@ -15,7 +15,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Toolkit"
 include (":app")
-include (":preferences")
-include (":core-ktx")
-include (":material2")
-include (":material3")
+include(":foundation")
+include(":theme")
+include(":preferences")

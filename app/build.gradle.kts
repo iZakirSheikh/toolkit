@@ -13,7 +13,7 @@ android {
         minSdk = 21
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0.0-test"
+        versionName = "3.0.0-dev"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -28,31 +28,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions { jvmTarget = "1.8" }
+    kotlinOptions { jvmTarget = "11" }
     buildFeatures { compose = true }
-    packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
 }
 
 dependencies {
-
-    implementation(libs.compose.activity)
-
-    implementation(libs.core.ktx)
-    implementation(libs.compose.ui)
-    implementation(libs.compose.material)
-    implementation(libs.compose.preview)
-    implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.coil)
-    implementation(libs.material.icons.core)
-    implementation(libs.material.icons.extended)
-    // FIXME: Tests are disabled for now.
-    //  Why?
-    //  Because my PC/laptop is old and slow and it can't handle that many dependencies; this makes
-    //  it slow.
-    implementation(project(path = ":core-ktx"))
-    implementation(project(path = ":material2"))
-    implementation(project(path = ":preferences"))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.coil.compose)
 }

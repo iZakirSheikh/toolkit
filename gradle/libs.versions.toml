@@ -1,8 +1,13 @@
 [versions]
-compose = "1.7.6"
+compose = "1.8.0-alpha08"
 kotlin = "2.1.0"
 agp = "8.8.0"
-
+material_icons = "1.7.6"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.0"
+material = "1.12.0"
 
 [plugins]
 # Jetbrains Compose Compiler
@@ -13,30 +18,29 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 maven-publish = { id = "maven-publish", version = "0.0.0" }
 
 [libraries]
-compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
-compose-material3 = { module = "androidx.compose.material3:material3", version = "1.3.1" }
-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
-compose-preview = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
-compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.0" }
-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-compose-ui-util = { module = "androidx.compose.ui:ui-util", version.ref = "compose" }
-compose-foundation-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "compose" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.10.0" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "compose" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+#///
+androidx-animation =  { group = "androidx.compose.animation", name = "animation", version.ref = "compose" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "compose" }
+androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "compose" }
+android-ui-util = { group = "androidx.compose.ui", name = "ui-util", version.ref = "compose" }
 
-core-ktx = { module = "androidx.core:core-ktx", version = "1.15.0" }
-# FixMe: This dependency is currently required in material2 for BottomSheetDialog. Updating this cause
-#  Some issue in the Dialog; Don't update it'
-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version = "2.8.7" }
-#noinspection GradleDependency
-material-view = { module = "com.google.android.material:material", version = "1.9.0" }
+androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "material_icons" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material_icons"}
 
-preferences = {module = "androidx.datastore:datastore-preferences", version = "1.1.2" }
-coil = {module = "io.coil-kt:coil-compose", version = "2.7.0"}
-# Material Icons: Core and extended sets of Material Design icons for use in Compose UIs.
-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "compose" }
-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose" }
+androidx-preferences = { group = "androidx.datastore", name = "datastore-preferences", version = "1.1.2" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version = "3.0.4" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.15.0" }
 
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 
 
