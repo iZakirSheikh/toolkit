@@ -27,7 +27,8 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-animation =  { group = "androidx.compose.animation", name = "animation", version.ref = "compose" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "compose" }
 androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "compose" }
-android-ui-util = { group = "androidx.compose.ui", name = "ui-util", version.ref = "compose" }
+androidx-ui-util = { group = "androidx.compose.ui", name = "ui-util", version.ref = "compose" }
+androidx-material-ripple  = { group = "androidx.compose.material", name = "material-ripple", version.ref = "compose" }
 
 androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "material_icons" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material_icons"}

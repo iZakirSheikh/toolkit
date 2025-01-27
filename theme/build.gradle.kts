@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -34,4 +35,5 @@ android {
 dependencies {
     implementation(project(":foundation"))
     implementation(libs.androidx.foundation)
+    implementation(libs.androidx.material.ripple)
 }

@@ -21,12 +21,8 @@ package com.zs.compose.foundation
 import androidx.annotation.FloatRange
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.ColorUtils
-import kotlin.math.max
-import kotlin.math.min
 
 private const val TAG = "Color"
 
@@ -105,3 +101,58 @@ val Color.Companion.JetBlack
 val Color.Companion.TrafficBlack
     get() = com.zs.compose.foundation.TrafficBlack
 
+
+/**
+ * Returns a new [Color] with modified components.
+ *
+ * Returns a new color based on this color, but with optional changes to hue, saturation, lightness, and alpha.
+ * Unspecified components (using [Float.NaN]) will retain their original values.
+ *
+ * @param hue         The new hue (0.0-360.0), or [Float.NaN] to keep the original.
+ * @param saturation  The new saturation (0.0-1.0), or [Float.NaN] to keep the original.
+ * @param lightness   The new lightness (0.0-1.0), or [Float.NaN] to keep the original.
+ * @param alpha       The new alpha (0.0-1.0), or [Float.NaN] to keep the original.
+ * @return A new [Color] with the updated components.
+ */
+fun Color.copy(
+    hue: Float = Float.NaN,
+    saturation: Float = Float.NaN,
+    lightness: Float = Float.NaN,
+    alpha: Float = Float.NaN
+): Color {
+    // val hsl[0] =
+    val hsl = FloatArray(3)
+    ColorUtils.colorToHSL(toArgb(), hsl)
+    return Color.hsl(
+        hue = if (!hue.isNaN()) hue else hsl[0],
+        saturation = if (!saturation.isNaN()) saturation else hsl[1],
+        lightness = if (!lightness.isNaN()) lightness else hsl[2],
+        alpha = if (!alpha.isNaN()) alpha else hsl[3]
+    )
+}
+
+/**
+ * Blends this color with another color using a given ratio.
+ *
+ * This function performs a linear interpolation between two colors, based on the
+ * provided `ratio`. A ratio of 0.0 returns this color, a ratio of 1.0 returns
+ * the `color` parameter, and values in between return a blend of the two.
+ *
+ * The blending is done separately for each color channel (red, green, blue, and alpha).
+ *
+ * @param color The color to blend with this color.
+ * @param ratio The ratio of the blend. A value of 0.0 represents this color,
+ *              a value of 1.0 represents the `color` parameter.
+ *              Values between 0.0 and 1.0 represent a linear interpolation between
+ *              the two colors.
+ * @return A new [Color] instance representing the blended color.
+ * @throws IllegalArgumentException if the ratio is not within the range [0.0, 1.0] (Checked by @FloatRange)
+ */
+fun Color.blend(color: Color, @FloatRange(from = 0.0, to = 1.0) ratio: Float): Color {
+    val inverseRatio = 1 - ratio
+    val a = alpha * inverseRatio + color.alpha * ratio
+    val r = red * inverseRatio + color.red * ratio
+    val g = green * inverseRatio + color.green * ratio
+    val b = blue * inverseRatio + color.blue * ratio
+    return Color(r, g, b, a, colorSpace = ColorSpaces.Srgb)
+}
