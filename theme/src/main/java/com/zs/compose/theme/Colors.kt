@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.Amber
+import com.zs.compose.foundation.BlueLilac
 import com.zs.compose.foundation.MetroGreen
 import com.zs.compose.foundation.RedViolet
 import com.zs.compose.foundation.Rose
@@ -148,7 +149,7 @@ class Colors(
  * @see darkColors
  */
 fun lightColors(
-    accent: Color = Color.MetroGreen,
+    accent: Color = Color(0xFF6750A4),
     onAccent: Color = Color.SignalWhite,
     error: Color = Color.RedViolet,
     onError: Color = Color.SignalWhite,
