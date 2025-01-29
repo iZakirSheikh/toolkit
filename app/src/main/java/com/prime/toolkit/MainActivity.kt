@@ -3,38 +3,52 @@ package com.prime.toolkit
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.unit.dp
 import com.zs.compose.theme.AppTheme
-import com.zs.compose.theme.Button
-import com.zs.compose.theme.ElevatedButton
-import com.zs.compose.theme.FilledTonalButton
-import com.zs.compose.theme.OutlinedButton
-import com.zs.compose.theme.Text
-import com.zs.compose.theme.TextButton
+import com.zs.compose.theme.CircularProgressIndicator
+import com.zs.compose.theme.LinearProgressIndicator
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.state.ToggleableState
+import com.zs.compose.theme.Checkbox
+import com.zs.compose.theme.ExperimentalThemeApi
+import com.zs.compose.theme.RadioButton
+import com.zs.compose.theme.RangeSlider
+import com.zs.compose.theme.Slider
+import com.zs.compose.theme.Switch
+import com.zs.compose.theme.TriStateCheckbox
 
 private const val TAG = "MainActivity"
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalThemeApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                Row {
-                    Button(onClick = {}) {
-                        Text("Filled")
-                    }
-                    TextButton("", onClick = {})
-                    TextButton(onClick = {}) {
-                        Text("Text ")
-                    }
-                    OutlinedButton(onClick = {}) {
-                        Text("Outlined")
-                    }
-                    ElevatedButton(onClick = {}) {
-                        Text("Elevated")
-                    }
-                    FilledTonalButton(onClick = {}) { "Tonal" }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.padding(6.dp).fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(Modifier.weight(1f))
+                    var state by remember { mutableFloatStateOf(0.0f) }
+                    Slider(state, onValueChange = {state = it}, steps = 9, enabled = false)
+                    Spacer(Modifier.weight(1f), )
                 }
             }
         }

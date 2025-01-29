@@ -61,6 +61,28 @@ object AppTheme {
     /** Retrieves the current [MotionScheme] at the call site's position in the hierarchy. */
     val motion: Motion
         @Composable @ReadOnlyComposable get() = LocalMotion.current
+
+    @Composable
+    operator fun invoke(
+        colors: Colors = AppTheme.colors,
+        motion: Motion = AppTheme.motion,
+        shapes: Shapes = AppTheme.shapes,
+        typography: Typography = AppTheme.typography,
+        content: @Composable () -> Unit
+    ) {
+        val rippleIndication = ripple()
+        val selectionColors = rememberTextSelectionColors(colors)
+        CompositionLocalProvider(
+            LocalColors provides colors,
+            LocalMotion provides motion,
+            LocalIndication provides rippleIndication,
+            LocalShapes provides shapes,
+            LocalTextSelectionColors provides selectionColors,
+            LocalTypography provides typography,
+        ) {
+            ProvideTextStyle(value = typography.body1, content = content)
+        }
+    }
 }
 
 @Composable
@@ -78,24 +100,3 @@ internal fun rememberTextSelectionColors(colorScheme: Colors): TextSelectionColo
 /*@VisibleForTesting*/
 internal const val TextSelectionBackgroundOpacity = 0.4f
 
-@Composable
-fun AppTheme(
-    colors: Colors = AppTheme.colors,
-    motion: Motion = AppTheme.motion,
-    shapes: Shapes = AppTheme.shapes,
-    typography: Typography = AppTheme.typography,
-    content: @Composable () -> Unit
-) {
-    val rippleIndication = ripple()
-    val selectionColors = rememberTextSelectionColors(colors)
-    CompositionLocalProvider(
-        LocalColors provides colors,
-        LocalMotion provides motion,
-        LocalIndication provides rippleIndication,
-        LocalShapes provides shapes,
-        LocalTextSelectionColors provides selectionColors,
-        LocalTypography provides typography,
-    ) {
-        ProvideTextStyle(value = typography.body1, content = content)
-    }
-}
