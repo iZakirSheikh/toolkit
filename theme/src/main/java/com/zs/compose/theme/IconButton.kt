@@ -25,8 +25,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
@@ -80,6 +83,23 @@ fun IconButton(
 }
 
 /**
+ * @see IconButton
+ */
+@Composable
+@NonRestartableComposable
+fun IconButton(
+    icon: ImageVector,
+    contentDescription: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+    interactionSource: MutableInteractionSource? = null
+) = IconButton(onClick, modifier, enabled, interactionSource) {
+    Icon(icon, contentDescription, tint = tint)
+}
+
+/**
  * An [IconButton] with two states, for icons that can be toggled 'on' and 'off', such as a bookmark
  * icon, or a navigation icon that opens a drawer.
  *
@@ -124,5 +144,26 @@ fun IconToggleButton(
     }
 }
 
+/**
+ * @see IconToggleButton
+ */
+@Composable
+@NonRestartableComposable
+fun IconToggleButton(
+    checked: Boolean,
+    icon: ImageVector,
+    contentDescription: String?,
+    onCheckedChange: (Boolean) -> Unit,
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null,
+) = IconToggleButton(
+    checked, onCheckedChange, modifier, enabled, interactionSource
+) {
+    Icon(icon, contentDescription, tint = tint)
+}
+
 // Default radius of an unbounded ripple in an IconButton
 private val RippleRadius = 24.dp
+
