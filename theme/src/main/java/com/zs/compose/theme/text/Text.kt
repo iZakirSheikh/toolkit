@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.zs.compose.theme
+package com.zs.compose.theme.text
 
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
@@ -38,6 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import com.zs.compose.theme.DefaultTextStyle
+import com.zs.compose.theme.LocalContentColor
 
 // source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Text.kt;bpv=0
 // commit date: 2024-06-07 20:26

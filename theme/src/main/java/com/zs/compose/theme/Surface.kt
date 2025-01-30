@@ -76,7 +76,7 @@ import androidx.compose.ui.unit.dp
  *
  * @sample androidx.compose.material.samples.SurfaceSample
  *
- * To modify these default style values used by text, use [ProvideTextStyle] or explicitly pass a
+ * To modify these default style values used by text, use [com.zs.compose.theme.text.ProvideTextStyle] or explicitly pass a
  * new [TextStyle] to your text.
  *
  * To manually retrieve the content color inside a surface, use [LocalContentColor].
@@ -157,7 +157,7 @@ fun Surface(
  *
  * @sample androidx.compose.material.samples.ClickableSurfaceSample
  *
- * To modify these default style values used by text, use [ProvideTextStyle] or explicitly pass a
+ * To modify these default style values used by text, use [com.zs.compose.theme.text.ProvideTextStyle] or explicitly pass a
  * new [TextStyle] to your text.
  *
  * To manually retrieve the content color inside a surface, use [LocalContentColor].
@@ -253,7 +253,7 @@ fun Surface(
  *
  * @sample androidx.compose.material.samples.SelectableSurfaceSample
  *
- * To modify these default style values used by text, use [ProvideTextStyle] or explicitly pass a
+ * To modify these default style values used by text, use [com.zs.compose.theme.text.ProvideTextStyle] or explicitly pass a
  * new [TextStyle] to your text.
  *
  * To manually retrieve the content color inside a surface, use [LocalContentColor].
@@ -352,7 +352,7 @@ fun Surface(
  *
  * @sample androidx.compose.material.samples.ToggleableSurfaceSample
  *
- * To modify these default style values used by text, use [ProvideTextStyle] or explicitly pass a
+ * To modify these default style values used by text, use [com.zs.compose.theme.text.ProvideTextStyle] or explicitly pass a
  * new [TextStyle] to your text.
  *
  * To manually retrieve the content color inside a surface, use [LocalContentColor].

@@ -41,7 +41,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import com.zs.compose.theme.ExperimentalThemeApi
-import com.zs.compose.theme.LocalTextStyle
 import com.zs.compose.theme.text.TextFieldDefaults.indicatorLine
 
 /**
