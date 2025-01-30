@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Spacer(Modifier.weight(1f))
                     var state by remember { mutableFloatStateOf(0.0f) }
-                    Slider(state, onValueChange = {state = it}, steps = 9, enabled = false)
+                    Slider(state, onValueChange = {state = it}, steps = 9, enabled = true)
                     Spacer(Modifier.weight(1f), )
                 }
             }

@@ -1,6 +1,6 @@
 [versions]
-compose = "1.8.0-alpha08"
-kotlin = "2.1.0"
+compose = "1.8.0-beta01"
+kotlin = "2.1.10"
 agp = "8.8.0"
 material_icons = "1.7.6"
 junit = "4.13.2"
