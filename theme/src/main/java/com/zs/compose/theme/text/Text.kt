@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.zs.compose.theme.DefaultTextStyle
+import com.zs.compose.theme.LocalContentAlpha
 import com.zs.compose.theme.LocalContentColor
 
 // source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Text.kt;bpv=0
@@ -124,7 +125,13 @@ fun Text(
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
     style: TextStyle = LocalTextStyle.current
 ) {
-    val textColor = color.takeOrElse { style.color.takeOrElse { LocalContentColor.current } }
+    val textColor = color.takeOrElse {
+        style.color.takeOrElse {
+            LocalContentColor.current.copy(
+                LocalContentAlpha.current
+            )
+        }
+    }
     when (text) {
         is String -> BasicText(
             text,
