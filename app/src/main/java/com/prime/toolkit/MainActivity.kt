@@ -3,6 +3,7 @@ package com.prime.toolkit
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +31,11 @@ import com.zs.compose.theme.Chip
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
+import com.zs.compose.theme.ListItem
 import com.zs.compose.theme.OutlinedButton
+import com.zs.compose.theme.Surface
+import com.zs.compose.theme.Switch
+import com.zs.compose.theme.darkColors
 import com.zs.compose.theme.rememberDismissState
 import com.zs.compose.theme.text.Text
 
@@ -41,72 +47,83 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier
-                        .padding(6.dp)
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(Modifier.weight(1f))
-
-                    var expanded by remember { mutableStateOf(false) }
-
-                    Chip(
-                        onClick = { expanded = true },
+            AppTheme(colors = darkColors()) {
+                Surface {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier
+                            .padding(6.dp)
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(Icons.Filled.Sort, null)
-                    }
+                        Spacer(Modifier.weight(1f))
 
-                    val state = rememberDismissState(
+                        var expanded by remember { mutableStateOf(false) }
 
-                    )
-
-                    AlertDialog(
-                        expanded,
-                        onDismissRequest = { expanded = false },
-                        icon = {
-                            IconButton(
-                                Icons.Filled.Feedback,
-                                onClick = {},
-                                contentDescription = null
-                            )
-                        },
-                        title = { Text("Settings") },
-                        actions = {
-                            Row {
-                                IconButton(
-                                    Icons.Outlined.Edit,
-                                    onClick = {},
-                                    contentDescription = null
-                                )
-                                IconButton(
-                                    Icons.Outlined.Settings,
-                                    onClick = {},
-                                    contentDescription = null
-                                )
-                                IconButton(
-                                    Icons.Outlined.MoreVert,
-                                    onClick = {},
-                                    contentDescription = null
-                                )
-                            }
-                        },
-                        footer = {
-                            Button(onClick = {}) {
-                                Text("Discard")
-                            }
-                            OutlinedButton(onClick = {}) {
-                                Text("Cancel")
-                            }
+                        Chip(
+                            onClick = { expanded = true },
+                        ) {
+                            Icon(Icons.Filled.Sort, null)
                         }
-                    ) {
-                        Text("The last saved draft will be moved to deleted items folder.")
+
+                        val state = rememberDismissState(
+
+                        )
+
+                        ListItem(
+                            heading = {Text("Headline")},
+                            subheading = {Text("Subheading")},
+                            leading = {Icon(Icons.Outlined.Person, null)},
+                            trailing = { Switch(true, null) },
+                            overline = {Text("Overline")},
+                            modifier = Modifier.clickable(){}
+                        )
+
+                        AlertDialog(
+                            expanded,
+                            onDismissRequest = { expanded = false },
+                            icon = {
+                                IconButton(
+                                    Icons.Filled.Feedback,
+                                    onClick = {},
+                                    contentDescription = null
+                                )
+                            },
+                            title = { Text("Settings") },
+                            actions = {
+                                Row {
+                                    IconButton(
+                                        Icons.Outlined.Edit,
+                                        onClick = {},
+                                        contentDescription = null
+                                    )
+                                    IconButton(
+                                        Icons.Outlined.Settings,
+                                        onClick = {},
+                                        contentDescription = null
+                                    )
+                                    IconButton(
+                                        Icons.Outlined.MoreVert,
+                                        onClick = {},
+                                        contentDescription = null
+                                    )
+                                }
+                            },
+                            footer = {
+                                Button(onClick = {}) {
+                                    Text("Discard")
+                                }
+                                OutlinedButton(onClick = {}) {
+                                    Text("Cancel")
+                                }
+                            }
+                        ) {
+                            Text("The last saved draft will be moved to deleted items folder.")
+                        }
+
+
+                        Spacer(Modifier.weight(1f))
                     }
-
-
-                    Spacer(Modifier.weight(1f))
                 }
             }
         }
