@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
@@ -181,6 +182,31 @@ fun Text(
     }
 }
 
+
+@Composable
+@NonRestartableComposable
+fun Label(
+    text: CharSequence,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null,
+    textAlign: TextAlign? = null,
+    maxLines: Int = 1,
+    style: TextStyle = LocalTextStyle.current,
+) = Text(
+    text = text,
+    modifier = modifier,
+    style = style,
+    maxLines = maxLines,
+    color = color,
+    overflow = TextOverflow.Ellipsis,
+    fontWeight = fontWeight,
+    fontSize = fontSize,
+    textAlign = textAlign
+)
+
+
 /**
  * CompositionLocal containing the preferred [TextStyle] that will be used by [Text] components by
  * default. To set the value for this CompositionLocal, see [ProvideTextStyle] which will merge any
@@ -203,3 +229,4 @@ fun ProvideTextStyle(value: TextStyle, content: @Composable () -> Unit) {
     val mergedStyle = LocalTextStyle.current.merge(value)
     CompositionLocalProvider(LocalTextStyle provides mergedStyle, content = content)
 }
+
