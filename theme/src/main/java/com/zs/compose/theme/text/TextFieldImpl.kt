@@ -54,7 +54,6 @@ import androidx.compose.ui.text.lerp
 import androidx.compose.ui.unit.dp
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
-import com.zs.compose.theme.LocalContentAlpha
 import com.zs.compose.theme.LocalContentColor
 
 internal enum class TextFieldType {
@@ -193,12 +192,15 @@ internal fun CommonDecorationBox(
                     paddingValues = contentPadding
                 )
             }
+
             TextFieldType.Outlined -> {
                 // Outlined cutout
                 val labelSize = remember { mutableStateOf(Size.Zero) }
                 val drawBorder: @Composable () -> Unit = {
                     Box(
-                        Modifier.layoutId(BorderId).outlineCutout(labelSize.value, contentPadding),
+                        Modifier
+                            .layoutId(BorderId)
+                            .outlineCutout(labelSize.value, contentPadding),
                         propagateMinConstraints = true
                     ) {
                         border?.invoke()
@@ -243,19 +245,12 @@ internal fun Decoration(
 ) {
     val colorAndEmphasis: @Composable () -> Unit =
         @Composable {
-            CompositionLocalProvider(LocalContentColor provides contentColor) {
-                if (contentAlpha != null) {
-                    CompositionLocalProvider(
-                        LocalContentAlpha provides contentAlpha,
-                        content = content
-                    )
-                } else {
-                    CompositionLocalProvider(
-                        LocalContentAlpha provides contentColor.alpha,
-                        content = content
-                    )
-                }
-            }
+            CompositionLocalProvider(
+                LocalContentColor provides if (contentAlpha == null) contentColor else contentColor.copy(
+                    contentAlpha
+                ),
+                content
+            )
         }
     if (typography != null) ProvideTextStyle(typography, colorAndEmphasis) else colorAndEmphasis()
 }

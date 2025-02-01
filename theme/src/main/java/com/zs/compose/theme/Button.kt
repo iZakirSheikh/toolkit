@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.NonRestartableComposable
@@ -485,19 +484,17 @@ fun Button(
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
         interactionSource = interactionSource
     ) {
-        CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
-            ProvideTextStyle(value = AppTheme.typography.label1) {
-                Row(
-                    Modifier
-                        .defaultMinSize(
-                            minWidth = ButtonDefaults.MinWidth, minHeight = ButtonDefaults.MinHeight
-                        )
-                        .padding(contentPadding),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    content = content
-                )
-            }
+        ProvideTextStyle(value = AppTheme.typography.label1) {
+            Row(
+                Modifier
+                    .defaultMinSize(
+                        minWidth = ButtonDefaults.MinWidth, minHeight = ButtonDefaults.MinHeight
+                    )
+                    .padding(contentPadding),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                content = content
+            )
         }
     }
 }

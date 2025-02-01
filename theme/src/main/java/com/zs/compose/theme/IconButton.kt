@@ -77,8 +77,12 @@ fun IconButton(
             ),
         contentAlignment = Alignment.Center
     ) {
-        val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
-        CompositionLocalProvider(LocalContentAlpha provides contentAlpha, content = content)
+        val contentColor = if (enabled) LocalContentColor.current else LocalContentColor.current.copy(
+            ContentAlpha.disabled)
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor,
+            content = content
+        )
     }
 }
 
@@ -93,7 +97,7 @@ fun IconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+    tint: Color = LocalContentColor.current,
     interactionSource: MutableInteractionSource? = null
 ) = IconButton(onClick, modifier, enabled, interactionSource) {
     Icon(icon, contentDescription, tint = tint)
@@ -139,8 +143,9 @@ fun IconToggleButton(
             ),
         contentAlignment = Alignment.Center
     ) {
-        val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
-        CompositionLocalProvider(LocalContentAlpha provides contentAlpha, content = content)
+        val contentColor = if (enabled) LocalContentColor.current else LocalContentColor.current.copy(
+            ContentAlpha.disabled)
+        CompositionLocalProvider(LocalContentColor provides contentColor, content = content)
     }
 }
 
@@ -154,7 +159,7 @@ fun IconToggleButton(
     icon: ImageVector,
     contentDescription: String?,
     onCheckedChange: (Boolean) -> Unit,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+    tint: Color = LocalContentColor.current,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,

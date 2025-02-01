@@ -59,14 +59,10 @@ object AppTheme {
     val shapes: Shapes
         @Composable @ReadOnlyComposable get() = LocalShapes.current
 
-    /** Retrieves the current [MotionScheme] at the call site's position in the hierarchy. */
-    val motion: Motion
-        @Composable @ReadOnlyComposable get() = LocalMotion.current
 
     @Composable
     operator fun invoke(
         colors: Colors = AppTheme.colors,
-        motion: Motion = AppTheme.motion,
         shapes: Shapes = AppTheme.shapes,
         typography: Typography = AppTheme.typography,
         content: @Composable () -> Unit
@@ -75,7 +71,6 @@ object AppTheme {
         val selectionColors = rememberTextSelectionColors(colors)
         CompositionLocalProvider(
             LocalColors provides colors,
-            LocalMotion provides motion,
             LocalIndication provides rippleIndication,
             LocalShapes provides shapes,
             LocalTextSelectionColors provides selectionColors,

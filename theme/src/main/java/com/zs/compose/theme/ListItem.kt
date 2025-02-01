@@ -89,7 +89,7 @@ private val LIST_ITEM_THREE_LINE_CONTAINER_HEIGHT = 88.0.dp
 fun BaseListItem(
     heading: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    contentColor: Color = LocalContentColor.current.copy(LocalContentAlpha.current),
+    contentColor: Color = LocalContentColor.current,
     padding: PaddingValues? = null,
     spacing: Dp = Dp.Unspecified,
     subheading: (@Composable () -> Unit)? = null,
@@ -120,7 +120,7 @@ fun BaseListItem(
                     trailing?.invoke() // 2
                     if (overline != null)
                         CompositionLocalProvider(
-                            LocalContentAlpha provides ContentAlpha.medium,
+                            LocalContentColor provides contentColor.copy(ContentAlpha.medium),
                             overline // 3
                         )
                 }
@@ -128,7 +128,7 @@ fun BaseListItem(
             if (subheading != null)
                 ProvideTextStyle(value = typography.body2) {
                     CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.medium,
+                        LocalContentColor provides contentColor.copy(ContentAlpha.medium),
                         content = subheading // 4
                     )
                 }
@@ -237,7 +237,7 @@ fun BaseListItem(
 fun ListItem(
     heading: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    contentColor: Color = LocalContentColor.current.copy(LocalContentAlpha.current),
+    contentColor: Color = LocalContentColor.current,
     padding: PaddingValues? = null,
     spacing: Dp = Dp.Unspecified,
     subheading: (@Composable () -> Unit)? = null,

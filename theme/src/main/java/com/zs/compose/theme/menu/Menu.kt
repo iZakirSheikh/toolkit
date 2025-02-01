@@ -73,7 +73,6 @@ import androidx.compose.ui.window.PopupProperties
 import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ContentAlpha
-import com.zs.compose.theme.LocalContentAlpha
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.Surface
 import com.zs.compose.theme.ripple
@@ -455,7 +454,7 @@ fun DropdownMenuItem(
         val typography = AppTheme.typography
         ProvideTextStyle (typography.label1) {
             val contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
-            CompositionLocalProvider(LocalContentAlpha provides contentAlpha) { content() }
+            CompositionLocalProvider(LocalContentColor provides LocalContentColor.current.copy(contentAlpha)) { content() }
         }
     }
 }

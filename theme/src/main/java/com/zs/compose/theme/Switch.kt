@@ -94,7 +94,6 @@ private class DefaultSwitchColors(
             } else {
                 if (checked) disabledCheckedThumbColor else disabledUncheckedThumbColor
             },
-            AppTheme.motion.slowEffectsSpec()
         )
     }
 
@@ -105,8 +104,7 @@ private class DefaultSwitchColors(
                 if (checked) checkedTrackColor else uncheckedTrackColor
             } else {
                 if (checked) disabledCheckedTrackColor else disabledUncheckedTrackColor
-            },
-            AppTheme.motion.slowEffectsSpec()
+            }
         )
     }
 
@@ -240,7 +238,7 @@ fun Switch(
         else -> Modifier
     }
     // animates the position
-    val position by animateFloatAsState(if (checked) 1f else 0f, AppTheme.motion.slowSpatialSpec())
+    val position by animateFloatAsState(if (checked) 1f else 0f)
     Canvas(
         modifier
             .thenIf(onCheckedChange != null) { minimumInteractiveComponentSize() }

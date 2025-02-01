@@ -96,7 +96,7 @@ private class DefaultCheckboxColors(
             state == ToggleableState.Off -> unchecked
             else -> indeterminate
         }
-        return animateColorAsState(color, AppTheme.motion.slowEffectsSpec())
+        return animateColorAsState(color)
     }
 }
 

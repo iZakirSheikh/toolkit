@@ -40,7 +40,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.zs.compose.theme.DefaultTextStyle
-import com.zs.compose.theme.LocalContentAlpha
 import com.zs.compose.theme.LocalContentColor
 
 // source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Text.kt;bpv=0
@@ -53,7 +52,7 @@ import com.zs.compose.theme.LocalContentColor
 /**
  * High level element that displays text and provides semantics / accessibility information.
  *
- * The default [style] uses the [LocalTextStyle] provided by the [MaterialTheme] / components. If
+ * The default [style] uses the [LocalTextStyle] provided by the [com.zs.compose.theme.AppTheme] / components. If
  * you are setting your own style, you may want to consider first retrieving [LocalTextStyle], and
  * using [TextStyle.copy] to keep any theme defined attributes, only modifying the specific
  * attributes you want to override.
@@ -128,9 +127,7 @@ fun Text(
 ) {
     val textColor = color.takeOrElse {
         style.color.takeOrElse {
-            LocalContentColor.current.copy(
-                LocalContentAlpha.current
-            )
+            LocalContentColor.current
         }
     }
     when (text) {

@@ -34,9 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
@@ -103,14 +101,12 @@ fun FloatingActionButton(
         elevation = elevation.elevation(interactionSource).value,
         interactionSource = interactionSource
     ) {
-        CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
-            ProvideTextStyle(AppTheme.typography.label1) {
-                Box(
-                    modifier = Modifier.defaultMinSize(minWidth = FabSize, minHeight = FabSize),
-                    contentAlignment = Alignment.Center
-                ) {
-                    content()
-                }
+        ProvideTextStyle(AppTheme.typography.label1) {
+            Box(
+                modifier = Modifier.defaultMinSize(minWidth = FabSize, minHeight = FabSize),
+                contentAlignment = Alignment.Center
+            ) {
+                content()
             }
         }
     }

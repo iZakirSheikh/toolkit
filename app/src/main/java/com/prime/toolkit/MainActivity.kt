@@ -42,6 +42,7 @@ import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.ListItem
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.OutlinedButton
+import com.zs.compose.theme.SelectableChip
 import com.zs.compose.theme.SliderPreference
 import com.zs.compose.theme.Surface
 import com.zs.compose.theme.Switch
@@ -122,6 +123,13 @@ class MainActivity : ComponentActivity() {
                             onClick = { expanded = true },
                         ) {
                             Icon(Icons.Filled.Sort, null)
+                        }
+
+                        SelectableChip(
+                            onClick = {},
+                            selected = true
+                        ) {
+                            Text("Chip")
                         }
 
                         val state = rememberDismissState(

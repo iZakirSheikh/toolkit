@@ -113,8 +113,8 @@ fun AlertDialog(
                                 content = {
                                     CompositionLocalProvider(
                                         LocalTextStyle provides AppTheme.typography.title2,
-                                        LocalContentAlpha provides ContentAlpha.high,
-                                        LocalContentColor provides AppTheme.colors.onBackground,
+                                        LocalContentColor provides AppTheme.colors.onBackground.copy(
+                                            ContentAlpha.high),
                                     ) {
                                         icon?.invoke() // Display the icon if provided.
                                         if (title != null) { // Display the title if provided.

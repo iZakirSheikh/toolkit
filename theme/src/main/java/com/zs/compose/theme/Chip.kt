@@ -494,32 +494,29 @@ fun Chip(
         border = border,
         interactionSource = interactionSource,
     ) {
-        CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
-            ProvideTextStyle(value = AppTheme.typography.label2) {
-                Row(
-                    Modifier.defaultMinSize(minHeight = ChipDefaults.MinHeight)
-                        .padding(
-                            start =
-                            if (leadingIcon == null) {
-                                HorizontalPadding
-                            } else 0.dp,
-                            end = HorizontalPadding,
-                        ),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (leadingIcon != null) {
-                        Spacer(Modifier.width(LeadingIconStartSpacing))
-                        val leadingIconContentColor by colors.leadingIconContentColor(enabled)
-                        CompositionLocalProvider(
-                            LocalContentColor provides leadingIconContentColor,
-                            LocalContentAlpha provides leadingIconContentColor.alpha,
-                            content = leadingIcon
-                        )
-                        Spacer(Modifier.width(LeadingIconEndSpacing))
-                    }
-                    content()
+        ProvideTextStyle(value = AppTheme.typography.label2) {
+            Row(
+                Modifier.defaultMinSize(minHeight = ChipDefaults.MinHeight)
+                    .padding(
+                        start =
+                        if (leadingIcon == null) {
+                            HorizontalPadding
+                        } else 0.dp,
+                        end = HorizontalPadding,
+                    ),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (leadingIcon != null) {
+                    Spacer(Modifier.width(LeadingIconStartSpacing))
+                    val leadingIconContentColor by colors.leadingIconContentColor(enabled)
+                    CompositionLocalProvider(
+                        LocalContentColor provides leadingIconContentColor,
+                        content = leadingIcon
+                    )
+                    Spacer(Modifier.width(LeadingIconEndSpacing))
                 }
+                content()
             }
         }
     }
@@ -592,77 +589,74 @@ fun SelectableChip(
         interactionSource = interactionSource,
         border = border,
     ) {
-        CompositionLocalProvider(LocalContentAlpha provides contentColor.value.alpha) {
-            ProvideTextStyle(value = AppTheme.typography.label2) {
-                Row(
-                    Modifier.width(IntrinsicSize.Max)
-                        .defaultMinSize(minHeight = ChipDefaults.MinHeight)
-                        .padding(
-                            start =
-                            if (leadingIcon != null || (selected && selectedIcon != null)) {
-                                0.dp
-                            } else {
-                                HorizontalPadding
-                            },
-                            end =
-                            if (trailingIcon == null) {
-                                HorizontalPadding
-                            } else {
-                                0.dp
-                            }
-                        ),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (leadingIcon != null || (selected && selectedIcon != null)) {
-                        Spacer(Modifier.width(LeadingIconStartSpacing))
-                        Box {
+        ProvideTextStyle(value = AppTheme.typography.label2) {
+            Row(
+                Modifier.width(IntrinsicSize.Max)
+                    .defaultMinSize(minHeight = ChipDefaults.MinHeight)
+                    .padding(
+                        start =
+                        if (leadingIcon != null || (selected && selectedIcon != null)) {
+                            0.dp
+                        } else {
+                            HorizontalPadding
+                        },
+                        end =
+                        if (trailingIcon == null) {
+                            HorizontalPadding
+                        } else {
+                            0.dp
+                        }
+                    ),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (leadingIcon != null || (selected && selectedIcon != null)) {
+                    Spacer(Modifier.width(LeadingIconStartSpacing))
+                    Box {
+                        if (leadingIcon != null) {
+                            val leadingIconColor = colors.leadingIconColor(enabled, selected)
+                            CompositionLocalProvider(
+                                LocalContentColor provides leadingIconColor.value,
+                                content = leadingIcon
+                            )
+                        }
+                        if (selected && selectedIcon != null) {
+                            var overlayModifier: Modifier = Modifier
+                            var iconColor = contentColor.value
                             if (leadingIcon != null) {
-                                val leadingIconColor = colors.leadingIconColor(enabled, selected)
+                                overlayModifier =
+                                    Modifier.requiredSize(SelectedIconContainerSize)
+                                        .background(
+                                            color = contentColor.value,
+                                            shape = CircleShape
+                                        )
+                                        .clip(CircleShape)
+
+                                iconColor = colors.backgroundColor(enabled, selected).value
+                            }
+                            Box(
+                                modifier = overlayModifier,
+                                contentAlignment = Alignment.Center
+                            ) {
                                 CompositionLocalProvider(
-                                    LocalContentColor provides leadingIconColor.value,
-                                    LocalContentAlpha provides leadingIconColor.value.alpha,
-                                    content = leadingIcon
+                                    LocalContentColor provides iconColor,
+                                    content = selectedIcon
                                 )
                             }
-                            if (selected && selectedIcon != null) {
-                                var overlayModifier: Modifier = Modifier
-                                var iconColor = contentColor.value
-                                if (leadingIcon != null) {
-                                    overlayModifier =
-                                        Modifier.requiredSize(SelectedIconContainerSize)
-                                            .background(
-                                                color = contentColor.value,
-                                                shape = CircleShape
-                                            )
-                                            .clip(CircleShape)
-
-                                    iconColor = colors.backgroundColor(enabled, selected).value
-                                }
-                                Box(
-                                    modifier = overlayModifier,
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CompositionLocalProvider(
-                                        LocalContentColor provides iconColor,
-                                        content = selectedIcon
-                                    )
-                                }
-                            }
                         }
-                        Spacer(Modifier.width(LeadingIconEndSpacing))
                     }
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = content,
-                    )
-                    if (trailingIcon != null) {
-                        Spacer(Modifier.width(TrailingIconSpacing))
-                        trailingIcon()
-                        Spacer(Modifier.width(TrailingIconSpacing))
-                    }
+                    Spacer(Modifier.width(LeadingIconEndSpacing))
+                }
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = content,
+                )
+                if (trailingIcon != null) {
+                    Spacer(Modifier.width(TrailingIconSpacing))
+                    trailingIcon()
+                    Spacer(Modifier.width(TrailingIconSpacing))
                 }
             }
         }

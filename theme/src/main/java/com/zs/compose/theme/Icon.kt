@@ -65,7 +65,7 @@ fun Icon(
     imageVector: ImageVector,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+    tint: Color = LocalContentColor.current
 ) {
     Icon(
         painter = rememberVectorPainter(imageVector),
@@ -99,7 +99,7 @@ fun Icon(
     bitmap: ImageBitmap,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+    tint: Color = LocalContentColor.current
 ) {
     val painter = remember(bitmap) { BitmapPainter(bitmap) }
     Icon(
@@ -133,7 +133,7 @@ fun Icon(
     painter: Painter,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+    tint: Color = LocalContentColor.current
 ) {
     val colorFilter =
         remember(tint) { if (tint == Color.Unspecified) null else ColorFilter.tint(tint) }

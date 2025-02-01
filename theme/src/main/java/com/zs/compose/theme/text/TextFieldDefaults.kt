@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ContentAlpha
 import com.zs.compose.theme.ExperimentalThemeApi
-import com.zs.compose.theme.LocalContentAlpha
 import com.zs.compose.theme.LocalContentColor
 
 /**
@@ -389,7 +388,7 @@ object TextFieldDefaults {
      */
     @Composable
     fun textFieldColors(
-        textColor: Color = LocalContentColor.current.copy(LocalContentAlpha.current),
+        textColor: Color = LocalContentColor.current,
         disabledTextColor: Color = textColor.copy(ContentAlpha .disabled),
         backgroundColor: Color = /*AppTheme.colors.onBackground.copy(alpha = BackgroundOpacity)*/ AppTheme.colors.background(2.dp),
         cursorColor: Color = AppTheme.colors.accent,
@@ -443,7 +442,7 @@ object TextFieldDefaults {
      */
     @Composable
     fun outlinedTextFieldColors(
-        textColor: Color = LocalContentColor.current.copy(LocalContentAlpha.current),
+        textColor: Color = LocalContentColor.current,
         disabledTextColor: Color = textColor.copy(ContentAlpha.disabled),
         backgroundColor: Color = Color.Transparent,
         cursorColor: Color = AppTheme.colors.accent,
