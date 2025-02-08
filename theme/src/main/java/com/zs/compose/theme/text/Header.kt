@@ -32,6 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.AppTheme
+import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.drawHorizontalDivider
 import com.zs.compose.theme.internal.ZeroPadding
@@ -44,6 +45,7 @@ import com.zs.compose.theme.internal.ZeroPadding
  * @param style The [TextStyle] to be applied to the header text.
  * @param contentPadding The padding to be applied around the header content.
  * @param action An optional composable function to display an action within the header.*/
+@OptIn(ExperimentalThemeApi::class)
 @Composable
 @NonRestartableComposable
 fun Header(
@@ -86,6 +88,7 @@ fun Header(
 /**
  * @see Header
  */
+@OptIn(ExperimentalThemeApi::class)
 @Composable
 @NonRestartableComposable
 fun Header(

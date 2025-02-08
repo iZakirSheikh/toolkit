@@ -92,7 +92,7 @@ private val DropdownMenuItemHorizontalPadding = 16.dp
 internal val DropdownMenuVerticalPadding = 8.dp
 private val DropdownMenuItemDefaultMinWidth = 112.dp
 private val DropdownMenuItemDefaultMaxWidth = 280.dp
-private val DropdownMenuItemDefaultMinHeight = 48.dp
+private val DropdownMenuItemDefaultMinHeight = 40.dp
 
 // Menu open/close animation.
 internal const val InTransitionDuration = 120
@@ -217,7 +217,7 @@ fun BasicPopupMenu(
     elevation: Dp = Dp.Unspecified,
     backgroundColor: Color = AppTheme.colors.background(1.dp),
     contentColor: Color = AppTheme.colors.onBackground,
-    shape: Shape = AppTheme.shapes.xSmall,
+    shape: Shape = AppTheme.shapes.small,
     border: BorderStroke? = null,
     properties: PopupProperties = DefaultMenuProperties,
     content: @Composable () -> Unit
@@ -368,7 +368,7 @@ fun DropDownMenu(
     elevation: Dp = Dp.Unspecified,
     backgroundColor: Color = AppTheme.colors.background(1.dp),
     contentColor: Color = AppTheme.colors.onBackground,
-    shape: Shape = AppTheme.shapes.xSmall,
+    shape: Shape = AppTheme.shapes.small,
     border: BorderStroke? = null,
     scrollState: ScrollState? = null,
     properties: PopupProperties = DefaultMenuProperties,

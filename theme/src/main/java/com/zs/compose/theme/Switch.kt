@@ -263,14 +263,14 @@ fun Switch(
                 size = size
             )
         }
-        val radius = size.minDimension / 2.5f
+        val radius = 0.33f * size.minDimension
         drawCircle(
             color = thumbColor,
             radius = radius,
             center = Offset(
                 x = (position * size.width).coerceIn(
-                    radius + stroke,
-                    size.width - (radius + stroke)
+                    1.4f * radius,
+                    size.width - (1.4f * radius)
                 ),
                 y = center.y
             )

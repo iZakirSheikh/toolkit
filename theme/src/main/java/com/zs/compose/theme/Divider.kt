@@ -118,8 +118,7 @@ fun VerticalDivider(
  * @see [Divider]
  * @see [DividerVertical]
  */
-
-
+@ExperimentalThemeApi
 fun Modifier.drawHorizontalDivider(
     color: Color,
     thickness: Dp = 1.dp,
@@ -160,6 +159,7 @@ fun Modifier.drawHorizontalDivider(
  * Draws vertical [Divider] at the end of the composable
  * @see drawHorizontalDivider
  */
+@ExperimentalThemeApi
 fun Modifier.drawVerticalDivider(
     color: Color,
     thickness: Dp = 1.dp,
