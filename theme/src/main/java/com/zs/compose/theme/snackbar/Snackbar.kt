@@ -18,332 +18,208 @@
  
 package com.zs.compose.theme.snackbar
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFromBaseline
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.layout.LastBaseline
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastFirst
-import androidx.compose.ui.util.fastForEach
+import com.zs.compose.foundation.ImageBrush
+import com.zs.compose.foundation.SignalWhite
+import com.zs.compose.foundation.composableIf
+import com.zs.compose.foundation.fadingEdge
+import com.zs.compose.foundation.thenIf
+import com.zs.compose.foundation.visualEffect
 import com.zs.compose.theme.AppTheme
+import com.zs.compose.theme.BaseListItem
 import com.zs.compose.theme.ButtonDefaults
-import com.zs.compose.theme.Surface
+import com.zs.compose.theme.Colors
+import com.zs.compose.theme.DismissValue
+import com.zs.compose.theme.ExperimentalThemeApi
+import com.zs.compose.theme.FilledTonalButton
+import com.zs.compose.theme.Icon
+import com.zs.compose.theme.SwipeToDismiss
 import com.zs.compose.theme.TextButton
+import com.zs.compose.theme.internal.FractionalThreshold
+import com.zs.compose.theme.rememberDismissState
 import com.zs.compose.theme.text.Label
-import com.zs.compose.theme.text.ProvideTextStyle
-import com.zs.compose.theme.text.Text
-import kotlin.math.max
+
+private inline val Colors.toastBackgroundColor
+    @Composable
+    @ReadOnlyComposable
+    get() = if (isLight) Color(0xFF0E0E0F) else AppTheme.colors.background(1.dp)
 
 /**
- * <a href="https://material.io/components/snackbars" class="external" target="_blank">Material
- * Design snackbar</a>.
- *
- * Snackbars provide brief messages about app processes at the bottom of the screen.
- *
- * Snackbars inform users of a process that an app has performed or will perform. They appear
- * temporarily, towards the bottom of the screen. They shouldn’t interrupt the user experience, and
- * they don’t require user input to disappear.
- *
- * A Snackbar can contain a single action. Because Snackbar disappears automatically, the action
- * shouldn't be "Dismiss" or "Cancel".
- *
- * ![Snackbars
- * image](https://developer.android.com/images/reference/androidx/compose/material/snackbars.png)
- *
- * This components provides only the visuals of the [Snackbar]. If you need to show a [Snackbar]
- * with defaults on the screen, use [ScaffoldState.snackbarHostState] and
- * [SnackbarHostState.showSnackbar]:
- *
- * @sample androidx.compose.material.samples.ScaffoldWithSimpleSnackbar
- *
- * If you want to customize appearance of the [Snackbar], you can pass your own version as a child
- * of the [SnackbarHost] to the [Scaffold]:
- *
- * @sample androidx.compose.material.samples.ScaffoldWithCustomSnackbar
- * @param modifier modifiers for the Snackbar layout
- * @param action action / button component to add as an action to the snackbar. Consider using
- *   [SnackbarDefaults.primaryActionColor] as the color for the action, if you do not have a
- *   predefined color you wish to use instead.
- * @param actionOnNewLine whether or not action should be put on the separate line. Recommended for
- *   action with long action text
- * @param shape Defines the Snackbar's shape as well as its shadow
- * @param backgroundColor background color of the Snackbar
- * @param contentColor color of the content to use inside the snackbar. Defaults to either the
- *   matching content color for [backgroundColor], or, if it is not a color from the theme, this
- *   will keep the same value set above this Surface.
- * @param elevation The z-coordinate at which to place the SnackBar. This controls the size of the
- *   shadow below the SnackBar
- * @param content content to show information about a process that an app has performed or will
- *   perform
+ * Represents a Snackbar component for [SnackbarHost]
  */
 @Composable
-fun Snackbar(
+@ExperimentalThemeApi
+internal fun Snackbar(
+    value: SnackbarData,
     modifier: Modifier = Modifier,
-    action: @Composable (() -> Unit)? = null,
-    actionOnNewLine: Boolean = false,
-    shape: Shape = AppTheme.shapes.xSmall,
-    backgroundColor: Color = AppTheme.colors.background(1.dp),
-    contentColor: Color = AppTheme.colors.onBackground,
-    elevation: Dp = 6.dp,
-    content: @Composable () -> Unit
+    backgroundColor: Color = AppTheme.colors.toastBackgroundColor,
+    contentColor: Color = Color.SignalWhite,
+    actionColor: Color = value.accent.takeOrElse { AppTheme.colors.accent },
 ) {
-    Surface(
-        modifier = modifier,
-        shape = shape,
-        elevation = elevation,
-        color = backgroundColor,
-        contentColor = contentColor
-    ) {
-        CompositionLocalProvider() {
-            val textStyle = AppTheme.typography.body2
-            ProvideTextStyle(value = textStyle) {
-                when {
-                    action == null -> TextOnlySnackbar(content)
-                    actionOnNewLine -> NewLineButtonSnackbar(content, action)
-                    else -> OneRowSnackbar(content, action)
-                }
-            }
-        }
-    }
-}
+    // State to track if Toast is expanded
+    val critical = value.duration == SnackbarDuration.Indefinite
+    var isExpanded: Boolean by remember { mutableStateOf(critical) }
+    // Handle back press to dismiss expanded Toast or the entire Toast
+    // BackHandler(isExpanded) { isExpanded = !isExpanded }
+    // State for swipe-to-dismiss gesture
 
-/**
- * <a href="https://material.io/components/snackbars" class="external" target="_blank">Material
- * Design snackbar</a>.
- *
- * Snackbars provide brief messages about app processes at the bottom of the screen.
- *
- * Snackbars inform users of a process that an app has performed or will perform. They appear
- * temporarily, towards the bottom of the screen. They shouldn’t interrupt the user experience, and
- * they don’t require user input to disappear.
- *
- * A Snackbar can contain a single action. Because they disappear automatically, the action
- * shouldn't be "Dismiss" or "Cancel".
- *
- * ![Snackbars
- * image](https://developer.android.com/images/reference/androidx/compose/material/snackbars.png)
- *
- * This version of snackbar is designed to work with [SnackbarData] provided by the [SnackbarHost],
- * which is usually used inside of the [Scaffold].
- *
- * This components provides only the visuals of the [Snackbar]. If you need to show a [Snackbar]
- * with defaults on the screen, use [ScaffoldState.snackbarHostState] and
- * [SnackbarHostState.showSnackbar]:
- *
- * @sample androidx.compose.material.samples.ScaffoldWithSimpleSnackbar
- *
- * If you want to customize appearance of the [Snackbar], you can pass your own version as a child
- * of the [SnackbarHost] to the [Scaffold]:
- *
- * @sample androidx.compose.material.samples.ScaffoldWithCustomSnackbar
- * @param snackbarData data about the current snackbar showing via [SnackbarHostState]
- * @param modifier modifiers for the Snackbar layout
- * @param actionOnNewLine whether or not action should be put on the separate line. Recommended for
- *   action with long action text
- * @param shape Defines the Snackbar's shape as well as its shadow
- * @param backgroundColor background color of the Snackbar
- * @param contentColor color of the content to use inside the snackbar. Defaults to either the
- *   matching content color for [backgroundColor], or, if it is not a color from the theme, this
- *   will keep the same value set above this Surface.
- * @param actionColor color of the action
- * @param elevation The z-coordinate at which to place the SnackBar. This controls the size of the
- *   shadow below the SnackBar
- */
-@Composable
-fun Snackbar(
-    snackbarData: SnackbarData,
-    modifier: Modifier = Modifier,
-    actionOnNewLine: Boolean = false,
-    shape: Shape = AppTheme.shapes.small,
-    backgroundColor: Color = AppTheme.colors.background(1.dp),
-    contentColor: Color = AppTheme.colors.onBackground,
-    elevation: Dp = 6.dp
-) {
-    val actionLabel = snackbarData.action
-    val actionComposable: (@Composable () -> Unit)? =
-        if (actionLabel != null) {
-            @Composable {
-                TextButton(
-                    colors = ButtonDefaults.textButtonColors(contentColor = snackbarData.accent.takeOrElse { AppTheme.colors.accent }),
-                    onClick = { snackbarData.action() },
-                    content = { Label(actionLabel) }
-                )
-            }
-        } else {
-            null
+    val dismissState = rememberDismissState(
+        confirmStateChange = {
+            // Dismiss only if not expanded or critical and expanded
+            if (critical || isExpanded || it == DismissValue.DismissedToEnd) return@rememberDismissState false
+            // Execute action if confirmed
+            value.dismiss()
+            true
         }
-    Snackbar(
-        modifier = modifier.padding(12.dp),
-        content = { Text(snackbarData.message) },
-        action = actionComposable,
-        actionOnNewLine = actionOnNewLine,
-        shape = shape,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
-        elevation = elevation
+    )
+    val colors = AppTheme.colors
+    // SwipeToDismiss composable for handling swipe gesture
+    SwipeToDismiss(
+        dismissState,
+        background = { },
+        dismissThresholds = { FractionalThreshold(0.75f) },
+        modifier = modifier
+//            .renderInSharedTransitionScopeOverlay(0.3f)
+            .animateContentSize()
+            ,
+        dismissContent = {
+            // Shape of the Toast based on expanded state
+            val shape = if (isExpanded) AppTheme.shapes.small else AppTheme.shapes.xSmall
+            BaseListItem(
+                contentColor = contentColor,
+                spacing = 4.dp,
+                leading = composableIf(value.icon != null) {
+                    // FixMe: It might cause problems.
+                    val icon = value.icon!!
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = actionColor,
+                        modifier = Modifier.padding(end = 4.dp)
+                    )
+                },
+                // Trailing action button if available and not expanded
+                trailing = composableIf(value.action != null && !isExpanded) {
+                    TextButton(
+                        text = value.action!!,
+                        onClick = value::action,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = actionColor,
+                            backgroundColor = Color.Transparent,
+                        ),
+                        shape = CircleShape,
+                        modifier = Modifier.height(37.dp),
+                    )
+                },
+                // Toast message
+                heading = {
+                    Label(
+                        text = value.message,
+                        color = contentColor,
+                        style = AppTheme.typography.body2,
+                        // Limit lines when not expanded
+                        maxLines = if (!isExpanded) 3 else Int.MAX_VALUE,
+                        modifier = Modifier
+                            // Max height constraint
+                            .heightIn(max = 200.dp)
+                            .thenIf(isExpanded) {
+                                val state = rememberScrollState()
+                                fadingEdge( state, false, 16.dp)
+                                    .verticalScroll(state)
+                            }
+                    )
+                },
+                // Footer with action buttons when expanded
+                footer = composableIf(isExpanded) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = Modifier.thenIf(value.icon != null) { padding(start = 20.dp) }.fillMaxWidth(),
+                        content = {
+                            // Action button if available
+                            val action = value.action
+                            if (action != null)
+                                FilledTonalButton(
+                                    text = action,
+                                    onClick = value::action,
+                                    colors = ButtonDefaults.buttonColors(
+                                        contentColor = actionColor,
+                                        backgroundColor = actionColor.copy(0.2f).compositeOver(
+                                            AppTheme.colors.toastBackgroundColor
+                                        )
+                                    ),
+                                    modifier = Modifier.height(37.dp),
+                                )
+                            // Cancel button
+                            TextButton(
+                                stringResource(android.R.string.cancel).uppercase(),
+                                value::dismiss,
+                                modifier = Modifier.height(37.dp),
+                                colors = ButtonDefaults.textButtonColors(contentColor = contentColor),
+                            )
+                        }
+                    )
+                },
+                modifier = Modifier
+                    .padding(horizontal = 18.dp)
+                    .shadow(6.dp, shape, clip = true)
+                    // Toggle expanded state on click
+                    .clickable(indication = null, interactionSource = null, enabled = !critical && value.message.length > 100) {
+                        isExpanded = !isExpanded
+                    }
+                    // Apply border and visual effect if dark theme
+                    .thenIf(!isExpanded) {
+                        drawWithContent {
+                            drawContent()
+                            drawRect(color = actionColor, size = size.copy(width = 3.dp.toPx()))
+                        }
+                    }
+                    .border(
+                        1.dp,
+                        Brush.linearGradient(
+                            listOf(
+                                Color.Gray.copy(if(!colors.isLight) 0.24f else 0.48f),
+                                Color.Transparent,
+                                Color.Transparent,
+                                Color.Gray.copy(if(!colors.isLight) 0.24f else 0.48f),
+                            )
+                        ),
+                        shape
+                    )
+                    .visualEffect(ImageBrush.NoiseBrush, 0.60f, overlay = true)
+                    .background(backgroundColor)
+                    //.clip(shape)
+                    .sizeIn(360.dp, 56.dp, 400.dp, 340.dp)
+            )
+        }
     )
 }
-
-
-@Composable
-private fun TextOnlySnackbar(content: @Composable () -> Unit) {
-    Layout({
-        Box(
-            modifier =
-            Modifier.padding(horizontal = HorizontalSpacing, vertical = SnackbarVerticalPadding)
-        ) {
-            content()
-        }
-    }) { measurables, constraints ->
-        val textPlaceables = ArrayList<Placeable>(measurables.size)
-        var firstBaseline = AlignmentLine.Unspecified
-        var lastBaseline = AlignmentLine.Unspecified
-        var height = 0
-
-        measurables.fastForEach {
-            val placeable = it.measure(constraints)
-            textPlaceables.add(placeable)
-            if (
-                placeable[FirstBaseline] != AlignmentLine.Unspecified &&
-                (firstBaseline == AlignmentLine.Unspecified ||
-                        placeable[FirstBaseline] < firstBaseline)
-            ) {
-                firstBaseline = placeable[FirstBaseline]
-            }
-            if (
-                placeable[LastBaseline] != AlignmentLine.Unspecified &&
-                (lastBaseline == AlignmentLine.Unspecified ||
-                        placeable[LastBaseline] > lastBaseline)
-            ) {
-                lastBaseline = placeable[LastBaseline]
-            }
-            height = max(height, placeable.height)
-        }
-
-        val hasText =
-            firstBaseline != AlignmentLine.Unspecified && lastBaseline != AlignmentLine.Unspecified
-
-        val minHeight =
-            if (firstBaseline == lastBaseline || !hasText) {
-                SnackbarMinHeightOneLine
-            } else {
-                SnackbarMinHeightTwoLines
-            }
-        val containerHeight = max(minHeight.roundToPx(), height)
-        layout(constraints.maxWidth, containerHeight) {
-            textPlaceables.fastForEach {
-                val textPlaceY = (containerHeight - it.height) / 2
-                it.placeRelative(0, textPlaceY)
-            }
-        }
-    }
-}
-
-@Composable
-private fun NewLineButtonSnackbar(text: @Composable () -> Unit, action: @Composable () -> Unit) {
-    Column(
-        modifier =
-        Modifier.fillMaxWidth()
-            .padding(
-                start = HorizontalSpacing,
-                end = HorizontalSpacingButtonSide,
-                bottom = SeparateButtonExtraY
-            )
-    ) {
-        Box(
-            Modifier.paddingFromBaseline(HeightToFirstLine, LongButtonVerticalOffset)
-                .padding(end = HorizontalSpacingButtonSide)
-        ) {
-            text()
-        }
-        Box(Modifier.align(Alignment.End)) { action() }
-    }
-}
-
-@Composable
-private fun OneRowSnackbar(text: @Composable () -> Unit, action: @Composable () -> Unit) {
-    val textTag = "text"
-    val actionTag = "action"
-    Layout(
-        {
-            Box(Modifier.layoutId(textTag).padding(vertical = SnackbarVerticalPadding)) { text() }
-            Box(Modifier.layoutId(actionTag)) { action() }
-        },
-        modifier = Modifier.padding(start = HorizontalSpacing, end = HorizontalSpacingButtonSide)
-    ) { measurables, constraints ->
-        val buttonPlaceable =
-            measurables.fastFirst { it.layoutId == actionTag }.measure(constraints)
-        val textMaxWidth =
-            (constraints.maxWidth - buttonPlaceable.width - TextEndExtraSpacing.roundToPx())
-                .coerceAtLeast(constraints.minWidth)
-        val textPlaceable =
-            measurables
-                .fastFirst { it.layoutId == textTag }
-                .measure(constraints.copy(minHeight = 0, maxWidth = textMaxWidth))
-
-        val firstTextBaseline = textPlaceable[FirstBaseline]
-        val lastTextBaseline = textPlaceable[LastBaseline]
-        val hasText =
-            firstTextBaseline != AlignmentLine.Unspecified &&
-                    lastTextBaseline != AlignmentLine.Unspecified
-        val isOneLine = firstTextBaseline == lastTextBaseline || !hasText
-        val buttonPlaceX = constraints.maxWidth - buttonPlaceable.width
-
-        val textPlaceY: Int
-        val containerHeight: Int
-        val buttonPlaceY: Int
-        if (isOneLine) {
-            val minContainerHeight = SnackbarMinHeightOneLine.roundToPx()
-            val contentHeight = buttonPlaceable.height
-            containerHeight = max(minContainerHeight, contentHeight)
-            textPlaceY = (containerHeight - textPlaceable.height) / 2
-            val buttonBaseline = buttonPlaceable[FirstBaseline]
-            buttonPlaceY =
-                buttonBaseline.let {
-                    if (it != AlignmentLine.Unspecified) {
-                        textPlaceY + firstTextBaseline - it
-                    } else {
-                        0
-                    }
-                }
-        } else {
-            val baselineOffset = HeightToFirstLine.roundToPx()
-            textPlaceY = baselineOffset - firstTextBaseline
-            val minContainerHeight = SnackbarMinHeightTwoLines.roundToPx()
-            val contentHeight = textPlaceY + textPlaceable.height
-            containerHeight = max(minContainerHeight, contentHeight)
-            buttonPlaceY = (containerHeight - buttonPlaceable.height) / 2
-        }
-
-        layout(constraints.maxWidth, containerHeight) {
-            textPlaceable.placeRelative(0, textPlaceY)
-            buttonPlaceable.placeRelative(buttonPlaceX, buttonPlaceY)
-        }
-    }
-}
-
-private val HeightToFirstLine = 30.dp
-private val HorizontalSpacing = 16.dp
-private val HorizontalSpacingButtonSide = 8.dp
-private val SeparateButtonExtraY = 2.dp
-private val SnackbarVerticalPadding = 6.dp
-private val TextEndExtraSpacing = 8.dp
-private val LongButtonVerticalOffset = 12.dp
-private val SnackbarMinHeightOneLine = 48.dp
-private val SnackbarMinHeightTwoLines = 68.dp

@@ -28,7 +28,9 @@ import kotlinx.coroutines.sync.Mutex
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalAccessibilityManager
+import com.zs.compose.theme.ExperimentalThemeApi
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -91,6 +93,7 @@ interface SnackbarData {
     val duration: SnackbarDuration
 
     val accent: Color get() = Color.Unspecified
+    val icon: ImageVector?
 
     /** Function to be called when Snackbar action has been performed to notify the listeners */
     fun action()
@@ -144,6 +147,7 @@ class SnackbarHostState {
     suspend fun showSnackbar(
         message: CharSequence,
         action: CharSequence? = null,
+        icon: ImageVector? = null,
         accent: Color = Color.Unspecified,
         duration: SnackbarDuration = SnackbarDuration.Short
     ): SnackbarResult =
@@ -151,7 +155,7 @@ class SnackbarHostState {
             try {
                 return suspendCancellableCoroutine { continuation ->
                     currentSnackbarData =
-                        SnackbarDataImpl(message, action, duration, accent, continuation)
+                        SnackbarDataImpl(message, action, icon, duration, accent, continuation)
                 }
             } finally {
                 currentSnackbarData = null
@@ -162,6 +166,7 @@ class SnackbarHostState {
     private class SnackbarDataImpl(
         override val message: CharSequence,
         override val action: CharSequence?,
+        override val icon: ImageVector?,
         override val duration: SnackbarDuration,
         override val accent: Color,
         private val continuation: CancellableContinuation<SnackbarResult>
@@ -197,6 +202,7 @@ class SnackbarHostState {
  * @param snackbar the instance of the [Snackbar] to be shown at the appropriate time with
  *   appearance based on the [SnackbarData] provided as a param
  */
+@OptIn(ExperimentalThemeApi::class)
 @Composable
 fun SnackbarHost(
     hostState: SnackbarHostState,

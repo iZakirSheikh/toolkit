@@ -177,6 +177,7 @@ fun Content(modifier: Modifier = Modifier) {
                 SliderPreference(
                     info,
                     value,
+                    steps = 9,
                     onRequestChange = ch,
                     icon = Icons.Default.Feedback
                 )
@@ -289,7 +290,7 @@ class MainActivity : ComponentActivity() {
                 append("Progress")
             }
             withStyle(SpanStyle(color = Color.Gray)){
-                append("\nThe progress completed. Here you can put content of any size.")
+                append("\nThe progress completed. Here you can put content of any size. This is a lng very long info for a dialog. i mena or a snackbar. wht is a snack bar in the forst place, it is a small bar shaped item at the bottom of the screen that displays info to the user. the forst place, it is a small bar shaped item at the bottom of the screen that displays info to the user.the forst place, it is a small bar shaped item at the bottom of the screen that displays info to the user.")
             }
         }
         setContent {
@@ -305,7 +306,8 @@ class MainActivity : ComponentActivity() {
                 state.showSnackbar(
                     message,
                     "Action",
-                    duration = SnackbarDuration.Indefinite
+                    icon = Icons.Default.Feedback,
+                    duration = SnackbarDuration.Long
                 )
             }
             AppTheme(colors = lightColors(accent =  Color(0xFF514700))) {
