@@ -18,6 +18,11 @@
 
 package com.zs.compose.theme.appbar
 
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.DecayAnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -44,14 +49,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ContentAlpha
+import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.None
 import com.zs.compose.theme.Surface
+import com.zs.compose.theme.appbar.TopAppBarDefaults.LargeTopBarHeight
+import com.zs.compose.theme.appbar.TopAppBarDefaults.TopBarHeight
 import com.zs.compose.theme.text.ProvideTextStyle
 
 private val TopAppBarHeight = 56.dp
@@ -119,6 +128,134 @@ object AppBarDefaults {
             WindowInsets.systemBars.only(
                 WindowInsetsSides.Vertical + WindowInsetsSides.Start
             )
+
+
+    /**
+     * @see APP_BAR_LAYOUT_ID_BACKGROUND
+     */
+    val LayoutIdBackground = APP_BAR_LAYOUT_ID_BACKGROUND
+    val LayoutIdNavIcon = APP_BAR_LAYOUT_ID_NAVIGATION_ICON
+    val LayoutIdTitle = APP_BAR_LAYOUT_ID_TITLE
+    val LayoutIdCollapsable_title = APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE
+    val LayoutIdAction = APP_BAR_LAYOUT_ID_ACTIONS
+
+
+    /**
+     * Creates a [TopAppBarStyle] suitable for large top app bars, which feature
+     * scrollable content and expandable height.
+     *
+     * @see TopAppBarStyle
+     */
+    @OptIn(ExperimentalThemeApi::class)
+    @Composable
+    fun largeAppBarStyle(
+        containerColor: Color = AppTheme.colors.background,
+        scrolledContainerColor: Color = AppTheme.colors.background(1.dp),
+        contentColor: Color = AppTheme.colors.onBackground,
+        scrolledContentColor: Color = AppTheme.colors.onBackground,
+        titleTextStyle: TextStyle = AppTheme.typography.title2,
+        scrolledTitleTextStyle: TextStyle = AppTheme.typography.headline2,
+        height: Dp = TopAppBarDefaults.TopBarHeight,
+        maxHeight: Dp = TopAppBarDefaults.LargeTopBarHeight,
+    ) = TopAppBarStyle(
+        containerColor = containerColor,
+        scrolledContainerColor = scrolledContainerColor,
+        contentColor = contentColor,
+        scrolledContentColor = scrolledContentColor,
+        titleTextStyle = titleTextStyle,
+        scrolledTitleTextStyle = scrolledTitleTextStyle,
+        height = height,
+        maxHeight = maxHeight
+    )
+
+    /**
+     * Creates a [TopAppBarStyle] suitable for smaller, non-expandable top app bars.
+     * @see largeAppBarStyle
+     */
+    @ExperimentalThemeApi
+    @Composable
+    fun topAppBarStyle(
+        containerColor: Color = AppTheme.colors.background,
+        scrolledContainerColor: Color = AppTheme.colors.background(1.dp),
+        contentColor: Color = AppTheme.colors.onBackground,
+        scrolledContentColor: Color = AppTheme.colors.onBackground,
+        titleTextStyle: TextStyle = AppTheme.typography.title2,
+        height: Dp = TopAppBarDefaults.TopBarHeight,
+    ) = TopAppBarStyle(
+        containerColor = containerColor,
+        scrolledContainerColor = scrolledContainerColor,
+        contentColor = contentColor,
+        scrolledContentColor = scrolledContentColor,
+        titleTextStyle = titleTextStyle,
+        scrolledTitleTextStyle = titleTextStyle,
+        height = height,
+        maxHeight = height
+    )
+
+    @ExperimentalThemeApi
+    @Composable
+    fun pinnedScrollBehavior(
+        canScroll: () -> Boolean = { true }
+    ): TopAppBarScrollBehavior = PinnedScrollBehavior(canScroll = canScroll)
+
+    /**
+     * Returns a [TopAppBarScrollBehavior]. A top app bar that is set up with this
+     * [TopAppBarScrollBehavior] will immediately collapse when the content is pulled up, and will
+     * immediately appear when the content is pulled down.
+     *
+     * @param state the state object to be used to control or observe the top app bar's scroll
+     * state. See [rememberTopAppBarState] for a state that is remembered across compositions.
+     * @param canScroll a callback used to determine whether scroll events are to be
+     * handled by this [EnterAlwaysScrollBehavior]
+     * @param snapAnimationSpec an optional [AnimationSpec] that defines how the top app bar snaps
+     * to either fully collapsed or fully extended state when a fling or a drag scrolled it into an
+     * intermediate position
+     * @param flingAnimationSpec an optional [DecayAnimationSpec] that defined how to fling the top
+     * app bar when the user flings the app bar itself, or the content below it
+     */
+    @ExperimentalThemeApi
+    @Composable
+    fun enterAlwaysScrollBehavior(
+        canScroll: () -> Boolean = { true },
+        snapAnimationSpec: AnimationSpec<Float>? = spring(stiffness = Spring.StiffnessMediumLow),
+        flingAnimationSpec: DecayAnimationSpec<Float>? = rememberSplineBasedDecay()
+    ): TopAppBarScrollBehavior =
+        EnterAlwaysScrollBehavior(
+            snapAnimationSpec = snapAnimationSpec,
+            flingAnimationSpec = flingAnimationSpec,
+            canScroll = canScroll
+        )
+
+    /**
+     * Returns a [TopAppBarScrollBehavior] that adjusts its properties to affect the colors and
+     * height of the top app bar.
+     *
+     * A top app bar that is set up with this [TopAppBarScrollBehavior] will immediately collapse
+     * when the nested content is pulled up, and will expand back the collapsed area when the
+     * content is  pulled all the way down.
+     *
+     * @param state the state object to be used to control or observe the top app bar's scroll
+     * state. See [rememberTopAppBarState] for a state that is remembered across compositions.
+     * @param canScroll a callback used to determine whether scroll events are to be
+     * handled by this [ExitUntilCollapsedScrollBehavior]
+     * @param snapAnimationSpec an optional [AnimationSpec] that defines how the top app bar snaps
+     * to either fully collapsed or fully extended state when a fling or a drag scrolled it into an
+     * intermediate position
+     * @param flingAnimationSpec an optional [DecayAnimationSpec] that defined how to fling the top
+     * app bar when the user flings the app bar itself, or the content below it
+     */
+    @ExperimentalThemeApi
+    @Composable
+    fun exitUntilCollapsedScrollBehavior(
+        canScroll: () -> Boolean = { true },
+        snapAnimationSpec: AnimationSpec<Float>? = spring(stiffness = Spring.StiffnessMediumLow),
+        flingAnimationSpec: DecayAnimationSpec<Float>? = rememberSplineBasedDecay()
+    ): TopAppBarScrollBehavior =
+        ExitUntilCollapsedScrollBehavior(
+            snapAnimationSpec = snapAnimationSpec,
+            flingAnimationSpec = flingAnimationSpec,
+            canScroll = canScroll
+        )
 }
 
 /**

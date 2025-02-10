@@ -2,33 +2,20 @@
 
 package com.prime.toolkit
 
-import android.graphics.BlurMaskFilter
 import android.os.Bundle
-import android.preference.CheckBoxPreference
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -44,7 +31,6 @@ import androidx.compose.material.icons.outlined.PhotoAlbum
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.VideoLibrary
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -54,23 +40,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.PaintingStyle
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.zs.compose.theme.AlertDialog
 import com.zs.compose.theme.AppTheme
@@ -85,11 +62,9 @@ import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.ListItem
 import com.zs.compose.theme.LocalContentColor
-import com.zs.compose.theme.None
 import com.zs.compose.theme.OutlinedButton
 import com.zs.compose.theme.SelectableChip
 import com.zs.compose.theme.SliderPreference
-import com.zs.compose.theme.Surface
 import com.zs.compose.theme.Switch
 import com.zs.compose.theme.SwitchPreference
 import com.zs.compose.theme.TextFieldPreference
@@ -100,10 +75,7 @@ import com.zs.compose.theme.adaptive.contentInsets
 import com.zs.compose.theme.appbar.AppBarDefaults
 import com.zs.compose.theme.appbar.BottomAppBar
 import com.zs.compose.theme.appbar.BottomNavigationItem
-import com.zs.compose.theme.appbar.SideBar
-import com.zs.compose.theme.appbar.SideNavigationItem
-import com.zs.compose.theme.appbar.TopAppBar
-import com.zs.compose.theme.darkColors
+import com.zs.compose.theme.appbar.LargeTopAppBar
 import com.zs.compose.theme.lightColors
 import com.zs.compose.theme.rememberDismissState
 import com.zs.compose.theme.snackbar.SnackbarDuration
@@ -119,11 +91,13 @@ private const val TAG = "MainActivity"
 @Composable
 fun Content(modifier: Modifier = Modifier) {
     val navInsets = WindowInsets.contentInsets
+    val behaviour = AppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         primary = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier
+                    .nestedScroll(behaviour.nestedScrollConnection)
                     .verticalScroll(rememberScrollState(), )
                     .padding(navInsets)
                     .padding(WindowInsets.contentInsets)
@@ -257,7 +231,7 @@ fun Content(modifier: Modifier = Modifier) {
             }
         },
         topBar = {
-            TopAppBar(
+            LargeTopAppBar(
                 title = { Text("Settings") },
                 windowInsets = AppBarDefaults.topAppBarWindowInsets,
                 navigationIcon = {
@@ -265,7 +239,8 @@ fun Content(modifier: Modifier = Modifier) {
                 },
                 actions = {
                     IconButton(Icons.Outlined.Settings, onClick = {}, contentDescription = null)
-                }
+                },
+                scrollBehavior = behaviour
             )
         },
         modifier = modifier
