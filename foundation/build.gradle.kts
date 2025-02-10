@@ -1,7 +1,10 @@
+import org.gradle.kotlin.dsl.from
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    id(libs.plugins.maven.publish.get().pluginId)
 }
 
 android {
@@ -36,4 +39,22 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.core.ktx)
 //    implementation(libs.chrisbanes.haze)
+}
+
+// Because the components are created only during the afterEvaluate phase, you must
+// configure your publications using the afterEvaluate() lifecycle method.
+afterEvaluate {
+    publishing {
+        publications {
+            // Create a Maven publication named "release"
+            create<MavenPublication>("release") {
+                // Use the release build variant component
+                from(components["release"])
+                // Customize publication attributes
+                groupId = "com.zs.compose"
+                artifactId = "foundation"
+                version = "3.0.0-dev01"
+            }
+        }
+    }
 }
