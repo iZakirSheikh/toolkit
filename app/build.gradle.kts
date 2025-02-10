@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.coil.compose)
     implementation(project(":theme"))
+    implementation(project(":foundation"))
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
 }

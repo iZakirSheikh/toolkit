@@ -83,6 +83,16 @@ object ContentAlpha {
             if (contentColor.luminance() < 0.5) highContrastAlpha else lowContrastAlpha
         }
     }
+
+    /**
+     * The recommended divider Alpha
+     */
+    val divider = 0.12f
+
+    /**
+     * The recommended LocalIndication Alpha
+     */
+    val indication = 0.1f
 }
 
 /**

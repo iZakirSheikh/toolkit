@@ -16,8 +16,27 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package com.zs.compose.theme
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.BoundsTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.SharedTransitionScope.OverlayClip
+import androidx.compose.animation.SharedTransitionScope.PlaceHolderSize
+import androidx.compose.animation.SharedTransitionScope.ResizeMode
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.ScaleToBounds
+import androidx.compose.animation.SharedTransitionScope.SharedContentState
+import androidx.compose.animation.core.Spring.StiffnessMediumLow
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -25,10 +44,52 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import com.zs.compose.theme.text.ProvideTextStyle
 
 // source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/MaterialTheme.kt;bpv=0
 // commit date: 2024-09-26 23:43
+@Composable
+/*@VisibleForTesting*/
+internal fun rememberTextSelectionColors(colorScheme: Colors): TextSelectionColors {
+    val primaryColor = colorScheme.accent
+    return remember(primaryColor) {
+        TextSelectionColors(
+            handleColor = primaryColor,
+            backgroundColor = primaryColor.copy(alpha = TextSelectionBackgroundOpacity),
+        )
+    }
+}
+
+/*@VisibleForTesting*/
+internal const val TextSelectionBackgroundOpacity = 0.4f
+
+/**
+ * Provides a [CompositionLocal] to access the current [SharedTransitionScope].
+ *
+ * This CompositionLocal should be provided bya parent composable that manages shared transitions.
+ */
+@OptIn(ExperimentalSharedTransitionApi::class)
+internal val LocalSharedTransitionScope =
+    staticCompositionLocalOf<SharedTransitionScope> {
+        error("CompositionLocal LocalSharedTransition not present")
+    }
+
+/**
+ * Provides a[CompositionLocal] to access the current [AnimatedVisibilityScope].
+ *
+ * This CompositionLocal should be provided by a parent composable that manages animated visibility.
+ */
+val LocalNavAnimatedVisibilityScope =
+    staticCompositionLocalOf<AnimatedVisibilityScope> { error("CompositionLocal LocalSharedTransition not present") }
 
 /**
  * Contains functions to access the current theme values provided at the call site's position in the
@@ -59,7 +120,14 @@ object AppTheme {
     val shapes: Shapes
         @Composable @ReadOnlyComposable get() = LocalShapes.current
 
+    /** Retrieves the current [SharedTransitionScope] at the call site's position in the hierarchy. */
+    @OptIn(ExperimentalSharedTransitionApi::class)
+    val sharedTransitionScope
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalSharedTransitionScope.current
 
+    @OptIn(ExperimentalSharedTransitionApi::class)
     @Composable
     operator fun invoke(
         colors: Colors = AppTheme.colors,
@@ -69,30 +137,132 @@ object AppTheme {
     ) {
         val rippleIndication = ripple()
         val selectionColors = rememberTextSelectionColors(colors)
-        CompositionLocalProvider(
-            LocalColors provides colors,
-            LocalIndication provides rippleIndication,
-            LocalShapes provides shapes,
-            LocalTextSelectionColors provides selectionColors,
-            LocalTypography provides typography,
-        ) {
-            ProvideTextStyle(value = typography.body1, content = content)
+        SharedTransitionLayout {
+            CompositionLocalProvider(
+                LocalColors provides colors,
+                LocalIndication provides rippleIndication,
+                LocalShapes provides shapes,
+                LocalTextSelectionColors provides selectionColors,
+                LocalTypography provides typography,
+                LocalSharedTransitionScope provides this
+            ) {
+                ProvideTextStyle(value = typography.body1, content = content)
+            }
         }
     }
 }
 
-@Composable
-/*@VisibleForTesting*/
-internal fun rememberTextSelectionColors(colorScheme: Colors): TextSelectionColors {
-    val primaryColor = colorScheme.accent
-    return remember(primaryColor) {
-        TextSelectionColors(
-            handleColor = primaryColor,
-            backgroundColor = primaryColor.copy(alpha = TextSelectionBackgroundOpacity),
+private val DefaultSpring = spring(
+    stiffness = StiffnessMediumLow,
+    visibilityThreshold = Rect.VisibilityThreshold
+)
+
+@ExperimentalSharedTransitionApi
+private val DefaultBoundsTransform = BoundsTransform { _, _ -> DefaultSpring }
+
+@ExperimentalSharedTransitionApi
+private val ParentClip: OverlayClip =
+    object : OverlayClip {
+        override fun getClipPath(
+            state: SharedContentState,
+            bounds: Rect,
+            layoutDirection: LayoutDirection,
+            density: Density
+        ): Path? {
+            return state.parentSharedContentState?.clipPathInOverlay
+        }
+    }
+
+private val DefaultClipInOverlayDuringTransition: (LayoutDirection, Density) -> Path? =
+    { _, _ -> null }
+
+/**
+ * @param renderInOverlay pass null to make this fun handle with default strategy.
+ * @see androidx.compose.animation.SharedTransitionScope.renderInSharedTransitionScopeOverlay
+ */
+fun Modifier.renderInSharedTransitionScopeOverlay(
+    zIndexInOverlay: Float = 0f,
+    renderInOverlay: (() -> Boolean)? = null,
+    clipInOverlayDuringTransition: (LayoutDirection, Density) -> Path? = DefaultClipInOverlayDuringTransition
+) = composed {
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    with(sharedTransitionScope) {
+        renderInSharedTransitionScopeOverlay(
+            renderInOverlay = renderInOverlay ?: { isTransitionActive },
+            zIndexInOverlay = zIndexInOverlay,
+            clipInOverlayDuringTransition = clipInOverlayDuringTransition
         )
     }
 }
 
-/*@VisibleForTesting*/
-internal const val TextSelectionBackgroundOpacity = 0.4f
+/**
+ * @return the state of shared contnet corresponding to [key].
+ * @see androidx.compose.animation.SharedTransitionScope.rememberSharedContentState
+ */
+@Composable
+private inline fun rememberSharedContentState(key: Any) =
+    with(AppTheme.sharedTransitionScope) {
+        rememberSharedContentState(key = key)
+    }
 
+/**
+ * A shared bounds modifier that uses scope from [AppTheme]'s [AppTheme.sharedTransitionScope] and
+ * [AnimatedVisibilityScope] from [LocalNavAnimatedVisibilityScope]
+ */
+fun Modifier.sharedBounds(
+    key: Any,
+    enter: EnterTransition = fadeIn(),
+    exit: ExitTransition = fadeOut(),
+    boundsTransform: BoundsTransform = DefaultBoundsTransform,
+    resizeMode: ResizeMode = ScaleToBounds(ContentScale.FillWidth, Alignment.Center),
+    placeHolderSize: PlaceHolderSize = PlaceHolderSize.contentSize,
+    renderInOverlayDuringTransition: Boolean = true,
+    zIndexInOverlay: Float = 0f,
+    clipInOverlayDuringTransition: OverlayClip = ParentClip
+) = composed {
+    val navAnimatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    val sharedContentState = rememberSharedContentState(key)
+    with(sharedTransitionScope) {
+        Modifier.sharedBounds(
+            sharedContentState = sharedContentState,
+            animatedVisibilityScope = navAnimatedVisibilityScope,
+            enter = enter,
+            exit = exit,
+            boundsTransform = boundsTransform,
+            resizeMode = resizeMode,
+            placeHolderSize = placeHolderSize,
+            renderInOverlayDuringTransition = renderInOverlayDuringTransition,
+            zIndexInOverlay = zIndexInOverlay,
+            clipInOverlayDuringTransition = clipInOverlayDuringTransition
+        )
+    }
+}
+
+/**
+ * @see androidx.compose.animation.SharedTransitionScope.sharedElement
+ */
+@OptIn(ExperimentalSharedTransitionApi::class)
+fun Modifier.sharedElement(
+    key: Any,
+    boundsTransform: BoundsTransform = DefaultBoundsTransform,
+    placeHolderSize: PlaceHolderSize = PlaceHolderSize.contentSize,
+    renderInOverlayDuringTransition: Boolean = true,
+    zIndexInOverlay: Float = 0f,
+    clipInOverlayDuringTransition: OverlayClip = ParentClip
+) = composed {
+    val sharedContentState = rememberSharedContentState(key = key)
+    val navAnimatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    with(sharedTransitionScope) {
+        sharedElement(
+            sharedContentState = sharedContentState,
+            placeHolderSize = placeHolderSize,
+            renderInOverlayDuringTransition = renderInOverlayDuringTransition,
+            zIndexInOverlay = zIndexInOverlay,
+            animatedVisibilityScope = navAnimatedVisibilityScope,
+            boundsTransform = boundsTransform,
+            clipInOverlayDuringTransition = clipInOverlayDuringTransition
+        )
+    }
+}
