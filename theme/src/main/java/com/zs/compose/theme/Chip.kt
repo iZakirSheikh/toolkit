@@ -425,7 +425,7 @@ object ChipDefaults {
     const val OutlinedBorderOpacity = 0.12f
 
     /** The outlined chip's border size */
-    val OutlinedBorderSize = 1.dp
+    val OutlinedBorderSize = 0.5.dp
 
     /** The size of a chip's leading icon */
     val LeadingIconSize = 20.dp
