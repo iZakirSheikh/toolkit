@@ -37,6 +37,7 @@ dependencies {
     implementation(project(":foundation"))
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.material.ripple)
+    implementation(libs.androidx.window)
 }
 
 // Because the components are created only during the afterEvaluate phase, you must

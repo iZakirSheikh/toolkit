@@ -2,7 +2,7 @@
 compose = "1.8.0-beta01"
 kotlin = "2.1.10"
 agp = "8.8.0"
-material_icons = "1.7.6"
+material_icons = "1.7.7"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -43,5 +43,6 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 chrisbanes-haze = {module= "dev.chrisbanes.haze:haze", version = "1.0.2"}
+androidx-window = { group = "androidx.window", name = "window", version = "1.3.0" }
 
 
