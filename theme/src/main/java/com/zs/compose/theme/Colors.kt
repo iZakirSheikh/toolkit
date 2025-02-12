@@ -53,7 +53,7 @@ import kotlin.math.ln
  * @param elevation the elevation value to use in the calculation.
  * @return the color with tonal elevation applied.
  */
-private fun applyTonalElevation(accent: Color, background: Color, elevation: Dp) =
+internal fun applyTonalElevation(accent: Color, background: Color, elevation: Dp) =
     accent.copy(alpha = ((4.5f * ln(elevation.value + 1)) + 2f) / 100f).compositeOver(background)
 
 /**

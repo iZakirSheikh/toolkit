@@ -48,23 +48,18 @@ value class WindowSize internal constructor(val value: DpSize) {
     constructor(width: Dp, height: Dp) : this(DpSize(width, height))
 
     /**
-     * Represents different reach categories based on screen width or height.
+     * Represents different categories based on screen width or height.
+     *
+     * @property Small Indicates a compact screen size, typically for smaller devices like phones. Breakpoint: 300- 400 dp
+     * @property Medium Indicates a medium screen size, typically for tablets or small laptops. Breakpoint: 401-650 dp
+     * @property Large Indicates a large screen size, typically for laptops or desktops. Breakpoint: 650-900 dp
+     * @property xLarge Indicates a very large screen size, typically for external monitors. Breakpoint: 900 dp and above
      */
-    @JvmInline
-    value class Category internal constructor(val rawValue: Int) {
-
-        /**
-         * @property Small Indicates a compact screen size, typically for smaller devices like phones. Breakpoint: 300- 400 dp
-         * @property Medium Indicates a medium screen size, typically for tablets or small laptops. Breakpoint: 401-650 dp
-         * @property Large Indicates a large screen size, typically for laptops or desktops. Breakpoint: 650-900 dp
-         * @property xLarge Indicates a very large screen size, typically for external monitors. Breakpoint: 900 dp and above
-         */
-        companion object {
-            val Small = Category(0)
-            val Medium = Category(1)
-            val Large = Category(2)
-            val xLarge = Category(3)
-        }
+    enum class Category {
+        Small,
+        Medium,
+        Large,
+        xLarge
     }
 
     val width: Category
@@ -90,6 +85,19 @@ value class WindowSize internal constructor(val value: DpSize) {
 
     operator fun component1() = width
     operator fun component2() = height
+
+    /**
+     * Consumes a specified amount of width and/or height from the current [WindowSize] and returns a new [WindowSize] with the adjusted dimensions.
+     *
+     * @param amount The [DpSize] to consume, representing the amount to subtract from both width and height.
+     * @return A new [WindowSize] with the consumed amount subtracted from the original [value].
+     */
+    fun consume(amount: DpSize): WindowSize = WindowSize(value - amount)
+
+    /**
+     * @see consume
+     */
+    fun consume(width: Dp = 0.dp, height: Dp = 0.dp) = consume(DpSize(width, height))
 
     val rawValue get() = value
 }

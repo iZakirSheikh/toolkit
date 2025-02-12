@@ -32,9 +32,12 @@ import androidx.compose.animation.SharedTransitionScope.PlaceHolderSize
 import androidx.compose.animation.SharedTransitionScope.ResizeMode
 import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.ScaleToBounds
 import androidx.compose.animation.SharedTransitionScope.SharedContentState
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.Spring.StiffnessMediumLow
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.LocalIndication
@@ -43,16 +46,26 @@ import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import com.zs.compose.foundation.OrientRed
+import com.zs.compose.foundation.SepiaBrown
+import com.zs.compose.foundation.SignalWhite
+import com.zs.compose.foundation.TrafficYellow
+import com.zs.compose.foundation.UmbraGrey
 import com.zs.compose.theme.text.ProvideTextStyle
 
 // source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/MaterialTheme.kt;bpv=0
@@ -149,6 +162,50 @@ object AppTheme {
                 ProvideTextStyle(value = typography.body1, content = content)
             }
         }
+    }
+
+
+    private val DefaultColorSpec = tween<Color>(AnimationConstants.DefaultDurationMillis)
+
+    /**
+     * Provides a composable function to set up the application's theme using the provided
+     * colors, typography, and shapes.
+     *
+     * @param isLight  if true, applies the light theme.
+     * @param fontFamily  the font family to be used in the theme.
+     * @param accent  the accent color to be used in the theme.
+     * @param content  the composable content to be displayed within the theme.
+     */
+    @Composable
+    @Deprecated("Replace this with another version of AppTheme")
+    operator fun invoke(
+        isLight: Boolean,
+        accent: Color = if (!isLight) Color.TrafficYellow else Color.SepiaBrown,
+        fontFamily: FontFamily = FontFamily.Default,
+        content: @Composable () -> Unit
+    ) {
+        val background by animateColorAsState(
+            targetValue = when {
+                !isLight -> Color(0xFF0E0E0F)
+                else -> applyTonalElevation(accent, Color.White, 0.8.dp)
+            },
+            animationSpec = DefaultColorSpec, label = "background"
+        )
+        val primary by animateColorAsState(accent, DefaultColorSpec, "accent")
+        val colors = Colors(
+            accent = primary,
+            background = background,
+            onBackground = if (isLight) Color.UmbraGrey else Color.SignalWhite,
+            onAccent = if (primary.luminance() > 0.45f) Color.Black else Color.SignalWhite,
+            error = Color.OrientRed,
+            onError = Color.SignalWhite,
+        )
+
+        invoke(
+            colors = colors,
+            typography = Typography(defaultFontFamily = fontFamily),
+            content = content
+        )
     }
 }
 

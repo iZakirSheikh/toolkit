@@ -8,6 +8,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.outlined.PhotoAlbum
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.VideoLibrary
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -62,6 +64,7 @@ import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.ListItem
 import com.zs.compose.theme.LocalContentColor
+import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.OutlinedButton
 import com.zs.compose.theme.SelectableChip
 import com.zs.compose.theme.SliderPreference
@@ -76,6 +79,7 @@ import com.zs.compose.theme.appbar.AppBarDefaults
 import com.zs.compose.theme.appbar.BottomAppBar
 import com.zs.compose.theme.appbar.BottomNavigationItem
 import com.zs.compose.theme.appbar.LargeTopAppBar
+import com.zs.compose.theme.calculateWindowSizeClass
 import com.zs.compose.theme.lightColors
 import com.zs.compose.theme.rememberDismissState
 import com.zs.compose.theme.snackbar.SnackbarDuration
@@ -84,7 +88,7 @@ import com.zs.compose.theme.text.Label
 import com.zs.compose.theme.text.Text
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import com.zs.compose.theme.WindowSize.Category
 
 private const val TAG = "MainActivity"
 
@@ -268,7 +272,10 @@ class MainActivity : ComponentActivity() {
                 append("\nThe progress completed. Here you can put content of any size. This is a lng very long info for a dialog. i mena or a snackbar. wht is a snack bar in the forst place, it is a small bar shaped item at the bottom of the screen that displays info to the user. the forst place, it is a small bar shaped item at the bottom of the screen that displays info to the user.the forst place, it is a small bar shaped item at the bottom of the screen that displays info to the user.")
             }
         }
+
+
         setContent {
+            val sizeClass = calculateWindowSizeClass(this)
             LaunchedEffect(Unit) {
                 delay(1000)
                 progress = -1f
@@ -285,56 +292,64 @@ class MainActivity : ComponentActivity() {
                     duration = SnackbarDuration.Long
                 )
             }
-            AppTheme(colors = lightColors(accent =  Color(0xFF514700))) {
-                NavigationSuiteScaffold(
-                    true,
-                    snackbarHostState = state,
-                    progress = progress,
-                    fabPosition = FabPosition.End,
-                    floatingActionButton = {
-                        FloatingActionButton(onClick = {lifecycleScope.launch(){state.showSnackbar(message)} }) {
-                            Icon(Icons.Filled.Feedback, null)
-                        }
-                    },
-                    content = { Content(Modifier.padding(WindowInsets.contentInsets)) }
-                ) {
-                    val accent = AppTheme.colors.accent
-                    val background = AppTheme.colors.background
-                    BottomAppBar(
-                        //windowInsets = WindowInsets.None,
-                       /* modifier = Modifier
-                            .padding(horizontal = 22.dp).windowInsetsPadding(
-                            AppBarDefaults.bottomAppBarWindowInsets,
-                        )*/
+            var light by remember { mutableStateOf(false) }
+            AppTheme(isLight = light) {
+                CompositionLocalProvider(LocalWindowSize provides sizeClass) {
+
+                    NavigationSuiteScaffold(
+                        sizeClass.width < Category.Medium,
+                        snackbarHostState = state,
+                        progress = progress,
+                        hideNavigationBar = false,
+                        fabPosition = FabPosition.Start,
+                        floatingActionButton = {
+                            FloatingActionButton(onClick = {lifecycleScope.launch(){
+                                light = !light
+                                state.showSnackbar(message)} }
+                            ) {
+                                Icon(Icons.Filled.Feedback, null)
+                            }
+                        },
+                        content = { Content(Modifier.padding(WindowInsets.contentInsets)) }
+                    ) {
+                        val accent = AppTheme.colors.accent
+                        val background = AppTheme.colors.background
+                        BottomAppBar(
+                            //windowInsets = WindowInsets.None,
+                            /* modifier = Modifier
+                                 .padding(horizontal = 22.dp).windowInsetsPadding(
+                                 AppBarDefaults.bottomAppBarWindowInsets,
+                             )*/
 //                            .border(1.dp, AppTheme.colors.background(5.dp), RoundedCornerShape(20))
 
-                        //shape = RoundedCornerShape(25),
-                    ){
-                        val colors = ChipDefaults.chipColors(backgroundColor = LocalContentColor.current.copy(
-                            0.3f), contentColor = LocalContentColor.current)
-                        var selected by remember { mutableIntStateOf(0) }
-                        BottomNavigationItem(selected == 0,
-                            onClick = {selected = 0},
-                            label = {Label("Home")},
-                            icon = {Icon(Icons.Outlined.Home, null)}
+                            //shape = RoundedCornerShape(25),
+                        ){
+                            val colors = ChipDefaults.chipColors(backgroundColor = LocalContentColor.current.copy(
+                                0.3f), contentColor = LocalContentColor.current)
+                            var selected by remember { mutableIntStateOf(0) }
+                            BottomNavigationItem(selected == 0,
+                                onClick = {selected = 0},
+                                label = {Label("Home")},
+                                icon = {Icon(Icons.Outlined.Home, null)}
                             )
-                        BottomNavigationItem(selected == 1,
-                            onClick = {selected = 1},
-                            label = {Label("Photos")},
-                            icon = {Icon(Icons.Outlined.PhotoAlbum, null)}
-                        )
+                            BottomNavigationItem(selected == 1,
+                                onClick = {selected = 1},
+                                label = {Label("Photos")},
+                                icon = {Icon(Icons.Outlined.PhotoAlbum, null)}
+                            )
 
-                        BottomNavigationItem(selected == 3,
-                            onClick = {selected = 3},
-                            label = {Label("Videos")},
-                            icon = {Icon(Icons.Outlined.VideoLibrary, null)}
-                        )
+                            BottomNavigationItem(selected == 3,
+                                onClick = {selected = 3},
+                                label = {Label("Videos")},
+                                icon = {Icon(Icons.Outlined.VideoLibrary, null)}
+                            )
 
-                        BottomNavigationItem(selected == 4,
-                            onClick = {selected = 4},
-                            label = {Label("Settings")},
-                            icon = {Icon(Icons.Outlined.Settings, null)}
-                        )
+                            BottomNavigationItem(selected == 4,
+                                onClick = {selected = 4},
+                                label = {Label("Settings")},
+                                icon = {Icon(Icons.Outlined.Settings, null)}
+                            )
+                        }
                     }
                 }
             }

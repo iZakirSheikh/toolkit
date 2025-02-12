@@ -251,6 +251,7 @@ fun NavigationSuiteScaffold(
     modifier: Modifier = Modifier,
     fabPosition: FabPosition = FabPosition.End,
     floatingActionButton: @Composable () -> Unit = {},
+    hideNavigationBar: Boolean = false,
     background: Color = AppTheme.colors.background,
     contentColor: Color = AppTheme.colors.onBackground,
     snackbarHostState: SnackbarHostState = remember(::SnackbarHostState),
@@ -281,7 +282,10 @@ fun NavigationSuiteScaffold(
             // 'hideNavigationBar'
             // Display the navigation bar (either bottom bar or navigation rail)
             // Don't show anything.
-            Slot(navBar)
+            when (hideNavigationBar) {
+                true -> Spacer(modifier = Modifier)
+                else -> navBar()
+            }
             // Display the SnackBar using the provided channel
             SnackbarHost(snackbarHostState)
             // Display the pixel element

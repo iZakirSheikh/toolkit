@@ -18,8 +18,10 @@
 
 package com.zs.compose.foundation
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -33,7 +35,6 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
-import java.io.Closeable
 
 private const val TAG = "Util"
 
@@ -141,3 +142,16 @@ fun LazyGridScope.stickyHeader(
         }
     )
 }
+
+/**
+ * A utility function that recursively searches for and returns the [Activity] instance associated with the current [Context].
+ *
+ * @return The [Activity] instance associated with the current [Context].
+ * @throws IllegalStateException if the current [Context] is not an [Activity] context.
+ */
+tailrec fun Context.findActivity(): Activity =
+    when (this) {
+        is Activity -> this
+        is ContextWrapper -> this.baseContext.findActivity()
+        else -> throw error("Context is not an Activity context, but a ${javaClass.simpleName} context. ")
+    }
