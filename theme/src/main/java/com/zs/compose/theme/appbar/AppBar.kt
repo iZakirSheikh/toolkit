@@ -461,6 +461,7 @@ fun SideBar(
     contentColor: Color = AppTheme.colors.onBackground,
     elevation: Dp = AppBarDefaults.SideBarElevation,
     border: BorderStroke? = null,
+    shape: Shape = RectangleShape,
     header: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -468,6 +469,7 @@ fun SideBar(
         modifier = modifier,
         color = backgroundColor,
         border = border,
+        shape = shape,
         contentColor = contentColor,
         elevation = elevation
     ) {
