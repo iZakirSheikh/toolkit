@@ -23,6 +23,7 @@ import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -292,6 +293,7 @@ fun TopAppBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     shape: Shape = RectangleShape,
+    border: BorderStroke? = null,
     backgroundColor: Color = AppTheme.colors.background(1.dp),
     contentColor: Color = AppTheme.colors.onBackground,
     elevation: Dp = AppBarDefaults.TopAppBarElevation,
@@ -301,6 +303,7 @@ fun TopAppBar(
         contentColor = contentColor.copy(ContentAlpha.medium),
         elevation = elevation,
         shape = shape,
+        border = border,
         modifier = modifier
     ) {
         Row(
@@ -385,6 +388,7 @@ fun BottomAppBar(
     backgroundColor: Color = AppTheme.colors.background(1.dp),
     contentColor: Color = AppTheme.colors.onBackground,
     shape: Shape = RectangleShape,
+    border: BorderStroke? = null,
     elevation: Dp = AppBarDefaults.BottomAppBarElevation,
     contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
@@ -394,6 +398,7 @@ fun BottomAppBar(
         contentColor = contentColor.copy(ContentAlpha.medium),
         elevation = elevation,
         shape = shape,
+        border = border,
         modifier = modifier
     ) {
         Row(
@@ -455,12 +460,14 @@ fun SideBar(
     backgroundColor: Color = AppTheme.colors.background(1.dp),
     contentColor: Color = AppTheme.colors.onBackground,
     elevation: Dp = AppBarDefaults.SideBarElevation,
+    border: BorderStroke? = null,
     header: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
         modifier = modifier,
         color = backgroundColor,
+        border = border,
         contentColor = contentColor,
         elevation = elevation
     ) {

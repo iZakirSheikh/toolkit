@@ -280,22 +280,25 @@ fun BasicPopupMenu(
             }
 
             // Surface
-            Surface(
-                modifier = Modifier.graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                    this.alpha = alpha
-                    transformOrigin = transformOriginState.value
-                } then modifier,
-                elevation = elevation.takeOrElse { MenuElevation },
-                contentColor = contentColor,
-                content = content,
-                color = backgroundColor,
-                border = border,
-                shape = shape,
-            )
+            // FixMe - It seems Popup is not using the app density hence providing here the
+            //  app density instead of the popup density provided internally
+            CompositionLocalProvider(LocalDensity provides density) {
+                Surface(
+                    modifier = Modifier.graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                        this.alpha = alpha
+                        transformOrigin = transformOriginState.value
+                    } then modifier,
+                    elevation = elevation.takeOrElse { MenuElevation },
+                    contentColor = contentColor,
+                    content = content,
+                    color = backgroundColor,
+                    border = border,
+                    shape = shape,
+                )
+            }
         }
-
         Popup(
             onDismissRequest = onDismissRequest,
             popupPositionProvider = popupPositionProvider,
