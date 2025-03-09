@@ -16,7 +16,6 @@
             <option value="$PROJECT_DIR$/theme" />
           </set>
         </option>
-        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>
