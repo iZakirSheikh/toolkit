@@ -101,6 +101,7 @@ import com.zs.compose.theme.appbar.FloatingLargeTopAppBar
 import com.zs.compose.theme.dynamicAccentColor
 import com.zs.compose.theme.menu.DropDownMenu
 import com.zs.compose.theme.snackbar.Snackbar
+import com.zs.compose.theme.snackbar.SnackbarHost
 
 private const val TAG = "MainActivity"
 
@@ -314,16 +315,16 @@ class MainActivity : ComponentActivity() {
 
                     NavigationSuiteScaffold(
                         sizeClass.width < Category.Medium,
-                        snackbarHostState = state,
-                        progress = progress,
+                       snackbarHostState = state,
                         snackbar = {
                             Snackbar(
                                 it,
-                                background = Background(AppTheme.colors.background(1.dp)),
-                                contentColor = AppTheme.colors.onBackground,
-                                shape = RoundedCornerShape(9)
+                                // background = Background(AppTheme.colors.background(1.dp)),
+                                // contentColor = AppTheme.colors.onBackground,
+                                shape = RoundedCornerShape(10)
                             )
                         },
+                        progress = progress,
                         hideNavigationBar = false,
                         fabPosition = FabPosition.Start,
                         floatingActionButton = {

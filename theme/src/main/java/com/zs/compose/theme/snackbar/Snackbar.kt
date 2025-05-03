@@ -27,6 +27,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -34,6 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -99,9 +101,11 @@ private val SnackButtonScale = Modifier.scale(0.85f)
 private val SPACING = 4.dp
 private val DismissThreshHold = FractionalThreshold(0.75f)
 private val SnackNoiseModifier =
-    Modifier.visualEffect(ImageBrush.NoiseBrush, 0.03f, overlay = false, blendMode = BlendMode.Exclusion)
+    Modifier.visualEffect(ImageBrush.NoiseBrush, 0.08f, overlay = false, blendMode = BlendMode.Exclusion)
 
 private val SnackMessageMaxHeight = 190.dp
+private val SnackbarShape =  RoundedCornerShape(10)
+private val ExpandedContentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
 
 /**
  * Represents a Snackbar component for [SnackbarHost]
@@ -114,7 +118,7 @@ fun Snackbar(
     modifier: Modifier = Modifier,
     background: Background = Background.Unspecified,
     contentColor: Color = Color.SignalWhite,
-    shape: Shape = AppTheme.shapes.small,
+    shape: Shape = SnackbarShape,
     border: BorderStroke? = AppTheme.colors.snackbarBorder,
     actionColor: Color = value.accent.takeOrElse { AppTheme.colors.accent },
 ) {
@@ -152,18 +156,16 @@ fun Snackbar(
     SwipeToDismiss(
         dismissState,
         background = { },
-        modifier = modifier.animateContentSize(),
+        modifier = Modifier.animateContentSize(),
         dismissThresholds = { DismissThreshHold },
         dismissContent = {
             Layout(
                 contentColor = contentColor,
                 spacing = SPACING,
-                padding = null,
                 modifier = modifier
+                    .then(SnackBarSize)
                     .padding(horizontal = SnackbarHorizontalMargin)
                     .shadow(6.dp, shape, clip = true)
-                    .thenIf(border != null) { border(border!!, shape) }
-                    .background(background)
                     // Toggle expanded state on click
                     .clickable(
                         indication = null,
@@ -171,7 +173,8 @@ fun Snackbar(
                         enabled = critical || value.message.length > 100 || value.action == null,
                         onClick = { expanded = !expanded }
                     )
-                    .then(SnackBarSize),
+                    .thenIf(border != null) { border(border!!, shape) }
+                    .background(background),
                 leading = composableIf(value.icon != null) {
                     Icon(
                         imageVector = value.icon!!,
@@ -210,7 +213,7 @@ fun Snackbar(
                                 val state = rememberScrollState()
                                 fadingEdge(state, false, 10.dp)
                                     .verticalScroll(state)
-                                    .padding(vertical = 4.dp)
+                                    .padding(bottom = 4.dp)
                             }
                     )
                 },
