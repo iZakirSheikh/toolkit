@@ -158,25 +158,25 @@ typealias IntSaver<O> = Saver<Int, O>
 /**
  * @see [intPreferencesKey]
  */
-fun intPreferenceKey(name: String) =
+fun intPreferenceKey(name: String): Key1<Int, Int> =
     Key1<Int, Int>(intPreferencesKey(name), null)
 
 /**
  * @see [intPreferencesKey]
  */
-fun intPreferenceKey(name: String, defaultValue: Int) =
+fun intPreferenceKey(name: String, defaultValue: Int): Key2<Int, Int> =
     Key2(intPreferencesKey(name), defaultValue, null)
 
 /**
  * @see [intPreferencesKey]
  */
-fun <O> intPreferenceKey(name: String, saver: IntSaver<O>) =
+fun <O> intPreferenceKey(name: String, saver: IntSaver<O>): Key1<Int, O> =
     Key1(intPreferencesKey(name), saver)
 
 /**
  * @see [intPreferencesKey]
  */
-fun <O> intPreferenceKey(name: String, defaultValue: O, saver: IntSaver<O>) =
+fun <O> intPreferenceKey(name: String, defaultValue: O, saver: IntSaver<O>): Key2<Int, O> =
     Key2(intPreferencesKey(name), defaultValue, saver)
 
 
@@ -211,25 +211,25 @@ typealias FloatSaver<O> = Saver<Float, O>
 /**
  * @see [floatPreferencesKey]
  */
-fun floatPreferenceKey(name: String) =
+fun floatPreferenceKey(name: String): Key1<Float, Float> =
     Key1<Float, Float>(floatPreferencesKey(name), null)
 
 /**
  * @see [floatPreferencesKey]
  */
-fun floatPreferenceKey(name: String, defaultValue: Float) =
+fun floatPreferenceKey(name: String, defaultValue: Float): Key2<Float, Float> =
     Key2(floatPreferencesKey(name), defaultValue, null)
 
 /**
  * @see [floatPreferencesKey]
  */
-fun <O> floatPreferenceKey(name: String, saver: FloatSaver<O>) =
+fun <O> floatPreferenceKey(name: String, saver: FloatSaver<O>): Key1<Float, O> =
     Key1(floatPreferencesKey(name), saver)
 
 /**
  * @see [floatPreferencesKey]
  */
-fun <O> floatPreferenceKey(name: String, defaultValue: O, saver: FloatSaver<O>) =
+fun <O> floatPreferenceKey(name: String, defaultValue: O, saver: FloatSaver<O>): Key2<Float, O> =
     Key2(floatPreferencesKey(name), defaultValue, saver)
 
 
@@ -264,25 +264,25 @@ typealias DoubleSaver<O> = Saver<Double, O>
 /**
  * @see [doublePreferencesKey]
  */
-fun doublePreferenceKey(name: String) =
+fun doublePreferenceKey(name: String): Key1<Double, Double> =
     Key1<Double, Double>(doublePreferencesKey(name), null)
 
 /**
  * @see [doublePreferencesKey]
  */
-fun doublePreferenceKey(name: String, defaultValue: Double) =
+fun doublePreferenceKey(name: String, defaultValue: Double): Key2<Double, Double> =
     Key2(doublePreferencesKey(name), defaultValue, null)
 
 /**
  * @see [doublePreferencesKey]
  */
-fun <O> doublePreferenceKey(name: String, saver: DoubleSaver<O>) =
+fun <O> doublePreferenceKey(name: String, saver: DoubleSaver<O>): Key1<Double, O> =
     Key1(doublePreferencesKey(name), saver)
 
 /**
  * @see [doublePreferencesKey]
  */
-fun <O> doublePreferenceKey(name: String, defaultValue: O, saver: DoubleSaver<O>) =
+fun <O> doublePreferenceKey(name: String, defaultValue: O, saver: DoubleSaver<O>): Key2<Double, O> =
     Key2(doublePreferencesKey(name), defaultValue, saver)
 
 /**
@@ -316,37 +316,37 @@ typealias LongSaver<O> = Saver<Long, O>
 /**
  * @see [longPreferencesKey]
  */
-fun longPreferenceKey(name: String) =
+fun longPreferenceKey(name: String): Key1<Long, Long> =
     Key1<Long, Long>(longPreferencesKey(name), null)
 
 /**
  * @see [longPreferencesKey]
  */
-fun longPreferenceKey(name: String, defaultValue: Long) =
+fun longPreferenceKey(name: String, defaultValue: Long): Key2<Long, Long> =
     Key2(longPreferencesKey(name), defaultValue, null)
 
 /**
  * @see [longPreferencesKey]
  */
-fun <O> longPreferenceKey(name: String, saver: LongSaver<O>) =
+fun <O> longPreferenceKey(name: String, saver: LongSaver<O>): Key1<Long, O> =
     Key1(longPreferencesKey(name), saver)
 
 /**
  * @see [longPreferencesKey]
  */
-fun <O> longPreferenceKey(name: String, defaultValue: O, saver: LongSaver<O>) =
+fun <O> longPreferenceKey(name: String, defaultValue: O, saver: LongSaver<O>): Key2<Long, O> =
     Key2(longPreferencesKey(name), defaultValue, saver)
 
 /**
  * @see [booleanPreferencesKey]
  */
-fun booleanPreferenceKey(name: String) =
+fun booleanPreferenceKey(name: String): Key1<Boolean, Boolean> =
     Key1<Boolean, Boolean>(booleanPreferencesKey(name), null)
 
 /**
  * @see [booleanPreferencesKey]
  */
-fun booleanPreferenceKey(name: String, defaultValue: Boolean) =
+fun booleanPreferenceKey(name: String, defaultValue: Boolean): Key2<Boolean, Boolean> =
     Key2(booleanPreferencesKey(name), defaultValue, null)
 
 /**
@@ -380,37 +380,37 @@ typealias StringSaver<O> = Saver<String, O>
 /**
  * @see [stringPreferencesKey]
  */
-fun stringPreferenceKey(name: String) =
+fun stringPreferenceKey(name: String): Key1<String, String> =
     Key1<String, String>(stringPreferencesKey(name), null)
 
 /**
  * @see [stringPreferencesKey]
  */
-fun stringPreferenceKey(name: String, defaultValue: String) =
+fun stringPreferenceKey(name: String, defaultValue: String): Key2<String, String> =
     Key2(stringPreferencesKey(name), defaultValue, null)
 
 /**
  * @see [stringPreferencesKey]
  */
-fun <O> stringPreferenceKey(name: String, saver: StringSaver<O>) =
+fun <O> stringPreferenceKey(name: String, saver: StringSaver<O>): Key1<String, O> =
     Key1(stringPreferencesKey(name), saver)
 
 /**
  * @see [stringPreferencesKey]
  */
-fun <O> stringPreferenceKey(name: String, defaultValue: O, saver: StringSaver<O>) =
+fun <O> stringPreferenceKey(name: String, defaultValue: O, saver: StringSaver<O>): Key2<String, O> =
     Key2(stringPreferencesKey(name), defaultValue, saver)
 
 /**
  * @see [stringSetPreferenceKey]
  */
-fun stringSetPreferenceKey(name: String) =
+fun stringSetPreferenceKey(name: String): Key1<Set<String>, Set<String>> =
     Key1<Set<String>, Set<String>>(stringSetPreferencesKey(name), null)
 
 /**
  * @see [stringSetPreferenceKey]
  */
-fun stringSetPreferenceKey(name: String, defaultValue: Set<String>) =
+fun stringSetPreferenceKey(name: String, defaultValue: Set<String>): Key2<Set<String>, Set<String>> =
     Key2(stringSetPreferencesKey(name), defaultValue, null)
 
 
