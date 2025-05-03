@@ -42,4 +42,7 @@ dependencies {
     implementation(project(":foundation"))
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.ui.tooling.preview)
+
 }

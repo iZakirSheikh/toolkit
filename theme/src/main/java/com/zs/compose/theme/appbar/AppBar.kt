@@ -313,75 +313,12 @@ object AppBarDefaults {
  *   not a color from the theme, this will keep the same value set above this TopAppBar.
  * @param elevation the elevation of this TopAppBar.
  */
-@Composable
-fun TopAppBar(
-    title: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
-    navigationIcon: @Composable (() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {},
-    shape: Shape = RectangleShape,
-    border: BorderStroke? = null,
-    backgroundColor: Color = AppTheme.colors.background(1.dp),
-    contentColor: Color = AppTheme.colors.onBackground,
-    elevation: Dp = AppBarDefaults.TopAppBarElevation,
-) {
-    Surface(
-        color = backgroundColor,
-        contentColor = contentColor.copy(ContentAlpha.medium),
-        elevation = elevation,
-        shape = shape,
-        border = border,
-        modifier = modifier
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .thenIf(windowInsets !== WindowInsets.None) { windowInsetsPadding(windowInsets) }
-                .padding(AppBarDefaults.ContentPadding)
-                .height(TopAppBarHeight),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-            content = {
-                if (navigationIcon == null) Spacer(TitleInsetWithoutIcon) else {
-                    Row(TitleIconModifier, verticalAlignment = Alignment.CenterVertically) {
-                        CompositionLocalProvider(
-                            LocalContentColor provides contentColor.copy(ContentAlpha.high),
-                            content = navigationIcon
-                        )
-                    }
-                }
-
-                Row(Modifier
-                    .fillMaxHeight()
-                    .weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                    ProvideTextStyle(value = AppTheme.typography.title2) {
-                        CompositionLocalProvider(
-                            LocalContentColor provides contentColor.copy(ContentAlpha.high),
-                            content = title
-                        )
-                    }
-                }
-
-                CompositionLocalProvider(LocalContentColor provides contentColor.copy(ContentAlpha.medium)) {
-                    Row(
-                        Modifier.fillMaxHeight(),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = actions
-                    )
-                }
-            }
-        )
-    }
-}
-
 @ExperimentalThemeApi
 @Composable
 fun TopAppBar(
-    background: Background,
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    background: Background = Background(AppTheme.colors.background(1.dp)),
     windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
@@ -473,11 +410,12 @@ fun TopAppBar(
  * @param content the content of this BottomAppBar. The default layout here is a [Row], so content
  *   inside will be placed horizontally.
  */
+@ExperimentalThemeApi
 @Composable
 fun BottomAppBar(
     modifier: Modifier = Modifier,
     windowInsets: WindowInsets = AppBarDefaults.bottomAppBarWindowInsets,
-    backgroundColor: Color = AppTheme.colors.background(1.dp),
+    background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground,
     shape: Shape = RectangleShape,
     border: BorderStroke? = null,
@@ -486,7 +424,7 @@ fun BottomAppBar(
     content: @Composable RowScope.() -> Unit
 ){
     Surface(
-        color = backgroundColor,
+        background = background,
         contentColor = contentColor.copy(ContentAlpha.medium),
         elevation = elevation,
         shape = shape,
@@ -504,7 +442,6 @@ fun BottomAppBar(
             content = content
         )
     }
-
 }
 
 /**
@@ -545,45 +482,6 @@ fun BottomAppBar(
  * @param content destinations inside this NavigationRail, this should contain multiple
  *   [NavigationRailItem]s
  */
-@Composable
-fun SideBar(
-    windowInsets: WindowInsets = AppBarDefaults.sideBarWindowInsets,
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = AppTheme.colors.background(1.dp),
-    contentColor: Color = AppTheme.colors.onBackground,
-    elevation: Dp = AppBarDefaults.SideBarElevation,
-    border: BorderStroke? = null,
-    shape: Shape = RectangleShape,
-    header: @Composable (ColumnScope.() -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Surface(
-        modifier = modifier,
-        color = backgroundColor,
-        border = border,
-        shape = shape,
-        contentColor = contentColor,
-        elevation = elevation
-    ) {
-        Column(
-            Modifier
-                .fillMaxHeight()
-                .thenIf(windowInsets !== WindowInsets.None) { windowInsetsPadding(windowInsets) }
-                .defaultMinSize(minWidth = SideBarMinWidth)
-                .padding(vertical = SideBarVerticalPadding)
-                .selectableGroup(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(SideBarVerticalPadding)
-        ) {
-            if (header != null) {
-                header()
-                Spacer(Modifier.height(SideBarHeaderPadding))
-            }
-            content()
-        }
-    }
-}
-
 @ExperimentalThemeApi
 @Composable
 fun SideBar(
@@ -626,46 +524,8 @@ fun SideBar(
 
 private val FBAB_HORIZONTAL_MARGIN = 30.dp
 
-/** @see BottomAppBar */
-@Composable
-fun FloatingBottomNavigationBar(
-    modifier: Modifier = Modifier,
-    windowInsets: WindowInsets = AppBarDefaults.bottomAppBarWindowInsets,
-    backgroundColor: Color = AppTheme.colors.background(1.dp),
-    contentColor: Color = AppTheme.colors.onBackground,
-    shape: Shape = CircleShape,
-    border: BorderStroke? = null,
-    elevation: Dp = AppBarDefaults.BottomAppBarElevation,
-    contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
-    content: @Composable RowScope.() -> Unit,
-) {
-    Surface(
-        color = backgroundColor,
-        contentColor = contentColor.copy(ContentAlpha.medium),
-        elevation = elevation,
-        shape = shape,
-        border = border,
-        modifier = modifier
-            .padding(horizontal = FBAB_HORIZONTAL_MARGIN)
-            .thenIf(windowInsets !== WindowInsets.None) { windowInsetsPadding(windowInsets) }
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(contentPadding)
-                .defaultMinSize(minHeight = TopAppBarHeight),
-            horizontalArrangement = Arrangement.spacedBy(
-                BottomBarItemHorizontalPadding,
-                Alignment.CenterHorizontally
-            ),
-            verticalAlignment = Alignment.CenterVertically,
-            content = content
-        )
-    }
-}
-
 /**
- * @see FloatingBottomNavigationBar
+ * @see BottomAppBar
  *
  * @param background The background layer for this BottomAppBar
  */

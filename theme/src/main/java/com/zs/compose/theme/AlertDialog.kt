@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalThemeApi::class)
+
 package com.zs.compose.theme
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.Dialog
 import com.zs.compose.theme.text.LocalTextStyle
 import com.zs.compose.theme.text.ProvideTextStyle
@@ -81,7 +85,7 @@ fun AlertDialog(
     bottomBar: @Composable (RowScope.() -> Unit)? = null,
     modifier: Modifier = Modifier,
     shape: Shape = AppTheme.shapes.xSmall,
-    backgroundColor: Color = AppTheme.colors.background(1.dp),
+    background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground.copy(ContentAlpha.medium),
     properties: DialogProperties = DialogProperties(),
     content: @Composable () -> Unit
@@ -92,7 +96,7 @@ fun AlertDialog(
         Surface(
             modifier = modifier.widthIn(280.dp, 560.dp),
             shape = shape,
-            color = backgroundColor,
+            background = background,
             contentColor = contentColor,
             content = {
                 // Use a Column to arrange the dialog's content vertically.

@@ -15,10 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
+@file:OptIn(ExperimentalThemeApi::class, ExperimentalFoundationApi::class)
+
 package com.zs.compose.theme.snackbar
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,7 +36,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,94 +45,143 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.ImageBrush
 import com.zs.compose.foundation.SignalWhite
+import com.zs.compose.foundation.background
 import com.zs.compose.foundation.composableIf
 import com.zs.compose.foundation.fadingEdge
 import com.zs.compose.foundation.thenIf
 import com.zs.compose.foundation.visualEffect
 import com.zs.compose.theme.AppTheme
-import com.zs.compose.theme.BaseListItem
+import com.zs.compose.theme.Button
 import com.zs.compose.theme.ButtonDefaults
 import com.zs.compose.theme.Colors
 import com.zs.compose.theme.DismissValue
 import com.zs.compose.theme.ExperimentalThemeApi
-import com.zs.compose.theme.FilledTonalButton
 import com.zs.compose.theme.Icon
+import com.zs.compose.theme.OutlinedButton
 import com.zs.compose.theme.SwipeToDismiss
 import com.zs.compose.theme.TextButton
 import com.zs.compose.theme.internal.FractionalThreshold
 import com.zs.compose.theme.rememberDismissState
 import com.zs.compose.theme.text.Label
+import com.zs.compose.theme.BaseListItem as Layout
 
-private inline val Colors.toastBackgroundColor
-    @Composable
-    @ReadOnlyComposable
-    get() = if (isLight) Color(0xFF0E0E0F) else AppTheme.colors.background(1.dp)
+private inline val Colors.snackBackgroundColor
+    get() = if (isLight) Color(0xFF0E0E0F) else background(1.dp)
+
+private val Colors.snackbarBorder
+    get() = BorderStroke(
+        1.dp,
+        Brush.linearGradient(
+            listOf(
+                Color.Gray.copy(if (!isLight) 0.24f else 0.48f),
+                Color.Transparent,
+                Color.Transparent,
+                Color.Gray.copy(if (!isLight) 0.24f else 0.48f),
+            )
+        )
+    )
+
+private val SnackBarSize =
+    Modifier.sizeIn(360.dp, 56.dp, 450.dp, 250.dp)
+private val SnackbarHorizontalMargin = 18.dp
+
+private val SnackButtonScale = Modifier.scale(0.85f)
+private val SPACING = 4.dp
+private val DismissThreshHold = FractionalThreshold(0.75f)
+private val SnackNoiseModifier =
+    Modifier.visualEffect(ImageBrush.NoiseBrush, 0.03f, overlay = false, blendMode = BlendMode.Exclusion)
+
+private val SnackMessageMaxHeight = 190.dp
 
 /**
  * Represents a Snackbar component for [SnackbarHost]
  */
+
 @Composable
 @ExperimentalThemeApi
-internal fun Snackbar(
+fun Snackbar(
     value: SnackbarData,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = AppTheme.colors.toastBackgroundColor,
+    background: Background = Background.Unspecified,
     contentColor: Color = Color.SignalWhite,
+    shape: Shape = AppTheme.shapes.small,
+    border: BorderStroke? = AppTheme.colors.snackbarBorder,
     actionColor: Color = value.accent.takeOrElse { AppTheme.colors.accent },
 ) {
-    // State to track if Toast is expanded
-    val critical = value.duration == SnackbarDuration.Indefinite
-    var isExpanded: Boolean by remember { mutableStateOf(false) }
-    // Handle back press to dismiss expanded Toast or the entire Toast
+    // A message is critical if duration is indefinite and action is not null.
+    // critical messages are not dismissible by the swipe and must expand to include cancel button.
+    val critical = value.duration == SnackbarDuration.Indefinite && value.action != null
+    // initially snackbar is not expanded; it is expandable if message is critical or text is long.
+    var expanded: Boolean by remember { mutableStateOf(false) }
+    // TODO - Add this in future.
+    //  Handle back press to dismiss expanded Toast or the entire Toast
     // BackHandler(isExpanded) { isExpanded = !isExpanded }
-    // State for swipe-to-dismiss gesture
-
     val dismissState = rememberDismissState(
         confirmStateChange = {
             // Dismiss only if not expanded or critical and expanded
-            if (critical || isExpanded || it == DismissValue.DismissedToEnd) return@rememberDismissState false
+            if (critical || expanded || it == DismissValue.DismissedToEnd) return@rememberDismissState false
             // Execute action if confirmed
             value.dismiss()
             true
         }
     )
     val colors = AppTheme.colors
+    val background = background.takeOrElse {
+        thenIf(!expanded) {
+                drawWithContent {
+                    drawContent()
+                    drawRect(color = actionColor, size = size.copy(width = 3.dp.toPx()))
+                }
+            }
+            .background(colors.snackBackgroundColor)
+            .then(SnackNoiseModifier)
+    }
+
+    //
     // SwipeToDismiss composable for handling swipe gesture
     SwipeToDismiss(
         dismissState,
         background = { },
-        dismissThresholds = { FractionalThreshold(0.75f) },
-        modifier = modifier
-            .animateContentSize(),
-//            .renderInSharedTransitionScopeOverlay(0.3f),
+        modifier = modifier.animateContentSize(),
+        dismissThresholds = { DismissThreshHold },
         dismissContent = {
-            // Shape of the Toast based on expanded state
-            val shape = if (isExpanded) AppTheme.shapes.small else AppTheme.shapes.xSmall
-            BaseListItem(
+            Layout(
                 contentColor = contentColor,
-                spacing = 4.dp,
-                leading = composableIf (value.icon != null) {
-                    // FixMe: It might cause problems.
-                    val icon = value.icon!!
+                spacing = SPACING,
+                padding = null,
+                modifier = modifier
+                    .padding(horizontal = SnackbarHorizontalMargin)
+                    .shadow(6.dp, shape, clip = true)
+                    .thenIf(border != null) { border(border!!, shape) }
+                    .background(background)
+                    // Toggle expanded state on click
+                    .clickable(
+                        indication = null,
+                        interactionSource = null,
+                        enabled = critical || value.message.length > 100 || value.action == null,
+                        onClick = { expanded = !expanded }
+                    )
+                    .then(SnackBarSize),
+                leading = composableIf(value.icon != null) {
                     Icon(
-                        painter = rememberVectorPainter(image = icon),
+                        imageVector = value.icon!!,
                         contentDescription = null,
                         tint = actionColor,
                         modifier = Modifier.padding(end = 4.dp)
                     )
                 },
-                // Trailing action button if available and not expanded
-                trailing = composableIf(value.action != null && !isExpanded) {
-                    TextButton (
+                trailing = composableIf(value.action != null && !expanded) {
+                    OutlinedButton(
                         text = value.action!!,
                         onClick = value::action,
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -137,91 +189,62 @@ internal fun Snackbar(
                             backgroundColor = Color.Transparent,
                         ),
                         shape = CircleShape,
-                        modifier = Modifier.scale(0.9f),
-                        border = androidx.compose.foundation.BorderStroke(ButtonDefaults.OutlinedBorderSize, contentColor.copy(
-                            ButtonDefaults.OutlinedBorderOpacity))
+                        modifier = SnackButtonScale,
+                        border = BorderStroke(
+                            ButtonDefaults.OutlinedBorderSize, contentColor.copy(
+                                ButtonDefaults.OutlinedBorderOpacity
+                            )
+                        )
                     )
                 },
-                // Toast message
+                // Message
                 heading = {
                     Label(
                         text = value.message,
                         color = contentColor,
                         style = AppTheme.typography.body2,
-                        // Limit lines when not expanded
-                        maxLines = if (!isExpanded) 3 else Int.MAX_VALUE,
+                        maxLines = if (!expanded) 3 else Int.MAX_VALUE,  // Limit lines when not expanded
                         modifier = Modifier
-                            // Max height constraint
-                            .heightIn(max = 195.dp)
-                            .thenIf(isExpanded) {
+                            .heightIn(max = SnackMessageMaxHeight)     // Max height constraint
+                            .thenIf(expanded) {
                                 val state = rememberScrollState()
-                                fadingEdge( state, false, 10.dp)
+                                fadingEdge(state, false, 10.dp)
                                     .verticalScroll(state)
+                                    .padding(vertical = 4.dp)
                             }
                     )
                 },
                 // Footer with action buttons when expanded
-                footer = composableIf(isExpanded) {
+                footer = composableIf(expanded) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = Modifier.thenIf(value.icon != null) { padding(start = 20.dp) }.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.fillMaxWidth(),
                         content = {
-                            // Action button if available
-                            val action = value.action
-                            if (action != null)
-                                FilledTonalButton(
-                                    text = action,
-                                    onClick = value::action,
-                                    colors = ButtonDefaults.buttonColors(
-                                        contentColor = actionColor,
-                                        backgroundColor = actionColor.copy(0.2f).compositeOver(
-                                            AppTheme.colors.toastBackgroundColor
-                                        )
-                                    ),
-                                    modifier = Modifier.scale(0.9f),
-                                    elevation = null
-                                )
                             // Cancel button
                             TextButton(
                                 stringResource(android.R.string.cancel).uppercase(),
                                 value::dismiss,
-                                modifier = Modifier.scale(0.9f),
+                                modifier = SnackButtonScale,
                                 colors = ButtonDefaults.textButtonColors(contentColor = contentColor),
                             )
+
+                            // Action button if available
+                            val action = value.action
+                            if (action != null)
+                                Button(
+                                    text = action,
+                                    onClick = value::action,
+                                    colors = ButtonDefaults.buttonColors(
+                                        contentColor = actionColor,
+                                        backgroundColor = actionColor.copy(0.15f)
+                                    ),
+                                    modifier = SnackButtonScale,
+                                    elevation = null
+                                )
                         }
                     )
-                },
-                modifier = Modifier
-                    .padding(horizontal = 18.dp)
-                    .shadow(6.dp, shape, clip = true)
-                    // Toggle expanded state on click
-                    .clickable(indication = null, interactionSource = null, enabled = !critical && value.message.length > 100) {
-                        isExpanded = !isExpanded
-                    }
-                    // Apply border and visual effect if dark theme
-                    .thenIf(!isExpanded) {
-                        drawWithContent {
-                            drawContent()
-                            drawRect(color = actionColor, size = size.copy(width = 3.dp.toPx()))
-                        }
-                    }
-                    .border(
-                        1.dp,
-                        Brush.linearGradient(
-                            listOf(
-                                Color.Gray.copy(if(!colors.isLight) 0.24f else 0.48f),
-                                Color.Transparent,
-                                Color.Transparent,
-                                Color.Gray.copy(if(!colors.isLight) 0.24f else 0.48f),
-                            )
-                        ),
-                        shape
-                    )
-                    .visualEffect(ImageBrush.NoiseBrush, 0.60f, overlay = true)
-                    .background(backgroundColor)
-                    //.clip(shape)
-                    .sizeIn(360.dp, 56.dp, 400.dp, 340.dp)
+                }
             )
         }
     )

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalThemeApi::class)
+
 package com.zs.compose.theme.menu
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -24,6 +26,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -70,9 +73,11 @@ import androidx.compose.ui.unit.takeOrElse
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ContentAlpha
+import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.Surface
 import com.zs.compose.theme.ripple
@@ -215,7 +220,7 @@ fun BasicPopupMenu(
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
     elevation: Dp = Dp.Unspecified,
-    containerColor: Color = AppTheme.colors.background(1.dp),
+    background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground,
     shape: Shape = AppTheme.shapes.small,
     border: BorderStroke? = null,
@@ -293,7 +298,7 @@ fun BasicPopupMenu(
                     elevation = elevation.takeOrElse { MenuElevation },
                     contentColor = contentColor,
                     content = content,
-                    color = containerColor,
+                    background = background,
                     border = border,
                     shape = shape,
                 )
@@ -307,7 +312,6 @@ fun BasicPopupMenu(
         )
     }
 }
-
 
 /**
  * [Material Design dropdown menu](https://m3.material.io/components/menus/overview)
@@ -369,7 +373,7 @@ fun DropDownMenu(
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
     elevation: Dp = Dp.Unspecified,
-    containerColor: Color = AppTheme.colors.background(1.dp),
+    background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground,
     shape: Shape = AppTheme.shapes.small,
     border: BorderStroke? = null,
@@ -382,7 +386,7 @@ fun DropDownMenu(
     modifier = modifier,
     offset = offset,
     elevation = elevation,
-    containerColor = containerColor,
+    background = background,
     contentColor = contentColor,
     shape = shape,
     border = border,

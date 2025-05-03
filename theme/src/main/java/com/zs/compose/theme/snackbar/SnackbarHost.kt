@@ -18,6 +18,7 @@
 
 package com.zs.compose.theme.snackbar
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -202,7 +203,7 @@ class SnackbarHostState {
  * @param snackbar the instance of the [Snackbar] to be shown at the appropriate time with
  *   appearance based on the [SnackbarData] provided as a param
  */
-@OptIn(ExperimentalThemeApi::class)
+@OptIn(ExperimentalThemeApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun SnackbarHost(
     hostState: SnackbarHostState,

@@ -80,7 +80,7 @@ inline fun <R> runCatching(tag: String, block: () -> R): R? {
  * Conditionally executes a composable function based on a boolean condition.
  * @return The [content] composable function if the [condition] is `true` else null
  */
-fun composableIf(condition: Boolean, content: @Composable () -> Unit) =
+inline fun composableIf(condition: Boolean, noinline content: @Composable () -> Unit) =
     if (condition) content else null
 
 /**

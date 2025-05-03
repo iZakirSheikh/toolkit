@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalThemeApi::class)
+@file:OptIn(ExperimentalThemeApi::class, ExperimentalFoundationApi::class)
 
 package com.prime.toolkit
 
@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -98,6 +99,8 @@ import com.zs.compose.theme.adaptive.TwoPane
 import com.zs.compose.theme.appbar.FloatingBottomNavigationBar
 import com.zs.compose.theme.appbar.FloatingLargeTopAppBar
 import com.zs.compose.theme.dynamicAccentColor
+import com.zs.compose.theme.menu.DropDownMenu
+import com.zs.compose.theme.snackbar.Snackbar
 
 private const val TAG = "MainActivity"
 
@@ -196,6 +199,8 @@ fun Content(modifier: Modifier = Modifier) {
                     overline = {Text("Overline")},
                     modifier = Modifier.clickable(){}
                 )
+
+                DropDownMenu(true, onDismissRequest = {}) { }
 
                 AlertDialog(
                     expanded,
@@ -311,12 +316,20 @@ class MainActivity : ComponentActivity() {
                         sizeClass.width < Category.Medium,
                         snackbarHostState = state,
                         progress = progress,
+                        snackbar = {
+                            Snackbar(
+                                it,
+                                background = Background(AppTheme.colors.background(1.dp)),
+                                contentColor = AppTheme.colors.onBackground,
+                                shape = RoundedCornerShape(9)
+                            )
+                        },
                         hideNavigationBar = false,
                         fabPosition = FabPosition.Start,
                         floatingActionButton = {
                             FloatingActionButton(onClick = {lifecycleScope.launch(){
                                 light = !light
-                                state.showSnackbar(message)} }
+                                state.showSnackbar(message, action = "Action")} }
                             ) {
                                 Icon(Icons.Filled.Feedback, null)
                             }

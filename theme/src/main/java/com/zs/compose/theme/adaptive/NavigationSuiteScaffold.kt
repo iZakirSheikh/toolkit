@@ -16,9 +16,12 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalThemeApi::class, ExperimentalFoundationApi::class)
+
 package com.zs.compose.theme.adaptive
 
 import androidx.annotation.FloatRange
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +43,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.zs.compose.theme.AppTheme
+import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.LinearProgressIndicator
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.internal.Slot
@@ -47,6 +51,8 @@ import com.zs.compose.theme.internal.component1
 import com.zs.compose.theme.internal.component2
 import com.zs.compose.theme.internal.component3
 import com.zs.compose.theme.internal.component4
+import com.zs.compose.theme.snackbar.Snackbar
+import com.zs.compose.theme.snackbar.SnackbarData
 import com.zs.compose.theme.snackbar.SnackbarHost
 import com.zs.compose.theme.snackbar.SnackbarHostState
 
@@ -254,6 +260,7 @@ fun NavigationSuiteScaffold(
     containerColor: Color = AppTheme.colors.background,
     contentColor: Color = AppTheme.colors.onBackground,
     snackbarHostState: SnackbarHostState = remember(::SnackbarHostState),
+    snackbar: @Composable (SnackbarData) -> Unit = { Snackbar(it) },
     @FloatRange(0.0, 1.0) progress: Float = Float.NaN,
     navBar: @Composable () -> Unit,
 ) {
@@ -286,7 +293,7 @@ fun NavigationSuiteScaffold(
                 else -> navBar()
             }
             // Display the SnackBar using the provided channel
-            SnackbarHost(snackbarHostState)
+            SnackbarHost(snackbarHostState, snackbar = snackbar)
             // Display the pixel element
             Slot(floatingActionButton)
             // Conditionally display the progress bar based on the 'progress' value

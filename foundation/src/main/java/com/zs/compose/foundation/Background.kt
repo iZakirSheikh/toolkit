@@ -18,13 +18,14 @@
 
 package com.zs.compose.foundation
 
-import android.annotation.SuppressLint
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.CacheDrawScope
+import androidx.compose.ui.draw.DrawResult
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -32,6 +33,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.isUnspecified
 
+//--------------------------------------------------------------------------------------------------
+// Background Rationale
 
 // **Rationale for Background Value Class**
 //
@@ -73,66 +76,71 @@ import androidx.compose.ui.graphics.isUnspecified
 @ExperimentalFoundationApi
 @JvmInline
 @Stable
-value class Background @PublishedApi internal constructor(val modifier: Modifier) {
+value class Background(@PublishedApi internal val modifier: Modifier) {
 
     /**
-     * Companion object to provide several overloads for constructing a [Background] instance.
+     * Creates a [Background] with a solid [color] and an optional [shape].
+     *
+     * This overload allows you to specify a background color and a shape. By default, the shape is a
+     * [RectangleShape], but it can be replaced with any other [Shape] like [CircleShape].
+     *
+     * @param color The [Color] to be used as the background color.
+     * @param shape The [Shape] to be applied as the background shape. Defaults to [RectangleShape].
+     * @return A new [Background] instance that applies the background with the specified color and shape.
+     *
      */
-    @SuppressLint("ModifierFactoryExtensionFunction")
+    constructor(color: Color, shape: Shape = RectangleShape) :
+            this(
+                when {
+                    color == Color.Transparent || color.isUnspecified -> Modifier
+                    else -> Modifier.background(color, shape)
+                }
+            )
+
+    /**@see background*/
+    constructor(
+        brush: Brush,
+        shape: Shape = RectangleShape,
+        @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f
+    ) : this(Modifier.background(brush, shape, alpha))
+
+
+    /**
+     * Creates a [Background] that draws custom content behind the Composable.
+     *
+     * This allows you to use the [DrawScope] to custom-draw elements behind the Composable,
+     * offering full flexibility for drawing operations, such as gradients or patterns.
+     *
+     * @param onDraw A lambda function with a receiver of [DrawScope] that is used to custom-draw behind the Composable.
+     * @return A new [Background] instance that applies the custom drawing operation.
+     */
+    constructor(onBuildDrawCache: CacheDrawScope.() -> DrawResult) :
+            this(Modifier.drawWithCache(onBuildDrawCache))
+
+    @Stable
+    inline val isSpecified: Boolean
+        get() = modifier != Unspecified.modifier
+
+    /**
+     * If this color [isSpecified] then this is returned, otherwise [block] is executed and its result
+     * is returned.
+     */
+    inline fun takeOrElse(block: Modifier.() -> Modifier): Background =
+        if (this.isSpecified) this else Background(Modifier.block())
+
     companion object {
-
         /**
-         * Creates a [Background] using a custom [Modifier] builder.
+         * Represents an unspecified background.
          *
-         * This allows you to construct a [Background] modifier dynamically using the provided lambda block.
+         * Indicates that the component should determine its background internally.
+         * Use this instead of `null` to preserve value class optimizations.
          *
-         * @param builder A lambda function with a receiver of [Modifier] to build the desired modifier.
-         * @return A new [Background] instance that wraps the generated [Modifier].
+         * @see Background
          */
-        inline operator fun invoke(builder: Modifier.() -> Modifier) =
-            Background(Modifier.builder())
+        val Unspecified = Background(Modifier)
 
-        /**
-         * Creates a [Background] with a solid [color] and an optional [shape].
-         *
-         * This overload allows you to specify a background color and a shape. By default, the shape is a
-         * [RectangleShape], but it can be replaced with any other [Shape] like [CircleShape].
-         *
-         * @param color The [Color] to be used as the background color.
-         * @param shape The [Shape] to be applied as the background shape. Defaults to [RectangleShape].
-         * @return A new [Background] instance that applies the background with the specified color and shape.
-         *
-         */
-        operator fun invoke(color: Color, shape: Shape = RectangleShape) = Background(
-            builder = {
-                if (color == Color.Transparent || color.isUnspecified) this else background(
-                    color,
-                    shape
-                )
-            }
-        )
 
-        operator fun invoke(
-            brush: Brush,
-            shape: Shape = RectangleShape,
-            @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f
-        ) = Background(
-            builder = { background(brush, shape, alpha) }
-        )
-        /*
-                */
-        /**
-         * Creates a [Background] that draws custom content behind the Composable.
-         *
-         * This allows you to use the [DrawScope] to custom-draw elements behind the Composable,
-         * offering full flexibility for drawing operations, such as gradients or patterns.
-         *
-         * @param onDraw A lambda function with a receiver of [DrawScope] that is used to custom-draw behind the Composable.
-         * @return A new [Background] instance that applies the custom drawing operation.
-         *//*
-        operator fun invoke(onDraw: DrawScope.() -> Unit) = Background(
-            Modifier.drawBehind(onDraw)
-        )*/
     }
 }
+
 
