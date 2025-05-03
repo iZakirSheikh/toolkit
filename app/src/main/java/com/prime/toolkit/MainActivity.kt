@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -44,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -53,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.SignalWhite
 import com.zs.compose.theme.AlertDialog
 import com.zs.compose.theme.AppTheme
@@ -257,6 +260,7 @@ fun Content(modifier: Modifier = Modifier) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 class MainActivity : ComponentActivity() {
     @SuppressLint("NewApi")
     @OptIn(ExperimentalThemeApi::class)
@@ -322,7 +326,16 @@ class MainActivity : ComponentActivity() {
                         val accent = AppTheme.colors.accent
                         val background = AppTheme.colors.background
                         FloatingBottomNavigationBar(
-                            modifier = Modifier.padding(bottom = 10.dp),
+                            modifier = Modifier.padding(bottom = 15.dp),
+                            background = Background(Brush.horizontalGradient(
+                                listOf(
+                                    Color.Black.copy(0.9f),
+                                    Color.Black,
+                                    Color.Gray.copy(0.8f)
+                                )
+                            )),
+                            border = _root_ide_package_.androidx.compose.foundation.BorderStroke(0.1.dp, Color.SignalWhite,),
+
                             //windowInsets = WindowInsets.None,
                             /* modifier = Modifier
                                  .padding(horizontal = 22.dp).windowInsetsPadding(

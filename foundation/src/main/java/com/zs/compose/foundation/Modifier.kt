@@ -18,17 +18,11 @@
 
 package com.zs.compose.foundation
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.NonRestartableComposable
-import androidx.compose.runtime.NonSkippableComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalLayoutDirection
 
 private const val TAG = "Modifier"
 
@@ -98,3 +92,15 @@ fun Modifier.rotateTransform(
         .then(rotated)
 }
 
+/**
+ * Applies the provided [Background] modifier to this [Modifier].
+ *
+ * This function combines the current [Modifier] with the modifier from the [Background] class.
+ * The [Background] class encapsulates various background-related modifiers.
+ *
+ * @param background The [Background] that contains the modifier to be applied.
+ * @return A new [Modifier] combining the current modifier with the [Background]'s modifier.
+ */
+@SuppressLint("ModifierFactoryUnreferencedReceiver")
+@ExperimentalFoundationApi
+fun Modifier.background(background: Background) = this then background.modifier
