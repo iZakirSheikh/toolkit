@@ -57,6 +57,11 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.core.text.HtmlCompat
 
+// TODO: 1. Address the issue where providing arguments to a string causes it to lose style
+//          information.
+//       2. Update to rely on the official toAnnotatedString release from Compose for improved
+//          consistency.
+
 private const val TAG = "Resources"
 
 private inline val TypefaceSpan.toSpanStyle: SpanStyle

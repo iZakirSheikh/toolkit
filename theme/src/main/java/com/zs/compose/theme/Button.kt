@@ -57,6 +57,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zs.compose.theme.internal.animateElevation
+import com.zs.compose.theme.text.Label
 import com.zs.compose.theme.text.ProvideTextStyle
 import com.zs.compose.theme.text.Text
 
@@ -528,7 +529,7 @@ fun Button(
     contentPadding,
 ) {
     if (icon != null) Icon(icon, contentDescription = text.toString())
-    Text(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
+    Label(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
 }
 
 /**
@@ -593,7 +594,7 @@ fun OutlinedButton(
     contentPadding,
 ) {
     if (icon != null) Icon(icon, contentDescription = text.toString())
-    Text(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
+    Label(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
 }
 
 /**
@@ -658,7 +659,7 @@ fun TextButton(
     contentPadding,
 ) {
     if (icon != null) Icon(icon, contentDescription = text.toString())
-    Text(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
+    Label(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
 }
 
 /**
@@ -726,7 +727,7 @@ fun FilledTonalButton(
     contentPadding,
 ) {
     if (icon != null) Icon(icon, contentDescription = text.toString())
-    Text(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
+    Label(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
 }
 
 /**
@@ -793,5 +794,5 @@ fun ElevatedButton(
     contentPadding,
 ) {
     if (icon != null) Icon(icon, contentDescription = text.toString())
-    Text(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
+    Label(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
 }

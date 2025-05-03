@@ -41,6 +41,15 @@ import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+// TODO:
+//  1.  Enhance the component to support custom colors for the fading effect, allowing users to
+//      customize the visual appearance of the fade.
+//  2.  Improve the fading transition at the edges by utilizing a mask, ensuring a smoother and
+//      more natural fade effect, particularly when not in immersive mode, to prevent any
+//      artifacts or abrupt transitions.
+//  3.  Ensure that the fading effect respects and adapts to any padding  the content padding in
+//      lazy lists, maintaining a consistent and correct visual presentation.
+
 private const val TAG = "FadingEdge"
 
 private val DEFAULT_FADING_EDGE_LENGTH = 10.dp
@@ -244,3 +253,4 @@ private class FadingEdgeNode(
         drawLayer(layer)
     }
 }
+

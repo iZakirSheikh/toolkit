@@ -2,11 +2,13 @@
 
 package com.prime.toolkit
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.zs.compose.foundation.SignalWhite
 import com.zs.compose.theme.AlertDialog
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Button
@@ -73,7 +76,6 @@ import com.zs.compose.theme.SwitchPreference
 import com.zs.compose.theme.TextFieldPreference
 import com.zs.compose.theme.adaptive.FabPosition
 import com.zs.compose.theme.adaptive.NavigationSuiteScaffold
-import com.zs.compose.theme.adaptive.Scaffold
 import com.zs.compose.theme.adaptive.contentInsets
 import com.zs.compose.theme.appbar.AppBarDefaults
 import com.zs.compose.theme.appbar.BottomAppBar
@@ -89,6 +91,10 @@ import com.zs.compose.theme.text.Text
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.zs.compose.theme.WindowSize.Category
+import com.zs.compose.theme.adaptive.TwoPane
+import com.zs.compose.theme.appbar.FloatingBottomNavigationBar
+import com.zs.compose.theme.appbar.FloatingLargeTopAppBar
+import com.zs.compose.theme.dynamicAccentColor
 
 private const val TAG = "MainActivity"
 
@@ -96,7 +102,7 @@ private const val TAG = "MainActivity"
 fun Content(modifier: Modifier = Modifier) {
     val navInsets = WindowInsets.contentInsets
     val behaviour = AppBarDefaults.exitUntilCollapsedScrollBehavior()
-    Scaffold(
+    TwoPane(
         primary = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -191,7 +197,7 @@ fun Content(modifier: Modifier = Modifier) {
                 AlertDialog(
                     expanded,
                     onDismissRequest = { expanded = false },
-                    icon = {
+                    navigationIcon = {
                         IconButton(
                             Icons.Filled.Feedback,
                             onClick = {},
@@ -218,7 +224,7 @@ fun Content(modifier: Modifier = Modifier) {
                             )
                         }
                     },
-                    footer = {
+                    bottomBar = {
                         Button(onClick = {}) {
                             Text("Discard")
                         }
@@ -227,7 +233,7 @@ fun Content(modifier: Modifier = Modifier) {
                         }
                     }
                 ) {
-                    Text("The last saved draft will be moved to deleted items folder.")
+                    Text("The last saved draft will be moved to deleted items folder. The last saved draft will be moved to deleted items folder. The last saved draft will be moved to deleted items folder. The last saved draft will be moved to deleted items folder.")
                 }
 
 
@@ -235,7 +241,7 @@ fun Content(modifier: Modifier = Modifier) {
             }
         },
         topBar = {
-            LargeTopAppBar(
+            FloatingLargeTopAppBar(
                 title = { Text("Settings") },
                 windowInsets = AppBarDefaults.topAppBarWindowInsets,
                 navigationIcon = {
@@ -252,6 +258,7 @@ fun Content(modifier: Modifier = Modifier) {
 }
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("NewApi")
     @OptIn(ExperimentalThemeApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -293,7 +300,7 @@ class MainActivity : ComponentActivity() {
                 )
             }
             var light by remember { mutableStateOf(false) }
-            AppTheme(isLight = light) {
+            AppTheme(isLight = light, accent = dynamicAccentColor(this, !light)) {
                 CompositionLocalProvider(LocalWindowSize provides sizeClass) {
 
                     NavigationSuiteScaffold(
@@ -314,7 +321,8 @@ class MainActivity : ComponentActivity() {
                     ) {
                         val accent = AppTheme.colors.accent
                         val background = AppTheme.colors.background
-                        BottomAppBar(
+                        FloatingBottomNavigationBar(
+                            modifier = Modifier.padding(bottom = 10.dp),
                             //windowInsets = WindowInsets.None,
                             /* modifier = Modifier
                                  .padding(horizontal = 22.dp).windowInsetsPadding(

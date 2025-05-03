@@ -23,6 +23,7 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -31,20 +32,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
+import com.zs.compose.foundation.thenIf
+import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.LocalContentColor
+import com.zs.compose.theme.None
 import com.zs.compose.theme.text.ProvideTextStyle
 
 /**
@@ -77,6 +89,8 @@ class TopAppBarStyle internal constructor(
     val scrolledTitleTextStyle: TextStyle,
     val height: Dp,
     val maxHeight: Dp,
+    val elevation: Dp = 0.dp,
+    val scrolledElevation: Dp = 0.dp,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -91,6 +105,8 @@ class TopAppBarStyle internal constructor(
         if (titleTextStyle != other.titleTextStyle) return false
         if (scrolledTitleTextStyle != other.scrolledTitleTextStyle) return false
         if (height != other.height) return false
+        if (elevation != other.elevation) return false
+        if (scrolledElevation != other.scrolledElevation) return false
         return maxHeight == other.maxHeight
     }
 
@@ -103,6 +119,8 @@ class TopAppBarStyle internal constructor(
         result = 31 * result + scrolledTitleTextStyle.hashCode()
         result = 31 * result + height.hashCode()
         result = 31 * result + maxHeight.hashCode()
+        result = 31 * result + elevation.hashCode()
+        result = 31 * result + scrolledElevation.hashCode()
         return result
     }
 
@@ -114,6 +132,8 @@ class TopAppBarStyle internal constructor(
                 "scrolledContentColor=$scrolledContentColor, " +
                 "titleTextStyle=$titleTextStyle, " +
                 "scrolledTitleTextStyle=$scrolledTitleTextStyle, " +
+                "elevation=$elevation, " +
+                "scrolledElevation=$scrolledElevation, " +
                 "height=$height, " +
                 "maxHeight=$maxHeight)"
     }
@@ -147,7 +167,7 @@ class TopAppBarStyle internal constructor(
      *     `containerColor` and `scrolledContainerColor` using a fast-out-linear-in easing.
      */
     @Stable
-    internal fun containerColor(fraction: Float): Color {
+    fun containerColor(fraction: Float): Color {
         return androidx.compose.ui.graphics.lerp(
             containerColor,
             scrolledContainerColor,
@@ -159,7 +179,7 @@ class TopAppBarStyle internal constructor(
      * @see containerColor
      */
     @Stable
-    internal fun contentColor(fraction: Float): Color {
+    fun contentColor(fraction: Float): Color {
         return androidx.compose.ui.graphics.lerp(
             contentColor,
             scrolledContentColor,
@@ -171,10 +191,19 @@ class TopAppBarStyle internal constructor(
      * @see containerColor
      */
     @Stable
-    internal fun titleTextStyle(fraction: Float): TextStyle {
+    fun titleTextStyle(fraction: Float): TextStyle {
         return androidx.compose.ui.text.lerp(
             titleTextStyle,
             scrolledTitleTextStyle,
+            FastOutLinearInEasing.transform(fraction)
+        )
+    }
+
+    @Stable
+    fun elevation(fraction: Float): Dp {
+        return lerp(
+            elevation,
+            scrolledElevation,
             FastOutLinearInEasing.transform(fraction)
         )
     }
@@ -234,13 +263,21 @@ internal object TopAppBarDefaults {
 @ExperimentalThemeApi
 @Composable
 fun LargeTopAppBar(
-    scrollBehavior: TopAppBarScrollBehavior?,
+    scrollBehavior: TopAppBarScrollBehavior,
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable() () -> Unit = {},
     actions: @Composable() RowScope.() -> Unit = {},
     windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     style: TopAppBarStyle = AppBarDefaults.largeAppBarStyle(),
+    background: @Composable TopAppBarScope.() -> Unit = {
+        val containerColor = style.containerColor(1 - fraction)
+        Spacer(
+            modifier = Modifier
+                .background(containerColor)
+                .fillMaxSize()
+        )
+    }
 ) = CollapsableTopBarLayout(
     height = style.height,
     maxHeight = style.maxHeight,
@@ -254,48 +291,45 @@ fun LargeTopAppBar(
     val appBarContentColor = style.contentColor(1 - fraction)
     val textStyle = style.titleTextStyle(fraction)
     CompositionLocalProvider(LocalContentColor provides appBarContentColor) {
-    ProvideTextStyle(textStyle) {
-        // Background; zIndex determines which is stacked where.
-        // so this will be at the bottom.
-        val containerColor = style.containerColor(1 - fraction)
-        Spacer(
-            modifier = Modifier
-                .background(containerColor)
-                .layoutId(APP_BAR_LAYOUT_ID_BACKGROUND)
-                .fillMaxSize()
-        )
-        // Defines the navIcon and actions first;
-        // make sure that title is always last; because if it is not; a new list of
-        // measurables will be created; which will make sure it is at the last.
-        Box(
-            Modifier
-                .layoutId(APP_BAR_LAYOUT_ID_NAVIGATION_ICON)
-                .padding(start = TopAppBarDefaults.TopAppBarHorizontalPadding),
-            content = { navigationIcon() }
-        )
+        ProvideTextStyle(textStyle) {
+            // Background; zIndex determines which is stacked where.
+            // so this will be at the bottom.
+            Box(
+                modifier = Modifier.layoutId(APP_BAR_LAYOUT_ID_BACKGROUND),
+                content = { background() }
+            )
+            // Defines the navIcon and actions first;
+            // make sure that title is always last; because if it is not; a new list of
+            // measurables will be created; which will make sure it is at the last.
+            Box(
+                Modifier
+                    .layoutId(APP_BAR_LAYOUT_ID_NAVIGATION_ICON)
+                    .padding(start = TopAppBarDefaults.TopAppBarHorizontalPadding),
+                content = { navigationIcon() }
+            )
 
-        // Actions
-        Box(
-            Modifier
-                .layoutId(APP_BAR_LAYOUT_ID_ACTIONS)
-                .padding(end = TopAppBarDefaults.TopAppBarHorizontalPadding),
-            content = {
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                    content = actions
-                )
-            }
-        )
+            // Actions
+            Box(
+                Modifier
+                    .layoutId(APP_BAR_LAYOUT_ID_ACTIONS)
+                    .padding(end = TopAppBarDefaults.TopAppBarHorizontalPadding),
+                content = {
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = actions
+                    )
+                }
+            )
 
-        Box(
-            Modifier
-                .layoutId(APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE)
-                .padding(horizontal = TopAppBarDefaults.TopAppBarHorizontalPadding),
-            content = { title() }
-        )
+            Box(
+                Modifier
+                    .layoutId(APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE)
+                    .padding(horizontal = TopAppBarDefaults.TopAppBarHorizontalPadding),
+                content = { title() }
+            )
+        }
     }
-}
 }
 
 /**
@@ -305,13 +339,25 @@ fun LargeTopAppBar(
 @ExperimentalThemeApi
 @Composable
 fun TopAppBar(
-    scrollBehavior: TopAppBarScrollBehavior?,
+    scrollBehavior: TopAppBarScrollBehavior,
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    navigationIcon: @Composable() () -> Unit = {},
+    navigationIcon: @Composable () -> Unit = {},
     actions: @Composable() RowScope.() -> Unit = {},
     windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     style: TopAppBarStyle = AppBarDefaults.topAppBarStyle(),
+    background: @Composable TopAppBarScope.() -> Unit = {
+        val appBarContainerColor by animateColorAsState(
+            targetValue = style.containerColor(fraction),
+            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+            label = "appBarContainerColor"
+        )
+        Spacer(
+            modifier = Modifier
+                .background(appBarContainerColor)
+                .fillMaxSize()
+        )
+    },
 ) = CollapsableTopBarLayout(
     height = style.height,
     maxHeight = style.height,
@@ -331,17 +377,7 @@ fun TopAppBar(
         ProvideTextStyle(style.scrolledTitleTextStyle) {
             // Background; zIndex determines which is stacked where.
             // so this will be at the bottom.
-            val appBarContainerColor by animateColorAsState(
-                targetValue = style.containerColor(fraction),
-                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                label = "appBarContainerColor"
-            )
-            Spacer(
-                modifier = Modifier
-                    .background(appBarContainerColor)
-                    .layoutId(APP_BAR_LAYOUT_ID_BACKGROUND)
-                    .fillMaxSize()
-            )
+            Box(modifier = Modifier.layoutId(APP_BAR_LAYOUT_ID_BACKGROUND), content = { background() })
             // Defines the navIcon and actions first;
             // make sure that title is always last; because if it is not; a new list of
             // measurables will be created; which will make sure it is at the last.
@@ -372,6 +408,102 @@ fun TopAppBar(
                     .padding(horizontal = TopAppBarDefaults.TopAppBarHorizontalPadding),
                 content = { title() }
             )
+        }
+    }
+}
+
+
+private const val FLTAB_COLLAPSED_HORIZONTAL_PADDING = 30f
+private val FLTAP_MAX_WIDTH = 500.dp
+
+private val FloatingTopBarShape = RoundedCornerShape(20)
+
+/** @see LargeTopAppBar */
+@Composable
+@ExperimentalThemeApi
+fun FloatingLargeTopAppBar(
+    title: @Composable () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior,
+    modifier: Modifier = Modifier,
+    navigationIcon: @Composable() () -> Unit = {},
+    actions: @Composable() RowScope.() -> Unit = {},
+    windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
+    style: TopAppBarStyle = AppBarDefaults.floatingLargeAppBarStyle(),
+    background: @Composable TopAppBarScope.() -> Unit = {
+        val colors = AppTheme.colors
+        Spacer(
+            modifier = Modifier
+                .shadow(lerp(12.dp, 0.dp, fraction / .05f), FloatingTopBarShape)
+                .thenIf(fraction == 0f) {
+                    border(
+                        0.1.dp,
+                        colors.background(30.dp),
+                        FloatingTopBarShape
+                    )
+                }
+                .background(style.containerColor(1 - fraction))
+                .fillMaxSize()
+        )
+    }
+) {
+    // TODO - Expose fraction through behaviour; instead of relying here on state.
+    var hPadding by rememberSaveable { mutableFloatStateOf(0f) }
+    CollapsableTopBarLayout(
+        height = style.height,
+        maxHeight = style.maxHeight,
+        insets = WindowInsets.None,
+        modifier = modifier
+            .widthIn(max = FLTAP_MAX_WIDTH)
+            .windowInsetsPadding(windowInsets)
+            .padding(horizontal = hPadding.dp),
+        scrollBehavior = scrollBehavior
+    ) {
+        require(style.height < style.maxHeight) {
+            "LargeTopAppBar maxHeight (${style.maxHeight}) must be greater than height (${style.height})"
+        }
+        // update hPadding
+        hPadding = com.zs.compose.foundation.lerp(FLTAB_COLLAPSED_HORIZONTAL_PADDING, 0f, fraction)
+        val appBarContentColor = style.contentColor(1 - fraction)
+        val textStyle = style.titleTextStyle(fraction)
+        CompositionLocalProvider(LocalContentColor provides appBarContentColor) {
+            ProvideTextStyle(textStyle) {
+                // Background; zIndex determines which is stacked where.
+                // so this will be at the bottom.
+                Box(
+                    modifier = Modifier.layoutId(APP_BAR_LAYOUT_ID_BACKGROUND),
+                    content = { background() }
+                )
+                // Defines the navIcon and actions first;
+                // make sure that title is always last; because if it is not; a new list of
+                // measurables will be created; which will make sure it is at the last.
+                Box(
+                    Modifier
+                        .layoutId(APP_BAR_LAYOUT_ID_NAVIGATION_ICON)
+                        .padding(start = TopAppBarDefaults.TopAppBarHorizontalPadding),
+                    content = { navigationIcon() }
+                )
+
+                // Actions
+                Box(
+                    Modifier
+                        .layoutId(APP_BAR_LAYOUT_ID_ACTIONS)
+                        .padding(end = TopAppBarDefaults.TopAppBarHorizontalPadding),
+                    content = {
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically,
+                            content = actions
+                        )
+                    }
+                )
+
+                Box(
+                    Modifier
+                        .layoutId(APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE)
+                        .padding(horizontal = TopAppBarDefaults.TopAppBarHorizontalPadding),
+                    content = { title() }
+                )
+            }
         }
     }
 }

@@ -38,8 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.zs.compose.foundation.Dialog
 import com.zs.compose.theme.text.LocalTextStyle
 import com.zs.compose.theme.text.ProvideTextStyle
 
@@ -75,10 +75,10 @@ private val TopbarArrangement = Arrangement.spacedBy(8.dp)
 fun AlertDialog(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    icon: @Composable (() -> Unit)? = null,
+    navigationIcon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     actions: @Composable (() -> Unit)? = null,
-    footer: @Composable (RowScope.() -> Unit)? = null,
+    bottomBar: @Composable (RowScope.() -> Unit)? = null,
     modifier: Modifier = Modifier,
     shape: Shape = AppTheme.shapes.xSmall,
     backgroundColor: Color = AppTheme.colors.background(1.dp),
@@ -86,11 +86,8 @@ fun AlertDialog(
     properties: DialogProperties = DialogProperties(),
     content: @Composable () -> Unit
 ) {
-    // If the dialog is not expanded, don't display it.
-    if (!expanded) return
-
     // Use the standard Dialog composable.
-    Dialog(onDismissRequest = onDismissRequest, properties = properties) {
+    Dialog(expanded, onDismissRequest = onDismissRequest, properties = properties) {
         // Use a Surface to define the dialog's appearance.
         Surface(
             modifier = modifier.widthIn(280.dp, 560.dp),
@@ -103,7 +100,7 @@ fun AlertDialog(
                     modifier = Modifier.height(IntrinsicSize.Min), // Make the Column wrap its content vertically.
                     content = {
                         // TopBar: Contains the icon, title, and actions.
-                        if (title != null || icon != null || actions != null) { // Only show the TopBar if at least one of its elements is provided.
+                        if (title != null || navigationIcon != null || actions != null) { // Only show the TopBar if at least one of its elements is provided.
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -114,9 +111,10 @@ fun AlertDialog(
                                     CompositionLocalProvider(
                                         LocalTextStyle provides AppTheme.typography.title2,
                                         LocalContentColor provides AppTheme.colors.onBackground.copy(
-                                            ContentAlpha.high),
+                                            ContentAlpha.high
+                                        ),
                                     ) {
-                                        icon?.invoke() // Display the icon if provided.
+                                        navigationIcon?.invoke() // Display the icon if provided.
                                         if (title != null) { // Display the title if provided.
                                             title()
                                             Spacer(Modifier.weight(1f)) // Push the actions to the end of the Row.
@@ -139,10 +137,10 @@ fun AlertDialog(
                         )
 
                         // Footer: Contains buttons or other secondary actions.
-                        if (footer != null) { // Only show the Footer if it's provided.
+                        if (bottomBar != null) { // Only show the Footer if it's provided.
                             Row(
                                 horizontalArrangement = FooterArrangement, // Use a custom arrangement (defined elsewhere) for the Footer.
-                                content = footer, // Display the provided footer content.
+                                content = bottomBar, // Display the provided footer content.
                                 modifier = Modifier
                                     .padding(FooterPadding) // Apply padding to the Footer.
                                     .fillMaxWidth() // Fill the available width.

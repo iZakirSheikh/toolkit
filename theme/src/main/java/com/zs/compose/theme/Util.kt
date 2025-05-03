@@ -19,10 +19,10 @@
 package com.zs.compose.theme
 
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.ui.unit.dp
 
-private val NoInsets = androidx.compose.foundation.layout.WindowInsets(0.dp)
+private val _NoInsets = WindowInsets()
 
 /** Represents no insets. */
-val WindowInsets.Companion.None get() = NoInsets
+val WindowInsets.Companion.None get() = _NoInsets

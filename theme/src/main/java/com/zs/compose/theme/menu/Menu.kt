@@ -215,7 +215,7 @@ fun BasicPopupMenu(
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
     elevation: Dp = Dp.Unspecified,
-    backgroundColor: Color = AppTheme.colors.background(1.dp),
+    containerColor: Color = AppTheme.colors.background(1.dp),
     contentColor: Color = AppTheme.colors.onBackground,
     shape: Shape = AppTheme.shapes.small,
     border: BorderStroke? = null,
@@ -293,7 +293,7 @@ fun BasicPopupMenu(
                     elevation = elevation.takeOrElse { MenuElevation },
                     contentColor = contentColor,
                     content = content,
-                    color = backgroundColor,
+                    color = containerColor,
                     border = border,
                     shape = shape,
                 )
@@ -355,7 +355,7 @@ fun BasicPopupMenu(
  * @param scrollState a [ScrollState] to used by the menu's content for items vertical scrolling
  * @param properties [PopupProperties] for further customization of this popup's behavior
  * @param shape the shape of the menu
- * @param backgroundColor the container color of the menu
+ * @param containerColor the container color of the menu
  * @param contentColor the content color within the items of the menu.
  * @param elevation the elevation for the shadow below the menu
  * @param border the border to draw around the container of the menu. Pass `null` for no border.
@@ -369,7 +369,7 @@ fun DropDownMenu(
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
     elevation: Dp = Dp.Unspecified,
-    backgroundColor: Color = AppTheme.colors.background(1.dp),
+    containerColor: Color = AppTheme.colors.background(1.dp),
     contentColor: Color = AppTheme.colors.onBackground,
     shape: Shape = AppTheme.shapes.small,
     border: BorderStroke? = null,
@@ -382,7 +382,7 @@ fun DropDownMenu(
     modifier = modifier,
     offset = offset,
     elevation = elevation,
-    backgroundColor = backgroundColor,
+    containerColor = containerColor,
     contentColor = contentColor,
     shape = shape,
     border = border,

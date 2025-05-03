@@ -41,6 +41,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zs.compose.foundation.thenIf
 
 /**
  * <a href="https://material.io/design/environment/surfaces.html" class="external"
@@ -106,14 +107,15 @@ fun Surface(
     CompositionLocalProvider(
         LocalContentColor provides contentColor
     ) {
-        Box(modifier = modifier
-            .surface(
-                shape = shape, backgroundColor = color, border = border, elevation = elevation
-            )
-            .semantics(mergeDescendants = false) {
-                @Suppress("DEPRECATION") isContainer = true
-            }
-            .pointerInput(Unit) {}, propagateMinConstraints = true
+        Box(
+            modifier = modifier
+                .surface(
+                    shape = shape, backgroundColor = color, border = border, elevation = elevation
+                )
+                .semantics(mergeDescendants = false) {
+                    @Suppress("DEPRECATION") isContainer = true
+                }
+                .pointerInput(Unit) {}, propagateMinConstraints = true
         ) {
             content()
         }
@@ -420,7 +422,13 @@ private fun Modifier.surface(
 ) = this
     .shadow(elevation, shape, clip = false)
     .then(if (border != null) Modifier.border(border, shape) else Modifier)
-    .background(color = backgroundColor, shape = shape)
+    // only apply background color to non-transparent colors
+    .thenIf(backgroundColor != Color.Transparent || backgroundColor != Color.Unspecified) {
+        background(
+            color = backgroundColor,
+            shape = shape
+        )
+    }
     .clip(shape)
 
 

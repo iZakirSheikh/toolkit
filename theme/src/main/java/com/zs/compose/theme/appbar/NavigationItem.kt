@@ -55,7 +55,7 @@ import com.zs.compose.theme.Surface
 import com.zs.compose.theme.ripple
 import com.zs.compose.theme.text.ProvideTextStyle
 
-private val BottomBarItemMinSize = 80.dp
+private val BottomBarItemMinSize = 64.dp
 
 
 private val BottomBarIndicatorIconPadding =

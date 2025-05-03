@@ -25,16 +25,22 @@ import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
+import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 private const val TAG = "Util"
 
@@ -128,6 +134,7 @@ fun LazyGridScope.stickyHeader(
         key = key,
         contentType = contentType,
         content = {
+            // TODO - Added parameter isPinned and fix the issue causing it to overlap.
             Layout(content = { content() }) { measurables, constraints ->
                 val placeable = measurables[0].measure(constraints)
                 val width = constraints.constrainWidth(placeable.width)
@@ -155,3 +162,67 @@ tailrec fun Context.findActivity(): Activity =
         is ContextWrapper -> this.baseContext.findActivity()
         else -> throw error("Context is not an Activity context, but a ${javaClass.simpleName} context. ")
     }
+
+private val _fullLineSpan: (LazyGridItemSpanScope.() -> GridItemSpan) =
+    { GridItemSpan(maxLineSpan) }
+
+/**
+ * A [GridItemSpan] that spans the entire width of a grid.
+ *
+ * Use this within a [LazyGridScope] to make an item occupy all columns in a [LazyVerticalGrid] or [LazyHorizontalGrid].
+ *
+ * This is shorthand for `GridItemSpan.FullLine`, providing a concise way to specify full-width items.
+ *
+ * Example:
+ * ```kotlin
+ * LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+ *   items(myList) { Text(it.name) } // Regular items
+ *   item(span = fullLineSpan) { Divider() } // Full-width item
+ *   items(myOtherList) { Button(onClick = {}) { Text(it.title) } } //Regular items
+ * }
+ * ```
+ *
+ * @see GridItemSpan.FullLine
+ * @see LazyGridScope
+ * @see androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+ * @see androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+ */
+val LazyGridScope.fullLineSpan
+    get() = _fullLineSpan
+
+
+/**
+ * A composable function that displays a Dialog if the `expanded` parameter is true.
+ *
+ * This function wraps the standard Compose [Dialog] to address potential density issues.
+ * Specifically, when there is a change in the system's density and the developer has set
+ * a custom density in the app, the system density in dialogs may override the custom
+ * density, leading to undesirable visual effects. This function uses [CompositionLocalProvider]
+ * to ensure the dialog uses the app's current density.
+ *
+ * @param expanded Controls the visibility of the dialog. If `false`, the dialog is not shown.
+ * @param onDismissRequest Callback invoked when the user tries to dismiss the dialog.
+ * @param properties [DialogProperties] for configuring the dialog's behavior.
+ * @param content The content of the dialog.
+ *
+ * @see androidx.compose.ui.window.Dialog
+ */
+@Composable
+@NonRestartableComposable
+fun Dialog(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    properties: DialogProperties = DialogProperties(),
+    content: @Composable () -> Unit
+) {
+    // Do not show when not expanded
+    if (!expanded) return
+    // There is a known issue with Android dialogs where the system's density overrides
+    // the custom density set by the developer in the app.
+    // This leads to dialogs appearing incorrectly. To address this, we provide the
+    // current density to the dialog's content via CompositionLocalProvider.
+    val density = LocalDensity.current
+    Dialog(onDismissRequest, properties) {
+        CompositionLocalProvider(LocalDensity provides density, content)
+    }
+}

@@ -19,14 +19,6 @@
 package com.zs.compose.theme.adaptive
 
 import androidx.annotation.FloatRange
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -38,12 +30,13 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.zs.compose.theme.ButtonDefaults.ContentPadding
-import com.zs.compose.theme.internal.ZeroPadding
 import kotlin.math.roundToInt
-
-// TODO: In the future, consider adding functionality to specify the preferred split location,
-//   Similar to Accompanist's approach.
+// TODO:
+//    1. In the future, it would be beneficial to add functionality that allows specifying
+//       the preferred split location, similar to Accompanist's implementation.
+//    2. Using a value class here seems redundant, as we are implementing an interface and
+//       casting to it; we should reconsider this design choice.
+//    3. Enhancing this to accept more parameters, such as spacing, could offer greater flexibility.
 
 /**
  * Strategy for positioning the details pane relative to the main content pane.
@@ -128,7 +121,7 @@ inline val TwoPaneStrategy.padding: PaddingValues
     inline get() = when (this) {
         is HorizontalTwoPaneStrategy -> WindowInsets.systemBars.asPaddingValues()
         is VerticalTwoPaneStrategy -> WindowInsets.navigationBars.asPaddingValues()
-        else -> WindowInsets.ZeroPadding
+        else -> PaddingValues.Zero
     }
 
 /**
@@ -137,7 +130,7 @@ inline val TwoPaneStrategy.padding: PaddingValues
 inline val TwoPaneStrategy.margin: PaddingValues
     inline get() = when (this) {
         is VerticalTwoPaneStrategy -> PaddingValues(horizontal = 16.dp)
-        else -> WindowInsets.ZeroPadding
+        else -> PaddingValues.Zero
     }
 
 /**

@@ -25,7 +25,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
@@ -41,11 +40,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.ImageBrush
@@ -87,7 +88,7 @@ internal fun Snackbar(
 ) {
     // State to track if Toast is expanded
     val critical = value.duration == SnackbarDuration.Indefinite
-    var isExpanded: Boolean by remember { mutableStateOf(critical) }
+    var isExpanded: Boolean by remember { mutableStateOf(false) }
     // Handle back press to dismiss expanded Toast or the entire Toast
     // BackHandler(isExpanded) { isExpanded = !isExpanded }
     // State for swipe-to-dismiss gesture
@@ -108,20 +109,19 @@ internal fun Snackbar(
         background = { },
         dismissThresholds = { FractionalThreshold(0.75f) },
         modifier = modifier
-//            .renderInSharedTransitionScopeOverlay(0.3f)
-            .animateContentSize()
-            ,
+            .animateContentSize(),
+//            .renderInSharedTransitionScopeOverlay(0.3f),
         dismissContent = {
             // Shape of the Toast based on expanded state
             val shape = if (isExpanded) AppTheme.shapes.small else AppTheme.shapes.xSmall
             BaseListItem(
                 contentColor = contentColor,
                 spacing = 4.dp,
-                leading = composableIf(value.icon != null) {
+                leading = composableIf (value.icon != null) {
                     // FixMe: It might cause problems.
                     val icon = value.icon!!
                     Icon(
-                        imageVector = icon,
+                        painter = rememberVectorPainter(image = icon),
                         contentDescription = null,
                         tint = actionColor,
                         modifier = Modifier.padding(end = 4.dp)
@@ -129,15 +129,17 @@ internal fun Snackbar(
                 },
                 // Trailing action button if available and not expanded
                 trailing = composableIf(value.action != null && !isExpanded) {
-                    TextButton(
+                    TextButton (
                         text = value.action!!,
                         onClick = value::action,
-                        colors = ButtonDefaults.textButtonColors(
+                        colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = actionColor,
                             backgroundColor = Color.Transparent,
                         ),
                         shape = CircleShape,
-                        modifier = Modifier.height(37.dp),
+                        modifier = Modifier.scale(0.9f),
+                        border = androidx.compose.foundation.BorderStroke(ButtonDefaults.OutlinedBorderSize, contentColor.copy(
+                            ButtonDefaults.OutlinedBorderOpacity))
                     )
                 },
                 // Toast message
@@ -150,10 +152,10 @@ internal fun Snackbar(
                         maxLines = if (!isExpanded) 3 else Int.MAX_VALUE,
                         modifier = Modifier
                             // Max height constraint
-                            .heightIn(max = 200.dp)
+                            .heightIn(max = 195.dp)
                             .thenIf(isExpanded) {
                                 val state = rememberScrollState()
-                                fadingEdge( state, false, 16.dp)
+                                fadingEdge( state, false, 10.dp)
                                     .verticalScroll(state)
                             }
                     )
@@ -177,13 +179,14 @@ internal fun Snackbar(
                                             AppTheme.colors.toastBackgroundColor
                                         )
                                     ),
-                                    modifier = Modifier.height(37.dp),
+                                    modifier = Modifier.scale(0.9f),
+                                    elevation = null
                                 )
                             // Cancel button
                             TextButton(
                                 stringResource(android.R.string.cancel).uppercase(),
                                 value::dismiss,
-                                modifier = Modifier.height(37.dp),
+                                modifier = Modifier.scale(0.9f),
                                 colors = ButtonDefaults.textButtonColors(contentColor = contentColor),
                             )
                         }

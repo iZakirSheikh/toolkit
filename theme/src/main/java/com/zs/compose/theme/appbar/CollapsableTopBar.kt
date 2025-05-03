@@ -28,6 +28,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.UiComposable
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutIdParentData
 import androidx.compose.ui.layout.MeasureScope
@@ -272,7 +273,7 @@ fun CollapsableTopBarLayout(
     // Place the content
     Layout(
         content = { scope.content() },
-        modifier = modifier.then(appBarDragModifier),
+        modifier = modifier.then(appBarDragModifier).pointerInput(Unit){},
         measurePolicy = { measurables, incomming ->
             // Calculate the static height in pixels of the suggested height
             val topBarHeight = height.roundToPx()

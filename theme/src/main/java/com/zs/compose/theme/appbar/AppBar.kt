@@ -43,6 +43,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -53,6 +54,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zs.compose.foundation.blend
 import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ContentAlpha
@@ -60,8 +62,7 @@ import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.None
 import com.zs.compose.theme.Surface
-import com.zs.compose.theme.appbar.TopAppBarDefaults.LargeTopBarHeight
-import com.zs.compose.theme.appbar.TopAppBarDefaults.TopBarHeight
+import com.zs.compose.theme.appbar.AppBarDefaults.largeAppBarStyle
 import com.zs.compose.theme.text.ProvideTextStyle
 
 private val TopAppBarHeight = 56.dp
@@ -134,11 +135,11 @@ object AppBarDefaults {
     /**
      * @see APP_BAR_LAYOUT_ID_BACKGROUND
      */
-    val LayoutIdBackground = APP_BAR_LAYOUT_ID_BACKGROUND
-    val LayoutIdNavIcon = APP_BAR_LAYOUT_ID_NAVIGATION_ICON
-    val LayoutIdTitle = APP_BAR_LAYOUT_ID_TITLE
-    val LayoutIdCollapsable_title = APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE
-    val LayoutIdAction = APP_BAR_LAYOUT_ID_ACTIONS
+    val ID_BACKGROUND = APP_BAR_LAYOUT_ID_BACKGROUND
+    val ID_NAVICON = APP_BAR_LAYOUT_ID_NAVIGATION_ICON
+    val ID_TITLE = APP_BAR_LAYOUT_ID_TITLE
+    val ID_COLLAPSABLE_TITLE = APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE
+    val ID_ACTION = APP_BAR_LAYOUT_ID_ACTIONS
 
 
     /**
@@ -155,10 +156,33 @@ object AppBarDefaults {
         contentColor: Color = AppTheme.colors.onBackground,
         scrolledContentColor: Color = AppTheme.colors.onBackground,
         titleTextStyle: TextStyle = AppTheme.typography.title2,
-        scrolledTitleTextStyle: TextStyle = AppTheme.typography.headline2,
+        scrolledTitleTextStyle: TextStyle = AppTheme.typography.display3,
         height: Dp = TopAppBarDefaults.TopBarHeight,
         maxHeight: Dp = TopAppBarDefaults.LargeTopBarHeight,
     ) = TopAppBarStyle(
+        containerColor = containerColor,
+        scrolledContainerColor = scrolledContainerColor,
+        contentColor = contentColor,
+        scrolledContentColor = scrolledContentColor,
+        titleTextStyle = titleTextStyle,
+        scrolledTitleTextStyle = scrolledTitleTextStyle,
+        height = height,
+        maxHeight = maxHeight
+    )
+
+    /** @see largeAppBarStyle  */
+    @OptIn(ExperimentalThemeApi::class)
+    @Composable
+    fun floatingLargeAppBarStyle(
+        containerColor: Color = AppTheme.colors.background,
+        scrolledContainerColor: Color =  AppTheme.colors.accent.blend(AppTheme.colors.background, 0.96f),
+        contentColor: Color = AppTheme.colors.onBackground,
+        scrolledContentColor: Color = AppTheme.colors.onBackground,
+        titleTextStyle: TextStyle = AppTheme.typography.title2,
+        scrolledTitleTextStyle: TextStyle = AppTheme.typography.display3,
+        height: Dp = TopAppBarDefaults.TopBarHeight,
+        maxHeight: Dp = TopAppBarDefaults.LargeTopBarHeight,
+    )= TopAppBarStyle(
         containerColor = containerColor,
         scrolledContainerColor = scrolledContainerColor,
         contentColor = contentColor,
@@ -492,3 +516,42 @@ fun SideBar(
     }
 }
 
+private val FBAB_HORIZONTAL_MARGIN = 30.dp
+
+/** @see BottomAppBar */
+@Composable
+fun FloatingBottomNavigationBar(
+    modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = AppBarDefaults.bottomAppBarWindowInsets,
+    backgroundColor: Color = AppTheme.colors.background(1.dp),
+    contentColor: Color = AppTheme.colors.onBackground,
+    shape: Shape = CircleShape,
+    border: BorderStroke? = null,
+    elevation: Dp = AppBarDefaults.BottomAppBarElevation,
+    contentPadding: PaddingValues = AppBarDefaults.ContentPadding,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Surface(
+        color = backgroundColor,
+        contentColor = contentColor.copy(ContentAlpha.medium),
+        elevation = elevation,
+        shape = shape,
+        border = border,
+        modifier = modifier
+            .padding(horizontal = FBAB_HORIZONTAL_MARGIN)
+            .thenIf(windowInsets !== WindowInsets.None) { windowInsetsPadding(windowInsets) }
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(contentPadding)
+                .defaultMinSize(minHeight = TopAppBarHeight),
+            horizontalArrangement = Arrangement.spacedBy(
+                BottomBarItemHorizontalPadding,
+                Alignment.CenterHorizontally
+            ),
+            verticalAlignment = Alignment.CenterVertically,
+            content = content
+        )
+    }
+}

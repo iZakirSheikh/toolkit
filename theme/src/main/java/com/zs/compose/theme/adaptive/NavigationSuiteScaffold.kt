@@ -43,7 +43,6 @@ import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.LinearProgressIndicator
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.internal.Slot
-import com.zs.compose.theme.internal.ZeroPadding
 import com.zs.compose.theme.internal.component1
 import com.zs.compose.theme.internal.component2
 import com.zs.compose.theme.internal.component3
@@ -151,7 +150,7 @@ private class VerticalMeasurePolicy(
  * to the navigation bar. The navigation bar can be a navigation rail or a wide navigation bar
  * depending on the user's configuration.
  *
- * In this layout, the [onNewInsets] lambda returns [ZeroPadding] because the width of the navigation
+ * In this layout, the [onNewInsets] lambda returns [PaddingValues.Zero] because the width of the navigation
  * bar is already accounted for and deducted from the available space for the content.
  *
  * The floating widget and toast are positioned at the bottom center of the screen.
@@ -182,7 +181,7 @@ private class HorizontalMeasurePolicy(
         constraints = c.copy(minWidth = contentWidth, maxWidth = contentWidth)
         val contentPlaceable = measurables[INDEX_CONTENT].measure(constraints)
         // reset new insets
-        onNewInsets(WindowInsets.ZeroPadding)
+        onNewInsets(PaddingValues.Zero)
         // Place the children in the parent layout
         return layout(width, height){
             var x = 0
@@ -238,7 +237,7 @@ private class HorizontalMeasurePolicy(
  * @param modifier Modifier for the Scaffold.
  * @param floatingActionButton A composable for the floating action button.
  * @param hideNavigationBar `true` to hide the navigation bar.
- * @param background Background color.
+ * @param containerColor Background color.
  * @param contentColor Content color.
  * @param snackbarHostState A [SnackbarHostState] for handling [com.zs.compose.theme.snackbar.Snackbar] messages.
  * @param progress Progress value (`Float.NaN` to hide, `-1f` for indeterminate, `0f - 1f` for determinate).
@@ -252,18 +251,18 @@ fun NavigationSuiteScaffold(
     fabPosition: FabPosition = FabPosition.End,
     floatingActionButton: @Composable () -> Unit = {},
     hideNavigationBar: Boolean = false,
-    background: Color = AppTheme.colors.background,
+    containerColor: Color = AppTheme.colors.background,
     contentColor: Color = AppTheme.colors.onBackground,
     snackbarHostState: SnackbarHostState = remember(::SnackbarHostState),
     @FloatRange(0.0, 1.0) progress: Float = Float.NaN,
     navBar: @Composable () -> Unit,
 ) {
     val (insets, onNewInsets) =
-        remember { mutableStateOf(WindowInsets.ZeroPadding) }
+        remember { mutableStateOf(PaddingValues.Zero) }
     val navBarInsets = WindowInsets.navigationBars
     Layout(
         modifier = modifier
-            .background(background)
+            .background(containerColor)
             .fillMaxSize(),
         measurePolicy = remember(vertical, navBarInsets, fabPosition) {
             when {

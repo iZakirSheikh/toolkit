@@ -25,11 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 
-internal val ZeroPadding = PaddingValues(0.dp)
-
-@PublishedApi
-internal val WindowInsets.Companion.ZeroPadding get() = com.zs.compose.theme.internal.ZeroPadding
-
 /**
  * A simple slot for holding content within the TwoPane layout.
  *
