@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.vector.PathBuilder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-private inline fun materialIcon(
+internal inline fun materialIcon(
     name: String,
     block: ImageVector.Builder.() -> ImageVector.Builder
 ): ImageVector =
@@ -43,7 +43,7 @@ private inline fun materialIcon(
         .block()
         .build()
 
-private inline fun materialIcon(
+internal inline fun materialIcon(
     name: String,
     autoMirror: Boolean = false,
     block: ImageVector.Builder.() -> ImageVector.Builder
@@ -59,7 +59,7 @@ private inline fun materialIcon(
         .block()
         .build()
 
-private inline fun ImageVector.Builder.materialPath(
+internal inline fun ImageVector.Builder.materialPath(
     fillAlpha: Float = 1f,
     strokeAlpha: Float = 1f,
     pathFillType: PathFillType = DefaultFillType,

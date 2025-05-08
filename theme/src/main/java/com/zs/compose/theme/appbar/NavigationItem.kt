@@ -37,6 +37,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -327,4 +328,57 @@ fun SideNavigationItem(
             }
         }
     }
+}
+
+/**
+ * A unified composable function that displays either a bottom navigation item or a side navigation item,
+ * based on the [isBottomNav] flag.
+ *
+ * This allows for a consistent API when choosing between Material BottomNavigationItem and a custom
+ * SideNavigationItem implementation.
+ *
+ * @param onClick called when this item is clicked
+ * @param icon icon for this item, typically an [Icon]
+ * @param modifier the [Modifier] to be applied to this item
+ * @param label optional text label for this item
+ * @param selected whether this item is selected
+ * @param isBottomNav if true, uses Bottom Navigation Item, else use side navigation item.
+ * @param colors [NavigationItemColors] that will be used to resolve the colors used for this
+ *   item in different states. See [NavigationItemDefaults.colors].
+ * @param enabled controls the enabled state of this item.
+ */
+@Composable
+@NonRestartableComposable
+fun NavigationItem(
+    onClick: () -> Unit,
+    icon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit) = {},
+    selected: Boolean = false,
+    isBottomNav: Boolean = false,
+    colors: NavigationItemColors = NavigationItemDefaults.colors(),
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource? = null
+) = when {
+    isBottomNav -> BottomNavigationItem(
+        selected = selected,
+        onClick = onClick,
+        icon = icon,
+        label = label,
+        modifier = modifier,
+        colors = colors,
+        enabled = enabled,
+        interactionSource = interactionSource
+    )
+
+    else -> SideNavigationItem(
+        selected = selected,
+        onClick = onClick,
+        icon = icon,
+        label = label,
+        modifier = modifier,
+        colors = colors,
+        enabled = enabled,
+        interactionSource = interactionSource
+    )
 }

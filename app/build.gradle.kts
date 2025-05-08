@@ -44,5 +44,5 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
-
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
 }

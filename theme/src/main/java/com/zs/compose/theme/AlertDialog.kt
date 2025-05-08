@@ -79,11 +79,11 @@ private val TopbarArrangement = Arrangement.spacedBy(8.dp)
 fun AlertDialog(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
     navigationIcon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     actions: @Composable (() -> Unit)? = null,
     bottomBar: @Composable (RowScope.() -> Unit)? = null,
-    modifier: Modifier = Modifier,
     shape: Shape = AppTheme.shapes.xSmall,
     background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground.copy(ContentAlpha.medium),
@@ -133,8 +133,8 @@ fun AlertDialog(
                         Box(
                             Modifier
                                 .weight(1f) // Allow the content to expand vertically.
-                                .fillMaxWidth() // Fill the available width.
-                                .padding(ContentPadding), // Apply padding to the content.
+                                .fillMaxWidth(), // Fill the available width.
+                              //  .padding(ContentPadding), // Apply padding to the content.
                             content = {
                                 ProvideTextStyle(AppTheme.typography.body2, content)
                             } // Display the provided content.
