@@ -154,7 +154,7 @@ fun TonalHeader(
                 .padding(TONAL_HEADER_MARGIN)
                 .border(0.5.dp, AppTheme.colors.background(30.dp), TONAL_CHAR_HEADER_SHAPE)
                 .background(AppTheme.colors.background(1.dp), TONAL_CHAR_HEADER_SHAPE)
-                .padding(horizontal = 32.dp, vertical = 8.dp),
+                .padding(horizontal = 22.dp, vertical = 8.dp),
         )
 
         else -> Label(

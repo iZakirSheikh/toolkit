@@ -47,6 +47,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -144,6 +145,9 @@ object AppBarDefaults {
     val ID_TITLE = APP_BAR_LAYOUT_ID_TITLE
     val ID_COLLAPSABLE_TITLE = APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE
     val ID_ACTION = APP_BAR_LAYOUT_ID_ACTIONS
+
+    val FLOATING_TOP_APP_BAR_MAX_WIDTH = 500.dp
+    val FloatingTopBarShape = RoundedCornerShape(20)
 
 
     /**

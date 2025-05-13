@@ -34,7 +34,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -377,7 +376,9 @@ fun TopAppBar(
         ProvideTextStyle(style.scrolledTitleTextStyle) {
             // Background; zIndex determines which is stacked where.
             // so this will be at the bottom.
-            Box(modifier = Modifier.layoutId(APP_BAR_LAYOUT_ID_BACKGROUND), content = { background() })
+            Box(
+                modifier = Modifier.layoutId(APP_BAR_LAYOUT_ID_BACKGROUND),
+                content = { background() })
             // Defines the navIcon and actions first;
             // make sure that title is always last; because if it is not; a new list of
             // measurables will be created; which will make sure it is at the last.
@@ -412,11 +413,7 @@ fun TopAppBar(
     }
 }
 
-
 private const val FLTAB_COLLAPSED_HORIZONTAL_PADDING = 30f
-private val FLTAP_MAX_WIDTH = 500.dp
-
-private val FloatingTopBarShape = RoundedCornerShape(20)
 
 /** @see LargeTopAppBar */
 @Composable
@@ -433,12 +430,12 @@ fun FloatingLargeTopAppBar(
         val colors = AppTheme.colors
         Spacer(
             modifier = Modifier
-                .shadow(lerp(12.dp, 0.dp, fraction / .05f), FloatingTopBarShape)
+                .shadow(lerp(12.dp, 0.dp, fraction / .05f), AppBarDefaults.FloatingTopBarShape)
                 .thenIf(fraction == 0f) {
                     border(
                         0.1.dp,
                         colors.background(30.dp),
-                        FloatingTopBarShape
+                        AppBarDefaults.FloatingTopBarShape
                     )
                 }
                 .background(style.containerColor(1 - fraction))
@@ -453,7 +450,7 @@ fun FloatingLargeTopAppBar(
         maxHeight = style.maxHeight,
         insets = WindowInsets.None,
         modifier = modifier
-            .widthIn(max = FLTAP_MAX_WIDTH)
+            .widthIn(max = AppBarDefaults.FLOATING_TOP_APP_BAR_MAX_WIDTH)
             .windowInsetsPadding(windowInsets)
             .padding(horizontal = hPadding.dp),
         scrollBehavior = scrollBehavior
@@ -500,6 +497,127 @@ fun FloatingLargeTopAppBar(
                 Box(
                     Modifier
                         .layoutId(APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE)
+                        .padding(horizontal = TopAppBarDefaults.TopAppBarHorizontalPadding),
+                    content = { title() }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * A large top app bar that adapts between immersive (end-to-end) and floating modes,
+ * adjusting background elevation, padding, and insets accordingly.
+ *
+ * - In immersive mode, the app bar spans the full width and uses the default large style.
+ * - In floating mode, it applies width constraints, shadows, and a floating style.
+ *
+ * @param immersive Whether the app bar is immersive (full-width) or floating.
+ * @param title The title composable.
+ * @param modifier Optional modifier for the app bar container.
+ * @param navigationIcon The navigation icon composable.
+ * @param actions Composable actions placed at the end of the app bar.
+ * @param behavior Scroll behavior to control collapsing.
+ * @param style The top app bar style (automatically derived from [immersive] by default).
+ * @param insets Insets to apply to the app bar; overridden when immersive is false.
+ * @param background Background composable rendered at the lowest z-index inside the app bar.
+ */
+@ExperimentalThemeApi
+@Composable
+fun AdaptiveLargeTopAppBar(
+    immersive: Boolean,
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationIcon: @Composable () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
+    behavior: TopAppBarScrollBehavior,
+    style: TopAppBarStyle = if (immersive) AppBarDefaults.largeAppBarStyle() else AppBarDefaults.floatingLargeAppBarStyle(),
+    insets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
+    background: @Composable TopAppBarScope.() -> Unit = {
+        val colors = AppTheme.colors
+        // when end-to-end
+        if (immersive)
+            Spacer(
+                modifier = Modifier
+                    .background(style.containerColor(1 - fraction))
+                    .fillMaxSize()
+            )
+        // when floating
+        else Spacer(
+                modifier = Modifier
+                    .shadow(lerp(12.dp, 0.dp, fraction / .05f), AppBarDefaults.FloatingTopBarShape)
+                    .thenIf(fraction == 0f) {
+                        border(
+                            0.1.dp,
+                            colors.background(30.dp),
+                            AppBarDefaults.FloatingTopBarShape
+                        )
+                    }
+                    .background(style.containerColor(1 - fraction))
+                    .fillMaxSize()
+            )
+    }
+) {
+    // TODO - Expose fraction through behaviour; instead of relying here on state.
+    var hPadding by rememberSaveable { mutableFloatStateOf(0f) }
+    CollapsableTopBarLayout(
+        height = style.height,
+        maxHeight = style.maxHeight,
+        insets = if (immersive) insets else WindowInsets.None,
+        modifier = modifier.thenIf(!immersive) {
+            widthIn(max = AppBarDefaults.FLOATING_TOP_APP_BAR_MAX_WIDTH)
+                .windowInsetsPadding(insets)
+                .padding(horizontal = hPadding.dp)
+        },
+        scrollBehavior = behavior
+    ) {
+        require(style.height < style.maxHeight) {
+            "LargeTopAppBar maxHeight (${style.maxHeight}) must be greater than height (${style.height})"
+        }
+        // update hPadding
+        hPadding = if (!immersive)
+            com.zs.compose.foundation.lerp(FLTAB_COLLAPSED_HORIZONTAL_PADDING, 0f, fraction)
+        else
+            0f
+        val appBarContentColor = style.contentColor(1 - fraction)
+        val textStyle = style.titleTextStyle(fraction)
+        CompositionLocalProvider(LocalContentColor provides appBarContentColor) {
+            ProvideTextStyle(textStyle) {
+                // Background; zIndex determines which is stacked where.
+                // so this will be at the bottom.
+                Box(
+                    modifier = Modifier.layoutId(AppBarDefaults.ID_BACKGROUND).fillMaxSize(),
+                    content = { background() },
+                    propagateMinConstraints = true
+                )
+                // Defines the navIcon and actions first;
+                // make sure that title is always last; because if it is not; a new list of
+                // measurables will be created; which will make sure it is at the last.
+                Box(
+                    Modifier
+                        .layoutId(AppBarDefaults.ID_NAVICON)
+                        .padding(start = TopAppBarDefaults.TopAppBarHorizontalPadding),
+                    content = { navigationIcon() }
+                )
+
+                // Actions
+                Box(
+                    Modifier
+                        .layoutId(AppBarDefaults.ID_ACTION)
+                        .padding(end = TopAppBarDefaults.TopAppBarHorizontalPadding),
+                    content = {
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically,
+                            content = actions
+                        )
+                    }
+                )
+
+                // Title
+                Box(
+                    Modifier
+                        .layoutId(AppBarDefaults.ID_COLLAPSABLE_TITLE)
                         .padding(horizontal = TopAppBarDefaults.TopAppBarHorizontalPadding),
                     content = { title() }
                 )
