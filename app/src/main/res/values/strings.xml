@@ -96,11 +96,14 @@
         <item>Blue</item>
     </string-array>
 
+    <string name="styled_string_list"><ul> <li><i>first</i> item</li> <li>item 2</li> </ul></string>
+
     <string name="text_with_url">This is a text with a <a href="https://www.bing.com">URL</a> span.</string>
 
-    <string name="snackbar_msg"><b><big>Title</big>\n</b><br/>This is a desc of the fake snackbar message, please follow the good practices for creating avalid <font color="#00ff00">snackbar</font> message. You can also use styles in the message to make it even more fun.</string>
-    <string name="snackbar_msg_short"><b><big>Title</big>\n</b><br/>This is a short sample message</string>
+    <string name="snackbar_msg"><b>Title\n</b><br />This is a desc of the fake snackbar message, please follow the good practices for creating avalid <font color="#00ff00">snackbar</font> message. You can also use styles in the message to make it even more fun.</string>
+    <string name="snackbar_msg_short"><b>Title\n</b><br />This is a short sample message</string>
     <string name="sample_preference_text"><b>Enable Trash can</b>
-          <font color = "gray" >\n<i><b>Only available on Android 11 and above</b></i>, when enabled, deleted tracks are moved to Trash Can folder instead of being permanently</font>
+          <font color="gray">\n<i><b>Only available on Android 11 and above</b></i>, when enabled, deleted tracks are moved to Trash Can folder instead of being permanently</font>
     </string>
+    <string name="strings_title">Strings<font color='grey' size='11'>\nStyle and manipulate as you prefer</font></string>
 </resources>

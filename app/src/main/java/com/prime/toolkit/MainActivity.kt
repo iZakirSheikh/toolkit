@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Textsms
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.Weekend
 import androidx.compose.runtime.Composable
@@ -39,6 +40,7 @@ import com.prime.toolkit.core.observe
 import com.prime.toolkit.core.rememberBackgroundProvider
 import com.prime.toolkit.games.Games
 import com.prime.toolkit.settings.Settings
+import com.prime.toolkit.text.Strings
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.ClaretViolet
 import com.zs.compose.theme.AppTheme
@@ -114,7 +116,8 @@ class MainActivity : ComponentActivity() {
                 Crossfade(selected, modifier = Modifier.observe(surface)) { value ->
                     when (value) {
                         0 -> Games()
-                        2 -> Settings()
+                        3 -> Settings()
+                        2 -> Strings()
                     }
                 }
             },
@@ -147,12 +150,20 @@ class MainActivity : ComponentActivity() {
                             onClick = { selected = 1 }
                         )
 
+                        // Strings
+                        NavigationItem(
+                            icon = { Icon(Icons.Default.Textsms, null) },
+                            label = { Label("Strings") },
+                            selected = selected == 2,
+                            onClick = { selected = 2 }
+                        )
+
                         // Settings
                         NavigationItem(
                             icon = { Icon(Icons.Default.Settings, null) },
                             label = { Label("Settings") },
-                            selected = selected == 2,
-                            onClick = { selected = 2 }
+                            selected = selected == 3,
+                            onClick = { selected = 3 }
                         )
                     }
                 )
