@@ -33,11 +33,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.zs.compose.foundation.Background
@@ -80,50 +82,53 @@ fun AlertDialog(
     properties: DialogProperties = DialogProperties(),
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val appdensity = LocalDensity.current
     androidx.compose.ui.window.Dialog(onDismissRequest, properties) {
         // Use a Surface to define the dialog's appearance.
-        Surface(
-            modifier = MinWidth,
-            shape = shape,
-            background = background,
-            contentColor = contentColor,
-            content = {
-                // Use a Column to arrange the dialog's content vertically.
-                Column(
-                    // Make the Column wrap its content vertically.
-                    modifier = Modifier.height(IntrinsicSize.Min),
-                    content = {
-                        topBar?.invoke()
+        CompositionLocalProvider(LocalDensity provides appdensity) {
+            Surface(
+                modifier = MinWidth,
+                shape = shape,
+                background = background,
+                contentColor = contentColor,
+                content = {
+                    // Use a Column to arrange the dialog's content vertically.
+                    Column(
+                        // Make the Column wrap its content vertically.
+                        modifier = Modifier.height(IntrinsicSize.Min),
+                        content = {
+                            topBar?.invoke()
 
-                        // Main content: The main content of the dialog.
-                        ProvideTextStyle(AppTheme.typography.body2) {
-                            Column(
-                                Modifier
-                                    .weight(1f) // Allow the content to expand vertically.
-                                    .fillMaxWidth() // Fill the available width.
-                                    .padding(ContentPadding), // Apply padding to the content.
-                                content = content,
-                                verticalArrangement = ContentSpacing
-                            )
-                        }
+                            // Main content: The main content of the dialog.
+                            ProvideTextStyle(AppTheme.typography.body2) {
+                                Column(
+                                    Modifier
+                                        .weight(1f) // Allow the content to expand vertically.
+                                        .fillMaxWidth() // Fill the available width.
+                                        .padding(ContentPadding), // Apply padding to the content.
+                                    content = content,
+                                    verticalArrangement = ContentSpacing
+                                )
+                            }
 
-                        // Footer: Contains buttons or other secondary actions.
-                        // Only show the Footer if it's provided.
-                        if (bottomBar != null) {
-                            // Display the provided footer content.
-                            // TODO - Maybe instead of fullMaxWidth; make it align end.
-                            Row(
-                                horizontalArrangement = FooterArrangement,
-                                content = bottomBar,
-                                modifier = Modifier
-                                    .padding(FooterPadding)
-                                    .fillMaxWidth()
-                            )
+                            // Footer: Contains buttons or other secondary actions.
+                            // Only show the Footer if it's provided.
+                            if (bottomBar != null) {
+                                // Display the provided footer content.
+                                // TODO - Maybe instead of fullMaxWidth; make it align end.
+                                Row(
+                                    horizontalArrangement = FooterArrangement,
+                                    content = bottomBar,
+                                    modifier = Modifier
+                                        .padding(FooterPadding)
+                                        .fillMaxWidth()
+                                )
+                            }
                         }
-                    }
-                )
-            }
-        )
+                    )
+                }
+            )
+        }
     }
 }
 

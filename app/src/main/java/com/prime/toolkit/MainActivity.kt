@@ -26,10 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.prime.toolkit.core.background
@@ -202,6 +204,7 @@ class MainActivity : ComponentActivity() {
                     val clazz = calculateWindowSizeClass(this)
                     CompositionLocalProvider(
                         LocalWindowSize provides clazz,
+                        LocalDensity provides Density(LocalDensity.current.density, 1.0f),
                         content = content
                     )
                 }
