@@ -45,8 +45,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.UrlAnnotation
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -90,6 +92,16 @@ private inline val StyleSpan.toSpanStyle: SpanStyle
         }
     }
 
+private val NoStyle = SpanStyle()
+private val LinkStyle = TextLinkStyles(
+    SpanStyle(color = Color.SkyBlue, textDecoration = TextDecoration.Underline),
+    focusedStyle = SpanStyle(
+        color = Color.SkyBlue,
+        textDecoration = TextDecoration.Underline,
+        fontWeight = FontWeight.Medium
+    )
+)
+
 /**
  * Converts a [Spanned] object into an [AnnotatedString] object.
  *
@@ -112,7 +124,6 @@ private inline val StyleSpan.toSpanStyle: SpanStyle
  *
  * Note: The size in [AbsoluteSizeSpan] is taken as Sp no matter what.
  */
-
 @OptIn(ExperimentalTextApi::class)
 @ExperimentalFoundationApi
 private fun Spanned.toAnnotatedString() =
@@ -142,14 +153,15 @@ private fun Spanned.toAnnotatedString() =
                 is ForegroundColorSpan -> SpanStyle(color = Color(span.foregroundColor))
                 // no idea wh this not works with html
                 is BackgroundColorSpan -> SpanStyle(background = Color(span.backgroundColor))
-                is URLSpan -> {
-                    UrlAnnotation(span.url)
-                    SpanStyle(color = Color.SkyBlue, textDecoration = TextDecoration.Underline)
-                }
-
-                else -> /*SpanStyle()*/ SpanStyle() // FixMe - unsupported span_ just ignore.
+                is URLSpan -> LinkAnnotation.Url(span.url, LinkStyle)
+                else -> NoStyle // FixMe - unsupported span_ just ignore.
             }
-            addStyle(style, start, end)
+            when (style) {
+                is LinkAnnotation.Url -> addLink(style, start, end)
+                is SpanStyle -> addStyle(style, start, end)
+                is ParagraphStyle -> addStyle(style, start, end)
+                else -> error("$style not supported")
+            }
         }
     }
 
@@ -332,7 +344,6 @@ fun textResource(@StringRes id: Int): CharSequence {
         else -> error("$formatted is some other type of string.")
     }
 }
-
 
 /**
  * Gets a string resource with the given ID and formats it with the given arguments.
