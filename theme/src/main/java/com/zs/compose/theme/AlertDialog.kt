@@ -21,21 +21,19 @@
 package com.zs.compose.theme
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,111 +41,83 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.zs.compose.foundation.Background
-import com.zs.compose.foundation.Dialog
-import com.zs.compose.theme.text.LocalTextStyle
 import com.zs.compose.theme.text.ProvideTextStyle
 
-private val DialogTopBarArrangement = Arrangement.spacedBy(8.dp)
-private val ContentPadding = PaddingValues(horizontal = 12.dp, vertical = 16.dp)
-private val FooterPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
 private val FooterArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
-private val TopbarArrangement = Arrangement.spacedBy(8.dp)
+private val FooterPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+private val ContentPadding = PaddingValues(horizontal = 12.dp, vertical = 16.dp)
+private val ContentSpacing = Arrangement.spacedBy(8.dp, )
+
+private val MinWidth = Modifier.widthIn(280.dp, 560.dp)
 
 /**
- * [Custom Design basic dialog](https://m3.material.io/components/dialogs/overview)
+ * AlertDialog is a composable that displays a dialog with a title, content, and optional actions.
+ * It's built on top of `androidx.compose.ui.window.Dialog` and `Surface` to provide a customizable
+ * dialog experience.
  *
- * Dialogs provide important prompts in a user flow. They can require an action, communicate
- * information, or help users accomplish a task.
- *
- * [Basic dialog image](https://developer.android.com/images/reference/androidx/compose/material3/basic-dialog.png)
- * Displays an alert dialog that can be customized with an icon, title, actions, footer, and content.
- *
- * @param expanded Determines whether the dialog is currently visible. If false, the dialog is not displayed.
- * @param onDismissRequest Callback invoked when the user tries to dismiss the dialog, typically by clicking outside or pressing the back button.
- * @param icon An optional composable function to display an icon in the dialog's top bar.
- * @param title An optional composable function to display a title in the dialog's top bar.
- * @param actions An optional composable function to display action buttons in the dialog's top bar.
- * @param footer An optional composable function to display content at the bottom of the dialog. Typically used for positive/negative actions like "Ok" or "Cancel".
- * @param modifier The `Modifier` to apply to the dialog's surface.
- * @param shape The `Shape` of the dialog's surface.
- * @param backgroundColor The background color of the dialog.
- * @param contentColor The content color of the dialog.
- * @param properties The `DialogProperties` for the dialog.
- * @param content The composable function that displays the main content of the dialog.
+ * @param onDismissRequest Callback that is invoked when the user requests to dismiss the dialog,
+ * such as by tapping outside the dialog or pressing the back button.
+ * @param topBar Optional composable lambda for the dialog's title area. Typically a [TopAppBar] composable.
+ * @param bottomBar Optional composable lambda for the dialog's actions area.
+ * This is a `RowScope`, so you can lay out buttons or other controls horizontally.
+ * @param shape The shape of the dialog's container. Defaults to `AppTheme.shapes.xSmall`.
+ * @param background The background of the dialog. Defaults to `Background(AppTheme.colors.background(1.dp))`.
+ * @param contentColor The preferred color for content inside the dialog.
+ * Defaults to `AppTheme.colors.onBackground.copy(ContentAlpha.medium)`.
+ * @param properties Properties to customize the behavior of the dialog.
+ * See `androidx.compose.ui.window.DialogProperties`.
+ * @param content The main content of the dialog. This is a `ColumnScope`, allowing you to arrange
+ * elements vertically.
  */
 @Composable
 fun AlertDialog(
-    expanded: Boolean,
     onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier,
-    navigationIcon: @Composable (() -> Unit)? = null,
-    title: @Composable (() -> Unit)? = null,
-    actions: @Composable (() -> Unit)? = null,
-    bottomBar: @Composable (RowScope.() -> Unit)? = null,
+    topBar: @Composable (() -> Unit)? = null,
+    bottomBar: @Composable (RowScope.() -> Unit)? = {},
     shape: Shape = AppTheme.shapes.xSmall,
     background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground.copy(ContentAlpha.medium),
     properties: DialogProperties = DialogProperties(),
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
-    // Use the standard Dialog composable.
-    Dialog(expanded, onDismissRequest = onDismissRequest, properties = properties) {
+    androidx.compose.ui.window.Dialog(onDismissRequest, properties) {
         // Use a Surface to define the dialog's appearance.
         Surface(
-            modifier = modifier.widthIn(280.dp, 560.dp),
+            modifier = MinWidth,
             shape = shape,
             background = background,
             contentColor = contentColor,
             content = {
                 // Use a Column to arrange the dialog's content vertically.
                 Column(
-                    modifier = Modifier.height(IntrinsicSize.Min), // Make the Column wrap its content vertically.
+                    // Make the Column wrap its content vertically.
+                    modifier = Modifier.height(IntrinsicSize.Min),
                     content = {
-                        // TopBar: Contains the icon, title, and actions.
-                        if (title != null || navigationIcon != null || actions != null) { // Only show the TopBar if at least one of its elements is provided.
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(AppTheme.colors.background(4.dp)), // Apply a background color to the TopBar.
-                                verticalAlignment = Alignment.CenterVertically, // Center the content vertically.
-                                horizontalArrangement = TopbarArrangement, // Use a custom arrangement (defined elsewhere) for the TopBar.
-                                content = {
-                                    CompositionLocalProvider(
-                                        LocalTextStyle provides AppTheme.typography.title2,
-                                        LocalContentColor provides AppTheme.colors.onBackground.copy(
-                                            ContentAlpha.high
-                                        ),
-                                    ) {
-                                        navigationIcon?.invoke() // Display the icon if provided.
-                                        if (title != null) { // Display the title if provided.
-                                            title()
-                                            Spacer(Modifier.weight(1f)) // Push the actions to the end of the Row.
-                                            actions?.invoke() // Display the actions if provided.
-                                        }
-                                    }
-                                }
+                        topBar?.invoke()
+
+                        // Main content: The main content of the dialog.
+                        ProvideTextStyle(AppTheme.typography.body2) {
+                            Column(
+                                Modifier
+                                    .weight(1f) // Allow the content to expand vertically.
+                                    .fillMaxWidth() // Fill the available width.
+                                    .padding(ContentPadding), // Apply padding to the content.
+                                content = content,
+                                verticalArrangement = ContentSpacing
                             )
                         }
 
-                        // Main content: The main content of the dialog.
-                        Box(
-                            Modifier
-                                .weight(1f) // Allow the content to expand vertically.
-                                .fillMaxWidth(), // Fill the available width.
-                              //  .padding(ContentPadding), // Apply padding to the content.
-                            content = {
-                                ProvideTextStyle(AppTheme.typography.body2, content)
-                            } // Display the provided content.
-                        )
-
                         // Footer: Contains buttons or other secondary actions.
-                        if (bottomBar != null) { // Only show the Footer if it's provided.
+                        // Only show the Footer if it's provided.
+                        if (bottomBar != null) {
+                            // Display the provided footer content.
+                            // TODO - Maybe instead of fullMaxWidth; make it align end.
                             Row(
-                                horizontalArrangement = FooterArrangement, // Use a custom arrangement (defined elsewhere) for the Footer.
-                                content = bottomBar, // Display the provided footer content.
+                                horizontalArrangement = FooterArrangement,
+                                content = bottomBar,
                                 modifier = Modifier
-                                    .padding(FooterPadding) // Apply padding to the Footer.
-                                    .fillMaxWidth() // Fill the available width.
+                                    .padding(FooterPadding)
+                                    .fillMaxWidth()
                             )
                         }
                     }
@@ -155,4 +125,34 @@ fun AlertDialog(
             }
         )
     }
+}
+
+/**
+ * @see AlertDialog
+ */
+@Composable
+@NonRestartableComposable
+fun AlertDialog(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    topBar: @Composable (() -> Unit)? = null,
+    bottomBar: @Composable (RowScope.() -> Unit)? = {},
+    shape: Shape = AppTheme.shapes.xSmall,
+    background: Background = Background(AppTheme.colors.background(1.dp)),
+    contentColor: Color = AppTheme.colors.onBackground.copy(ContentAlpha.medium),
+    properties: DialogProperties = DialogProperties(),
+    content: @Composable ColumnScope.() -> Unit
+) {
+    if (!expanded)
+        return
+    AlertDialog(
+        onDismissRequest,
+        topBar,
+        bottomBar,
+        shape,
+        background,
+        contentColor,
+        properties,
+        content
+    )
 }

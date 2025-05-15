@@ -16,33 +16,59 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalThemeApi::class)
+@file:OptIn(ExperimentalThemeApi::class, ExperimentalFoundationApi::class)
 
 package com.prime.toolkit.games
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Colorize
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.LocalFireDepartment
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import com.zs.compose.foundation.fadingEdge
+import com.prime.toolkit.core.AdaptiveLargeTopAppBar
+import com.prime.toolkit.core.background
+import com.prime.toolkit.core.observe
+import com.prime.toolkit.core.rememberBackgroundProvider
+import com.zs.compose.foundation.Background
+import com.zs.compose.foundation.MetroGreen
 import com.zs.compose.foundation.plus
+import com.zs.compose.theme.AlertDialog
+import com.zs.compose.theme.AppTheme
+import com.zs.compose.theme.Button
+import com.zs.compose.theme.ColorPickerDialog
 import com.zs.compose.theme.ExperimentalThemeApi
+import com.zs.compose.theme.IconButton
+import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.adaptive.Scaffold
-import com.zs.compose.theme.adaptive.contentInsets
+import com.zs.compose.theme.adaptive.content
 import com.zs.compose.theme.appbar.AppBarDefaults
+import com.zs.compose.theme.appbar.TopAppBar
+import com.zs.compose.theme.text.Label
+import com.zs.compose.theme.text.Text
 
 
 /**
@@ -96,25 +122,109 @@ private val Games: List<Game> = listOf(
 @Composable
 fun Games() {
     val behaviour = AppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val navInsets = WindowInsets.contentInsets
+    val navInsets = WindowInsets.content
+    val surface = rememberBackgroundProvider()
+    val (width, height) = LocalWindowSize.current
+
+
+
     Scaffold(
         topBar = {
-            Spacer(Modifier)
+            AdaptiveLargeTopAppBar(
+                height > width,
+                behavior = behaviour,
+                background = AppTheme.colors.background(surface),
+                title = { Label("Video Games") },
+                navigationIcon = {
+                    var showDialog by remember { mutableStateOf(false) }
+                    AlertDialog(
+                        showDialog,
+                        onDismissRequest = { showDialog = false },
+                        topBar = {
+                            TopAppBar(
+                                title = { Label("Gaming Tip") },
+                                background = Background(AppTheme.colors.background(1.dp)),
+                                navigationIcon = {
+                                    IconButton(
+                                        Icons.Outlined.Info,
+                                        contentDescription = null,
+                                        onClick = {}
+                                    )
+                                }
+                            )
+                        },
+                        background = AppTheme.colors.background(surface),
+                        bottomBar = {
+                            Button("Confirm", onClick = { showDialog = false })
+                        },
+                        content = {
+                            Text("Computer games can improve reflexes, problem-solving skills, and hand-eye coordination. Just remember to take regular breaks!")
+                        }
+                    )
+                   IconButton(Icons.Outlined.Info, onClick = { showDialog = !showDialog}, contentDescription = null)
+                },
+                actions = {
+                    var showColorPickerDialog by remember { mutableStateOf(false) }
+                    IconButton(
+                        Icons.Outlined.Colorize,
+                        contentDescription = null,
+                        onClick = {showColorPickerDialog = true}
+                    )
+
+                    val (color, onColorPicked) = remember { mutableStateOf(Color.MetroGreen) }
+
+                    ColorPickerDialog(
+                        showColorPickerDialog,
+                        color,
+                        {
+                            onColorPicked(it)
+                            showColorPickerDialog = false
+                        },
+                         //       background = AppTheme.colors.background(surface),
+                    )
+
+                    IconButton(
+                        Icons.Outlined.LocalFireDepartment,
+                        contentDescription = null,
+                        onClick = {}
+                    )
+
+                    IconButton(
+                        Icons.Outlined.MoreVert,
+                        contentDescription = null,
+                        onClick = {}
+                    )
+                }
+            )
         },
         content = {
-            val insets = navInsets + WindowInsets.contentInsets
+            val insets = navInsets.union(WindowInsets.content).union(
+                WindowInsets.systemBars.only(
+                    WindowInsetsSides.Vertical
+                )
+            )
             val state = rememberLazyGridState()
+
+
+
             LazyVerticalGrid(
                 state = state,
                 columns = GridCells.Adaptive(84.dp),
-                contentPadding = insets + PaddingValues(horizontal = 16.dp) + WindowInsets.systemBars.only(
-                    WindowInsetsSides.Vertical).asPaddingValues(),
+                contentPadding = PaddingValues(horizontal = 16.dp) + insets.asPaddingValues(),
                 horizontalArrangement = Arrangement.Absolute.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()/*.fadingEdge(state, false)*/,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(behaviour.nestedScrollConnection)
+                    .observe(surface)/*.fadingEdge(state, false)*/,
                 content = {
                     items(Games) { item ->
-                        Game(item)
+                        Game(
+                            item,
+                            modifier = Modifier.clickable() {
+
+                            }
+                        )
                     }
                 }
             )

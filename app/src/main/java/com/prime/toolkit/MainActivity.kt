@@ -2,21 +2,19 @@
 
 package com.prime.toolkit
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Collections
-import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Feedback
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.Weekend
-import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
@@ -28,86 +26,57 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.prime.toolkit.core.background
+import com.prime.toolkit.core.observe
+import com.prime.toolkit.core.rememberBackgroundProvider
 import com.prime.toolkit.games.Games
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.ClaretViolet
-import com.zs.compose.foundation.MetroGreen
 import com.zs.compose.theme.AppTheme
-import com.zs.compose.theme.ColorPickerDialog
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.FloatingActionButton
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.LocalWindowSize
-import com.zs.compose.theme.WindowSize.Category
 import com.zs.compose.theme.adaptive.NavigationSuiteScaffold
-import com.zs.compose.theme.appbar.BottomNavigationItem
 import com.zs.compose.theme.appbar.FloatingBottomNavigationBar
+import com.zs.compose.theme.appbar.NavigationItem
 import com.zs.compose.theme.appbar.SideBar
-import com.zs.compose.theme.appbar.SideNavigationItem
 import com.zs.compose.theme.calculateWindowSizeClass
 import com.zs.compose.theme.snackbar.SnackbarDuration
 import com.zs.compose.theme.snackbar.SnackbarHostState
-import com.zs.compose.theme.text.Text
+import com.zs.compose.theme.text.Label
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val TAG = "MainActivity"
 
-private val SampleProgressCompleteMessage = buildAnnotatedString {
+private val SampleTestMessage = buildAnnotatedString {
     withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-        append("Progress")
+        append("Network Status")
     }
     withStyle(SpanStyle(color = Color.Gray)) {
-        append("\nThe progress completed. Here you can put content of any size. This is a lng very long info for a dialog. i mena or a snackbar. wht is a snack bar in the forst place, it is a small bar shaped item at the bottom of the screen that displays info to the user. the forst place, it is a small bar shaped item at the bottom of the screen that displays info to the user.the forst place, it is a small bar shaped item at the bottom of the screen that displays info to the user.")
+        append("\nYou're currently offline. Please check your internet connection or try again later. This message can be as detailed as necessary, giving users clear context about the issue. Whether it’s a toast, dialog, or snackbar, the goal is to keep them informed in a non-intrusive way.")
     }
-}
-
-@Composable
-@NonRestartableComposable
-fun NavigationItem(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isBottomNav: Boolean = false,
-    checked: Boolean = false,
-) = when (isBottomNav) {
-    true -> BottomNavigationItem(
-        selected = checked,
-        icon = { Icon(icon, contentDescription = label) },
-        label = { Text(label) },
-        modifier = modifier,
-        onClick = onClick,
-
-        )
-
-    else -> SideNavigationItem(
-        selected = checked,
-        icon = { Icon(icon, contentDescription = label) },
-        label = { Text(label) },
-        modifier = modifier,
-        onClick = onClick
-    )
 }
 
 @Composable
 @NonRestartableComposable
 fun ToolkitNavBar(
     showBottomNav: Boolean,
+    background: Background,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) = when (showBottomNav) {
     true -> FloatingBottomNavigationBar(
         modifier = modifier,
         content = { content() },
-        background = Background(AppTheme.colors.background(1.dp)),
+        background = background,
         border = _root_ide_package_.androidx.compose.foundation.BorderStroke(
             0.6.dp,
             AppTheme.colors.background(5.dp)
@@ -117,32 +86,88 @@ fun ToolkitNavBar(
     else -> SideBar(
         modifier = modifier,
         content = { content() },
-        background = Background(AppTheme.colors.background(1.dp))
+        background = background
     )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 class MainActivity : ComponentActivity() {
-
     private val snackbar = SnackbarHostState()
+    var progress by mutableFloatStateOf(Float.NaN)
+    var darkMode by mutableStateOf(false)
 
-    @SuppressLint("NewApi")
+    private val content = @Composable {
+        var showColorPicker by remember { mutableStateOf(false) }
+        var selected by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+        val (width, height) = LocalWindowSize.current
+        val vertical = width < height
+        val surface = rememberBackgroundProvider()
+        val colors = AppTheme.colors
+        NavigationSuiteScaffold(
+            vertical = vertical,
+            snackbarHostState = snackbar,
+            progress = progress,
+            content = {
+                Crossfade(selected, modifier = Modifier.observe(surface)) { value ->
+                    when (value) {
+                        0 -> Games()
+                    }
+                }
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {darkMode = !darkMode},
+                    content = {
+                        Icon(Icons.Default.LightMode, null)
+                    },
+                )
+            },
+            navBar = {
+                ToolkitNavBar(
+                    vertical,
+                    background = if (vertical) colors.background(surface) else Background(colors.background(10.dp)),
+                    content = {
+                        // Home
+                        NavigationItem(
+                            icon = { Icon(Icons.Default.Weekend, null) },
+                            label = { Label("Home") },
+                            selected = selected == 0,
+                            onClick = { selected = 0 }
+                        )
+
+                        // @nd
+                        NavigationItem(
+                            icon = { Icon(Icons.Default.VideoLibrary, null) },
+                            label = { Label("Collections") },
+                            selected = selected == 1,
+                            onClick = { selected = 1 }
+                        )
+
+                        // Settings
+                        NavigationItem(
+                            icon = { Icon(Icons.Default.Settings, null) },
+                            label = { Label("Settings") },
+                            selected = selected == 2,
+                            onClick = { selected = 2 }
+                        )
+                    }
+                )
+            }
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Set up the window
-        // Window settings are likely handled in AppTheme already, but we ensure it here.
-        val x = Icons.Outlined.ColorLens
-        var progress by mutableFloatStateOf(Float.NaN)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                Color.Transparent.toArgb(),
-                Color.Transparent.toArgb()
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                Color.Transparent.toArgb(),
-                Color.Transparent.toArgb()
-            )
+
+        val style = SystemBarStyle.auto(
+            Color.Transparent.toArgb(),
+            Color.Transparent.toArgb(),
+            detectDarkMode = {
+                darkMode
+            }
         )
+
+
 
         //
         lifecycleScope.launch {
@@ -155,65 +180,26 @@ class MainActivity : ComponentActivity() {
                 progress += 0.05f
             }
             snackbar.showSnackbar(
-                SampleProgressCompleteMessage,
+                SampleTestMessage,
                 "Action",
                 icon = Icons.Default.Feedback,
                 duration = SnackbarDuration.Indefinite
             )
         }
 
-
+        // Content
         setContent {
-            val clazz = calculateWindowSizeClass(this)
-            var showColorPicker by remember { mutableStateOf(false) }
 
+            enableEdgeToEdge(
+                statusBarStyle = style,
+                navigationBarStyle = style
+            )
 
-
-            val content = @Composable {
-
-                ColorPickerDialog(showColorPicker, Color.MetroGreen) {
-                    showColorPicker = false
-                }
-
-                NavigationSuiteScaffold(
-                    vertical = clazz.width < Category.Medium,
-                    snackbarHostState = snackbar,
-                    progress = progress,
-                    content = { Games() },
-                    navBar = {
-                        ToolkitNavBar(clazz.width < Category.Medium) {
-                            NavigationItem(
-                                icon = Icons.Default.Weekend,
-                                label = "Home",
-                                checked = true,
-                                onClick = {}
-                            )
-                            NavigationItem(
-                                icon = Icons.Default.Collections,
-                                label = "Collections",
-                                onClick = {}
-                            )
-                            NavigationItem(
-                                icon = Icons.Default.Settings,
-                                label = "Settings",
-                                onClick = {}
-                            )
-                        }
-                    },
-                    floatingActionButton = {
-                        FloatingActionButton(onClick = { showColorPicker = true }) {
-                            Icon(Icons.Default.ColorLens, contentDescription = "Menu")
-                        }
-                    }
-                )
-            }
-
-
-            val isLight = !isSystemInDarkTheme()
             AppTheme(
-                isLight = isLight,
-                accent = if (isLight) Color.ClaretViolet else Color(0xFFD8A25E),
+                isLight = !darkMode,
+                accent = if (!darkMode) Color.ClaretViolet else Color(0xFFD8A25E),
                 content = {
+                    val clazz = calculateWindowSizeClass(this)
                     CompositionLocalProvider(
                         LocalWindowSize provides clazz,
                         content = content

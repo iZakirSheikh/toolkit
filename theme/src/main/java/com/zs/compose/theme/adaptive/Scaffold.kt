@@ -19,6 +19,7 @@
 package com.zs.compose.theme.adaptive
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -35,9 +36,9 @@ import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.LocalContentColor
+import com.zs.compose.theme.None
 import com.zs.compose.theme.contentColorFor
 import com.zs.compose.theme.internal.Slot
-import androidx.compose.foundation.layout.PaddingValues as Padding
 import androidx.compose.runtime.CompositionLocalProvider as Provider
 
 private const val INDEX_CONTENT = 0
@@ -78,7 +79,7 @@ fun Scaffold(
     // The indent propagated through window.contentIndent
     // The removes its old value; which means child has access to only topBar indent.
     val (indent, onIndentUpdated) =
-        remember { mutableStateOf(Padding.Zero) }
+        remember { mutableStateOf(WindowInsets.None) }
 
     //
     Layout(
@@ -114,7 +115,7 @@ fun Scaffold(
 
 private data class ScaffoldMeasurePolicy(
     private val fabPosition: FabPosition,
-    private val onUpdateIntent: (Padding) -> Unit
+    private val onUpdateIntent: (WindowInsets) -> Unit
 ) : MeasurePolicy {
     override fun MeasureScope.measure(
         measurables: List<Measurable>,
@@ -130,7 +131,7 @@ private data class ScaffoldMeasurePolicy(
         val fabPlaceable = measurables[INDEX_FAB].measure(constraints)
         // Update content insets (padding) based on the height of the top bar.
         // This ensures content doesn't overlap with the top bar.
-        onUpdateIntent(Padding(top = topBarPlaceable.height.toDp()))
+        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp()))
         // Layout the measured components within the Scaffold.
         return layout(width, height) {
             // place the content at top

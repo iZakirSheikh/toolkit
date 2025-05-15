@@ -18,20 +18,20 @@
 
 package com.zs.compose.theme.adaptive
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
+import com.zs.compose.theme.None
 
 /**
  * The content insets for the screen under current [NavigationSuitScaffold]
  */
 internal val LocalContentInsets =
-    compositionLocalOf { PaddingValues.Zero }
+    compositionLocalOf { WindowInsets.None }
 
 /**
  * Provides the insets for the current content within the [Scaffold].
  */
-val WindowInsets.Companion.contentInsets
+val WindowInsets.Companion.content
     @ReadOnlyComposable @Composable get() = LocalContentInsets.current

@@ -99,7 +99,7 @@ object AppBarDefaults {
     // TODO: clarify elevation in surface mapping - spec says 0.dp but it appears to have an
     //  elevation overlay applied in dark theme examples.
     /** Default elevation used for [TopAppBar]. */
-    val TopAppBarElevation = 4.dp
+    val TopAppBarElevation = 0.dp
 
     /** Default elevation used for [BottomAppBar]. */
     val BottomAppBarElevation = 2.dp
@@ -322,7 +322,7 @@ object AppBarDefaults {
 fun TopAppBar(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    background: Background = Background(AppTheme.colors.background(1.dp)),
+    background: Background = Background(AppTheme.colors.background(2.dp)),
     windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},

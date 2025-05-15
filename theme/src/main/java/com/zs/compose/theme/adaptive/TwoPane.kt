@@ -19,7 +19,7 @@
 package com.zs.compose.theme.adaptive
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.LocalContentColor
+import com.zs.compose.theme.None
 import com.zs.compose.theme.internal.Slot
-import androidx.compose.foundation.layout.PaddingValues as Padding
 import androidx.compose.runtime.CompositionLocalProvider as Provider
 
 private const val TAG = "TwoPane"
@@ -126,7 +126,7 @@ private fun TwoPane(
 ) {
     // The indent propagated through window.contentIndent
     // The removes its old value; which means child has access to only topBar indent.
-    val (indent, onIndentUpdated) = remember { mutableStateOf(PaddingValues.Zero) }
+    val (indent, onIndentUpdated) = remember { mutableStateOf(WindowInsets.None) }
     //
     Layout(
         modifier = modifier
@@ -170,7 +170,7 @@ private fun TwoPane(
  */
 private data class OnePaneMeasurePolicy(
     private val fabPosition: FabPosition,
-    private val onUpdateIntent: (Padding) -> Unit
+    private val onUpdateIntent: (WindowInsets) -> Unit
 ) : MeasurePolicy {
     override fun MeasureScope.measure(measurables: List<Measurable>, c: Constraints): MeasureResult {
         val width = c.maxWidth; val height = c.maxHeight
@@ -181,7 +181,7 @@ private data class OnePaneMeasurePolicy(
         val topBarPlaceable = measurables[INDEX_TOP_BAR].measure(constraints)
         val fabPlaceable = measurables[INDEX_FAB].measure(constraints)
         // Update content insets to account for Top Bar height
-        onUpdateIntent(Padding(top = topBarPlaceable.height.toDp()))
+        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp()))
         // measure dialog with original coordinates.
         val dialogPlaceable  = measurables.getOrNull(3)?.measure(c)
         // since details is absent no need to further complicate things.
@@ -214,7 +214,7 @@ private data class TwoPaneVerticalMeasurePolicy(
     private val strategy: VerticalTwoPaneStrategy,
     private val fabPosition: FabPosition,
     private val spacing: Dp,
-    private val onUpdateIntent: (Padding) -> Unit
+    private val onUpdateIntent: (WindowInsets) -> Unit
 ) : MeasurePolicy {
     override fun MeasureScope.measure(measurables: List<Measurable>, c: Constraints): MeasureResult {
         val width = c.maxWidth; val height = c.maxHeight
@@ -246,7 +246,7 @@ private data class TwoPaneVerticalMeasurePolicy(
         // measure dialog
         val dialogPlaceable = measurables.getOrNull(INDEX_DIALOG)?.measure(c)
         // Update content insets to account for Top Bar height
-        onUpdateIntent(Padding(top = topBarPlaceable.height.toDp()))
+        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp()))
         return layout(width, height) {
             // place the content at top
             contentPlaceable.placeRelative(0, 0)
@@ -281,7 +281,7 @@ private data class TwoPaneHorizontalMeasurePolicy(
     private val strategy: HorizontalTwoPaneStrategy,
     private val fabPosition: FabPosition,
     private val spacing: Dp,
-    private val onUpdateIntent: (Padding) -> Unit
+    private val onUpdateIntent: (WindowInsets) -> Unit
 ) : MeasurePolicy {
     override fun MeasureScope.measure(measurables: List<Measurable>, c: Constraints): MeasureResult {
         val width = c.maxWidth; val height = c.maxHeight
@@ -307,7 +307,7 @@ private data class TwoPaneHorizontalMeasurePolicy(
         val topBarPlaceable = measurables[INDEX_TOP_BAR].measure(constraints)
         val fabPlaceable = measurables[INDEX_FAB].measure(constraints)
         // Update content insets to account for Top Bar height
-        onUpdateIntent(Padding(top = topBarPlaceable.height.toDp()))
+        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp()))
         return layout(width, height){
             // place the content at top
             contentPlaceable.placeRelative(0, 0)

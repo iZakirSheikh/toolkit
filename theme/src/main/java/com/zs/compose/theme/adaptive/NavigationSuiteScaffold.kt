@@ -46,6 +46,7 @@ import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.LinearProgressIndicator
 import com.zs.compose.theme.LocalContentColor
+import com.zs.compose.theme.None
 import com.zs.compose.theme.internal.Slot
 import com.zs.compose.theme.internal.component1
 import com.zs.compose.theme.internal.component2
@@ -91,7 +92,7 @@ private const val INDEX_PROGRESS_BAR = 4
 private class VerticalMeasurePolicy(
     private val fabPosition: FabPosition,
     private val insets: WindowInsets,
-    private val onNewInsets: (PaddingValues) -> Unit
+    private val onNewInsets: (WindowInsets) -> Unit
 ) : MeasurePolicy {
     override fun MeasureScope.measure(measurables: List<Measurable>, c: Constraints): MeasureResult {
         val (_, width, _, height) = c
@@ -110,7 +111,7 @@ private class VerticalMeasurePolicy(
         val contentPlaceable = measurables[INDEX_CONTENT].measure(constraints)
         // Calculate the insets for the content.
         // and report through onNewIntent
-        onNewInsets(PaddingValues(bottom = navBarPlaceable.height.toDp()))
+        onNewInsets(WindowInsets(bottom = navBarPlaceable.height.toDp()))
         // Place the children in the parent layout
         return layout(width, height){
             // Place the main content at the top, filling the space up to the navigation bar
@@ -170,7 +171,7 @@ private class VerticalMeasurePolicy(
 private class HorizontalMeasurePolicy(
     private val fabPosition: FabPosition,
     private val insets: WindowInsets,
-    private val onNewInsets: (PaddingValues) -> Unit
+    private val onNewInsets: (WindowInsets) -> Unit
 ) : MeasurePolicy{
     override fun MeasureScope.measure(measurables: List<Measurable>, c: Constraints): MeasureResult {
         val (_, width, _, height) = c
@@ -187,7 +188,7 @@ private class HorizontalMeasurePolicy(
         constraints = c.copy(minWidth = contentWidth, maxWidth = contentWidth)
         val contentPlaceable = measurables[INDEX_CONTENT].measure(constraints)
         // reset new insets
-        onNewInsets(PaddingValues.Zero)
+        onNewInsets(WindowInsets.None)
         // Place the children in the parent layout
         return layout(width, height){
             var x = 0
@@ -265,7 +266,7 @@ fun NavigationSuiteScaffold(
     navBar: @Composable () -> Unit,
 ) {
     val (insets, onNewInsets) =
-        remember { mutableStateOf(PaddingValues.Zero) }
+        remember { mutableStateOf(WindowInsets.None) }
     val navBarInsets = WindowInsets.navigationBars
     Layout(
         modifier = modifier

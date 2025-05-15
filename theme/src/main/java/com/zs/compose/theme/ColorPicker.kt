@@ -28,8 +28,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -63,6 +61,7 @@ import androidx.compose.ui.unit.toIntSize
 import androidx.compose.ui.window.DialogProperties
 import com.zs.compose.foundation.Amber
 import com.zs.compose.foundation.AzureBlue
+import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.BlackOlive
 import com.zs.compose.foundation.CapriBlue
 import com.zs.compose.foundation.ClaretViolet
@@ -83,6 +82,7 @@ import com.zs.compose.foundation.TrafficBlack
 import com.zs.compose.foundation.TrafficYellow
 import com.zs.compose.foundation.UmbraGrey
 import com.zs.compose.foundation.thenIf
+import com.zs.compose.theme.appbar.TopAppBar
 import com.zs.compose.theme.internal.Icons
 import com.zs.compose.theme.internal.icons.ColorLens
 import com.zs.compose.theme.text.Label
@@ -226,7 +226,7 @@ private fun ColorPalette(
     // while the vertical axis represents the brightness.
     Canvas(
         modifier
-            .fillMaxWidth()
+            .clip(AppTheme.shapes.small)
             .aspectRatio(1.6f)
             .pointerInteropFilter {
                 when (it.action) {
@@ -409,8 +409,6 @@ private fun ColorSwatch(
 
 /*The space between the component of screen*/
 private val ItemSpacing = Arrangement.spacedBy(8.dp)
-private val hItemPadding = PaddingValues(horizontal = 12.dp)
-
 
 //TODO - Provide layout for landscape version.
 // Make it more versatile
@@ -422,75 +420,94 @@ fun ColorPickerDialog(
     initial: Color,
     onColorPicked: (Color) -> Unit
 ) {
+    // `hue` stores the currently selected base color, initialized to `initial`.
+    // `onHueChange` is a function to update `hue`.
     val (hue, onHueChange) = remember { mutableStateOf(initial) }
-    val (color, onBrightnessChange) =
-        remember(hue) { mutableStateOf(initial) }
+    // `color` stores the final selected color (with brightness applied), initialized to `initial`.
+    // `onBrightnessChange` is a function to update `color` when brightness changes.
+    val (color, onBrightnessChange) = remember { mutableStateOf(initial) }
     AlertDialog(
         expanded,
-        title = { Label(stringResource(R.string.theme_color_picker_dialog_title)) },
-        navigationIcon = {
-            Icon(
-                imageVector = Icons.ColorLens,
-                contentDescription = null,
-                modifier = Modifier.minimumInteractiveComponentSize()
-            )
-        },
+        // When the dialog is dismissed (e.g., by clicking outside),
+        // call `onColorPicked` with `Color.Unspecified` to indicate no color was selected.
+        // TODO - Maybe return here same initial color.
         onDismissRequest = { onColorPicked(Color.Unspecified) },
         properties = DialogProperties,
         shape = AppTheme.shapes.small,
+        topBar = {
+            // Display a color lens icon in the navigation area of the TopAppBar.
+            TopAppBar(
+                title = { Label(stringResource(R.string.theme_color_picker_dialog_title)) },
+                navigationIcon = {
+                    Icon(
+                        imageVector = Icons.ColorLens,
+                        contentDescription = null,
+                        modifier = Modifier.minimumInteractiveComponentSize()
+                    )
+                },
+                background = Background(AppTheme.colors.background(4.dp))
+            )
+        },
         bottomBar = {
+            // Cancel button: Dismisses the dialog and indicates no color was picked.
             TextButton(onClick = { onColorPicked(Color.Unspecified) }) {
                 Label(text = stringResource(id = android.R.string.cancel))
             }
-            TextButton(onClick = { onColorPicked(color) }) {
+            // OK button: Confirms the currently selected `color`.
+            Button(onClick = { onColorPicked(color) }) {
                 Label(text = stringResource(id = android.R.string.ok))
             }
         },
         content = {
-            // content
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = ItemSpacing,
+            // The main color palette where users can select saturation and brightness.
+            // `hue` is the base color, and `onBrightnessChange` updates the `color` state.
+            ColorPalette(hue, onBrightnessChange)
+
+            // Row containing the color preview circle and the hue slider.
+            val contentColor = LocalContentColor.current
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = ItemSpacing,
                 content = {
-                    ColorPalette(hue, onBrightnessChange)
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = ItemSpacing,
-                        modifier = Modifier.padding(hItemPadding),
-                        content = {
-                            Spacer(
-                                modifier = Modifier
-                                    .drawBehind {
-                                        drawCircle(color = color)
-                                        drawCircle(
-                                            color = Color.LightGray,
-                                            style = Stroke(1.dp.toPx())
-                                        )
-                                    }
-                                    .size(56.dp)
-                            )
-
-                            HueSlider(
-                                hue,
-                                onHuePicked = onHueChange,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                    )
-
-                    Label(
-                        "Swatches",
-                        style = AppTheme.typography.label3,
+                    // Spacer used to draw the color preview circle.
+                    Spacer(
                         modifier = Modifier
-                            .padding(top = 8.dp)
-                            .padding(horizontal = 12.dp)
-                            .align(Alignment.Start)
+                            .drawBehind {
+                                // Draw the selected color as a filled circle.
+                                drawCircle(
+                                    color = color,
+                                    radius = (size.minDimension / 2) - 2.dp.toPx()
+                                )
+                                // Draw a border around the color preview circle using the current content color.
+                                drawCircle(
+                                    color = contentColor,
+                                    style = Stroke(1.dp.toPx())
+                                )
+                            }
+                            .size(56.dp)
                     )
 
-                    ColorSwatch(hue, onHueChange, modifier = Modifier.padding(hItemPadding))
+                    // Slider to adjust the hue of the color.
+                    // `hue` is the current hue, `onHueChange` updates the `hue` state.
+                    HueSlider(
+                        hue,
+                        onHuePicked = onHueChange,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             )
+
+            // Label for the color swatches section.
+            Label(
+                "Swatches",
+                style = AppTheme.typography.label3,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .align(Alignment.Start)
+            )
+            // Displays a row of predefined color swatches.
+            // `hue` is the current hue, `onHueChange` updates the `hue` state when a swatch is selected.
+            ColorSwatch(hue, onHueChange)
         }
     )
 }
