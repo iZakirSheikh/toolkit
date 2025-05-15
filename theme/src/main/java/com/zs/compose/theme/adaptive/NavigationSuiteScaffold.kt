@@ -94,7 +94,10 @@ private class VerticalMeasurePolicy(
     private val insets: WindowInsets,
     private val onNewInsets: (WindowInsets) -> Unit
 ) : MeasurePolicy {
-    override fun MeasureScope.measure(measurables: List<Measurable>, c: Constraints): MeasureResult {
+    override fun MeasureScope.measure(
+        measurables: List<Measurable>,
+        c: Constraints
+    ): MeasureResult {
         val (_, width, _, height) = c
         // Measure the size requirements of each child element, allowing
         // them to use the full width
@@ -111,9 +114,9 @@ private class VerticalMeasurePolicy(
         val contentPlaceable = measurables[INDEX_CONTENT].measure(constraints)
         // Calculate the insets for the content.
         // and report through onNewIntent
-        onNewInsets(WindowInsets(bottom = navBarPlaceable.height.toDp()))
+        onNewInsets(WindowInsets(bottom = navBarPlaceable.height.toDp() + STANDARD_SPACING + fabPlaceable.height.toDp()))
         // Place the children in the parent layout
-        return layout(width, height){
+        return layout(width, height) {
             // Place the main content at the top, filling the space up to the navigation bar
             contentPlaceable.placeRelative(0, 0)
             // Place navbar at the bottom of the screen.
@@ -172,8 +175,11 @@ private class HorizontalMeasurePolicy(
     private val fabPosition: FabPosition,
     private val insets: WindowInsets,
     private val onNewInsets: (WindowInsets) -> Unit
-) : MeasurePolicy{
-    override fun MeasureScope.measure(measurables: List<Measurable>, c: Constraints): MeasureResult {
+) : MeasurePolicy {
+    override fun MeasureScope.measure(
+        measurables: List<Measurable>,
+        c: Constraints
+    ): MeasureResult {
         val (_, width, _, height) = c
         // Measure the size requirements of each child element
         // Allow the elements to have a custom size by not constraining them.
@@ -188,9 +194,9 @@ private class HorizontalMeasurePolicy(
         constraints = c.copy(minWidth = contentWidth, maxWidth = contentWidth)
         val contentPlaceable = measurables[INDEX_CONTENT].measure(constraints)
         // reset new insets
-        onNewInsets(WindowInsets.None)
+        onNewInsets(if (fabPlaceable.isZeroSized) WindowInsets.None else WindowInsets(bottom = STANDARD_SPACING + fabPlaceable.height.toDp()))
         // Place the children in the parent layout
-        return layout(width, height){
+        return layout(width, height) {
             var x = 0
             var y = 0
             // place nav_bar from top at the start of the screen

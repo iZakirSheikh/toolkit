@@ -171,7 +171,7 @@ fun Games() {
                         onClick = {showColorPickerDialog = true}
                     )
 
-                    val (color, onColorPicked) = remember { mutableStateOf(Color.MetroGreen) }
+                    val (color, onColorPicked) = remember { mutableStateOf(Color.Yellow) }
 
                     ColorPickerDialog(
                         showColorPickerDialog,

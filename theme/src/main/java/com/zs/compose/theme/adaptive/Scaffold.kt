@@ -131,7 +131,8 @@ private data class ScaffoldMeasurePolicy(
         val fabPlaceable = measurables[INDEX_FAB].measure(constraints)
         // Update content insets (padding) based on the height of the top bar.
         // This ensures content doesn't overlap with the top bar.
-        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp()))
+        // include fab as well
+        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp(), bottom = fabPlaceable.height.toDp()))
         // Layout the measured components within the Scaffold.
         return layout(width, height) {
             // place the content at top

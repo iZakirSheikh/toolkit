@@ -181,7 +181,7 @@ private data class OnePaneMeasurePolicy(
         val topBarPlaceable = measurables[INDEX_TOP_BAR].measure(constraints)
         val fabPlaceable = measurables[INDEX_FAB].measure(constraints)
         // Update content insets to account for Top Bar height
-        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp()))
+        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp(), bottom = fabPlaceable.height.toDp()))
         // measure dialog with original coordinates.
         val dialogPlaceable  = measurables.getOrNull(3)?.measure(c)
         // since details is absent no need to further complicate things.
@@ -246,7 +246,7 @@ private data class TwoPaneVerticalMeasurePolicy(
         // measure dialog
         val dialogPlaceable = measurables.getOrNull(INDEX_DIALOG)?.measure(c)
         // Update content insets to account for Top Bar height
-        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp()))
+        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp(), bottom = fabPlaceable.height.toDp()))
         return layout(width, height) {
             // place the content at top
             contentPlaceable.placeRelative(0, 0)
@@ -307,7 +307,7 @@ private data class TwoPaneHorizontalMeasurePolicy(
         val topBarPlaceable = measurables[INDEX_TOP_BAR].measure(constraints)
         val fabPlaceable = measurables[INDEX_FAB].measure(constraints)
         // Update content insets to account for Top Bar height
-        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp()))
+        onUpdateIntent(WindowInsets(top = topBarPlaceable.height.toDp(), bottom = fabPlaceable.height.toDp()))
         return layout(width, height){
             // place the content at top
             contentPlaceable.placeRelative(0, 0)

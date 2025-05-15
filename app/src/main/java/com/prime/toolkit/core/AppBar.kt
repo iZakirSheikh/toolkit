@@ -113,11 +113,16 @@ fun AdaptiveLargeTopAppBar(
     style,
     insets
 ){
-    if (fraction > 0.1f) return@AdaptiveLargeTopAppBar Spacer(Modifier)
     val colors = AppTheme.colors
     Spacer(
         modifier = Modifier
-            .background(background)
+            .thenIf(!immersive){
+                shadow(androidx.compose.ui.unit.lerp(12.dp, 0.dp, fraction / .05f), AppBarDefaults.FloatingTopBarShape)
+                .thenIf(fraction == 0f) {
+                    border(colors.border, AppBarDefaults.FloatingTopBarShape)
+                }
+            }
+            .thenIf(fraction < 0.1f){ background(background) }
             .fillMaxSize()
     )
 }
