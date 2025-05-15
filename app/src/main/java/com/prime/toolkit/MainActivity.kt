@@ -38,6 +38,7 @@ import com.prime.toolkit.core.background
 import com.prime.toolkit.core.observe
 import com.prime.toolkit.core.rememberBackgroundProvider
 import com.prime.toolkit.games.Games
+import com.prime.toolkit.settings.Settings
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.ClaretViolet
 import com.zs.compose.theme.AppTheme
@@ -113,6 +114,7 @@ class MainActivity : ComponentActivity() {
                 Crossfade(selected, modifier = Modifier.observe(surface)) { value ->
                     when (value) {
                         0 -> Games()
+                        2 -> Settings()
                     }
                 }
             },

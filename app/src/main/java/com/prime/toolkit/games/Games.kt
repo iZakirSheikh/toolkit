@@ -55,6 +55,7 @@ import com.prime.toolkit.core.observe
 import com.prime.toolkit.core.rememberBackgroundProvider
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.MetroGreen
+import com.zs.compose.foundation.fadingEdge
 import com.zs.compose.foundation.plus
 import com.zs.compose.theme.AlertDialog
 import com.zs.compose.theme.AppTheme
@@ -204,9 +205,6 @@ fun Games() {
                 )
             )
             val state = rememberLazyGridState()
-
-
-
             LazyVerticalGrid(
                 state = state,
                 columns = GridCells.Adaptive(84.dp),
@@ -216,7 +214,7 @@ fun Games() {
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(behaviour.nestedScrollConnection)
-                    .observe(surface)/*.fadingEdge(state, false)*/,
+                    .observe(surface)/*.fadingEdge(state,  false, length = 50.dp)*/,
                 content = {
                     items(Games) { item ->
                         Game(
