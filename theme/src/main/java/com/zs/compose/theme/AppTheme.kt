@@ -212,10 +212,8 @@ object AppTheme {
     }
 }
 
-private val DefaultSpring = spring(
-    stiffness = StiffnessMediumLow,
-    visibilityThreshold = Rect.VisibilityThreshold
-)
+private val DefaultSpring = tween<Rect>(250)
+    //spring(stiffness = StiffnessMediumLow, visibilityThreshold = Rect.VisibilityThreshold)
 
 @ExperimentalSharedTransitionApi
 private val DefaultBoundsTransform = BoundsTransform { _, _ -> DefaultSpring }
