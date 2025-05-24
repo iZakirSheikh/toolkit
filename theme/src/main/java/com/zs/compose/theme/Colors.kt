@@ -31,8 +31,6 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.Amber
-import com.zs.compose.foundation.BlueLilac
-import com.zs.compose.foundation.MetroGreen
 import com.zs.compose.foundation.RedViolet
 import com.zs.compose.foundation.Rose
 import com.zs.compose.foundation.SignalWhite
@@ -200,8 +198,12 @@ val LocalContentColor = compositionLocalOf { Color.Black }
  * [Colors], and then will return the corresponding color used for content. For example, when
  * [backgroundColor] is [Colors.accent], this will return [Colors.onAccent].
  *
- * If [backgroundColor] does not match a background color in the theme, this will return
- * [Color.Unspecified].
+ * If there is no exact match, the function determines whether [backgroundColor] is light or dark
+ * based on its [luminance]. Then, it attempts to find a contrasting content color:
+ * - For light backgrounds, it returns the first content color whose luminance is considered dark.
+ * - For dark backgrounds, it returns the first content color whose luminance is considered light.
+ *
+ * If no suitable contrasting color is found, it returns [Color.Unspecified].
  *
  * @return the matching content color for [backgroundColor]. If [backgroundColor] is not present in
  *   the theme's [Colors], then returns [Color.Unspecified].
@@ -209,13 +211,25 @@ val LocalContentColor = compositionLocalOf { Color.Black }
  */
 @Stable
 fun Colors.contentColorFor(backgroundColor: Color): Color =
-    when (backgroundColor) {
-        accent -> onAccent
-        background -> onBackground
-        error -> onError
-        else -> Color.Unspecified
+    when {
+        backgroundColor == accent -> onAccent
+        backgroundColor ==background -> onBackground
+        backgroundColor == error -> onError
+        // Background is light, look for dark contrasting text color
+        backgroundColor.luminance() >= 0.5f -> when {
+            onAccent.luminance() < 0.5f -> onAccent
+            onBackground.luminance() < 0.5f -> onBackground
+            onError.luminance() < 0.5f -> onError
+            else -> Color.Unspecified
+        }
+        // Background is dark, look for light contrasting text color
+        else -> when {
+            onAccent.luminance() > 0.5f -> onAccent
+            onBackground.luminance() > 0.5f -> onBackground
+            onError.luminance() > 0.5f -> onError
+            else -> Color.Unspecified
+        }
     }
-
 
 /**
  * @see com.zs.compose.theme.Colors.contentColorFor

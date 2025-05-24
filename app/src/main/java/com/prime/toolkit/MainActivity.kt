@@ -44,7 +44,10 @@ import com.prime.toolkit.settings.Settings
 import com.prime.toolkit.text.Strings
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.ClaretViolet
+import com.zs.compose.foundation.MetroGreen
 import com.zs.compose.theme.AppTheme
+import com.zs.compose.theme.Badge
+import com.zs.compose.theme.BadgedBox
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.FloatingActionButton
 import com.zs.compose.theme.Icon
@@ -139,12 +142,20 @@ class MainActivity : ComponentActivity() {
                     background = if (vertical) colors.background(surface) else Background(colors.background(10.dp)),
                     content = {
                         // Home
-                        NavigationItem(
-                            icon = { Icon(Icons.Default.Weekend, null) },
-                            label = { Label("Home") },
-                            selected = selected == 0,
-                            onClick = { selected = 0 }
-                        )
+                        BadgedBox(
+                            badge = {
+                                Badge(backgroundColor = Color.MetroGreen, content = {
+                                    Label("Pro")
+                                })
+                            }
+                        ) {
+                            NavigationItem(
+                                icon = { Icon(Icons.Default.Weekend, null) },
+                                label = { Label("Home") },
+                                selected = selected == 0,
+                                onClick = { selected = 0 }
+                            )
+                        }
 
                         // @nd
                         NavigationItem(
@@ -175,13 +186,19 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        preferences = Preferences(this, "app_preferences")
-        val key = stringPreferenceKey("test")
-        preferences[key] = "new string pref test"
-        Log.d(TAG, "onCreate: ${preferences[key]}")
+        if (!::preferences.isInitialized){
+            preferences = Preferences(this, "app_preferences")
+            val key = stringPreferenceKey("test")
+            preferences[key] = "new string pref test"
+            Log.d(TAG, "onCreate: ${preferences[key]}")
+        }
         val style = SystemBarStyle.auto(
             Color.Transparent.toArgb(),
             Color.Transparent.toArgb(),
