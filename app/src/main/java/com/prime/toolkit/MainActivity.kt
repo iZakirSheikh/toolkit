@@ -3,6 +3,7 @@
 package com.prime.toolkit
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -56,6 +57,8 @@ import com.zs.compose.theme.calculateWindowSizeClass
 import com.zs.compose.theme.snackbar.SnackbarDuration
 import com.zs.compose.theme.snackbar.SnackbarHostState
 import com.zs.compose.theme.text.Label
+import com.zs.preferences.Preferences
+import com.zs.preferences.stringPreferenceKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -100,6 +103,7 @@ class MainActivity : ComponentActivity() {
     private val snackbar = SnackbarHostState()
     var progress by mutableFloatStateOf(Float.NaN)
     var darkMode by mutableStateOf(false)
+    lateinit var preferences: Preferences
 
     private val content = @Composable {
         var showColorPicker by remember { mutableStateOf(false) }
@@ -174,6 +178,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        preferences = Preferences(this, "app_preferences")
+        val key = stringPreferenceKey("test")
+        preferences[key] = "new string pref test"
+        Log.d(TAG, "onCreate: ${preferences[key]}")
         val style = SystemBarStyle.auto(
             Color.Transparent.toArgb(),
             Color.Transparent.toArgb(),

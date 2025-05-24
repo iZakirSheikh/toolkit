@@ -43,12 +43,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.zs.compose.foundation.Background
+import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.text.ProvideTextStyle
 
 private val FooterArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
 private val FooterPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
 private val ContentPadding = PaddingValues(horizontal = 12.dp, vertical = 16.dp)
-private val ContentSpacing = Arrangement.spacedBy(8.dp, )
+private val ContentSpacing = Arrangement.spacedBy(8.dp)
 
 private val MinWidth = Modifier.widthIn(280.dp, 560.dp)
 
@@ -80,6 +81,7 @@ fun AlertDialog(
     background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground.copy(ContentAlpha.medium),
     properties: DialogProperties = DialogProperties(),
+    margin: PaddingValues? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val appdensity = LocalDensity.current
@@ -87,7 +89,7 @@ fun AlertDialog(
         // Use a Surface to define the dialog's appearance.
         CompositionLocalProvider(LocalDensity provides appdensity) {
             Surface(
-                modifier = MinWidth,
+                modifier = MinWidth.thenIf(margin != null) { padding(margin!!) },
                 shape = shape,
                 background = background,
                 contentColor = contentColor,
@@ -126,7 +128,7 @@ fun AlertDialog(
                             }
                         }
                     )
-                }
+                },
             )
         }
     }
@@ -146,6 +148,7 @@ fun AlertDialog(
     background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground.copy(ContentAlpha.medium),
     properties: DialogProperties = DialogProperties(),
+    margin: PaddingValues? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     if (!expanded)
@@ -158,6 +161,7 @@ fun AlertDialog(
         background,
         contentColor,
         properties,
+        margin,
         content
     )
 }

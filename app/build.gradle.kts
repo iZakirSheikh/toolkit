@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(project(":theme"))
     implementation(project(":foundation"))
+    implementation(project(":preferences"))
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui.tooling)

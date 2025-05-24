@@ -40,6 +40,9 @@ import androidx.compose.material.icons.outlined.Colorize
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocalFireDepartment
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.rounded.HomeMax
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,12 +65,15 @@ import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Button
 import com.zs.compose.theme.ColorPickerDialog
 import com.zs.compose.theme.ExperimentalThemeApi
+import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.adaptive.Scaffold
 import com.zs.compose.theme.adaptive.content
 import com.zs.compose.theme.appbar.AppBarDefaults
 import com.zs.compose.theme.appbar.TopAppBar
+import com.zs.compose.theme.menu.DropDownMenu
+import com.zs.compose.theme.menu.DropDownMenuItem
 import com.zs.compose.theme.text.Label
 import com.zs.compose.theme.text.Text
 
@@ -154,6 +160,7 @@ fun Games() {
                                 }
                             )
                         },
+                        margin = PaddingValues(horizontal = 30.dp),
                         background = AppTheme.colors.background(surface),
                         bottomBar = {
                             Button("Confirm", onClick = { showDialog = false })
@@ -190,10 +197,36 @@ fun Games() {
                         onClick = {}
                     )
 
+                    var showMore by remember { mutableStateOf(false) }
                     IconButton(
-                        Icons.Outlined.MoreVert,
-                        contentDescription = null,
-                        onClick = {}
+                        content = {
+                            Icon(Icons.Outlined.MoreVert, contentDescription = null)
+                            DropDownMenu(showMore, onDismissRequest = {showMore = false}) {
+                                DropDownMenuItem(
+                                    "Dropdown Item 1",
+                                    icon = Icons.Rounded.HomeMax,
+                                    onClick = {}
+                                )
+                                DropDownMenuItem(
+                                    "Dropdown Item 2",
+                                    icon = Icons.Rounded.Tune,
+                                    onClick = {}
+                                )
+                                DropDownMenuItem(
+                                    "Dropdown Item 3",
+                                    icon = Icons.Rounded.Settings,
+                                    onClick = {}
+                                )
+                                DropDownMenuItem(
+                                    "Dropdown Item 4",
+                                    icon = null,
+                                    onClick = {}
+                                )
+                            }
+                        },
+                        onClick = {
+                            showMore = true
+                        }
                     )
                 }
             )
