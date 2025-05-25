@@ -20,11 +20,9 @@
 
 package com.zs.compose.theme.menu
 
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.rememberTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
@@ -58,6 +56,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -104,6 +103,12 @@ private val DropdownMenuItemDefaultMinHeight = 40.dp
 // Menu open/close animation.
 internal const val InTransitionDuration = 120
 internal const val OutTransitionDuration = 75
+
+// Menu open/close animation.
+internal const val ExpandedScaleTarget = 1f
+internal const val ClosedScaleTarget = 0.8f
+internal const val ExpandedAlphaTarget = 1f
+internal const val ClosedAlphaTarget = 0f
 
 /** Default padding used for [DropdownMenuItem]. */
 private val DropdownMenuItemContentPadding =
@@ -225,14 +230,14 @@ fun BasicPopupMenu(
     background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground,
     shape: Shape = AppTheme.shapes.small,
-    border: BorderStroke? = null,
+    border: BorderStroke? = if (AppTheme.colors.isLight) null else BorderStroke(0.5.dp, AppTheme.colors.background(20.dp)),
     properties: PopupProperties = DefaultMenuProperties,
     content: @Composable () -> Unit
 ) {
-    val expandedStates = remember { MutableTransitionState(false) }
-    expandedStates.targetState = expanded
+    val expandedState = remember { MutableTransitionState(false) }
+    expandedState.targetState = expanded
 
-    if (expandedStates.currentState || expandedStates.targetState) {
+    if (expandedState.currentState || expandedState.targetState) {
         val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
         val density = LocalDensity.current
         val popupPositionProvider =
@@ -242,59 +247,39 @@ fun BasicPopupMenu(
 
         val content = @Composable {
             // Menu open/close animation.
-            val transition = rememberTransition(expandedStates, "DropDownMenu")
+            val transition = rememberTransition(expandedState, "DropDownMenu")
+
+            //
+            val scaleAnimationSpec = AppTheme.motionScheme.fastSpatialSpec<Float>()
+            val alphaAnimationSpec = AppTheme.motionScheme.fastEffectsSpec<Float>()
+
 
             val scale by
-            transition.animateFloat(
-                transitionSpec = {
-                    if (false isTransitioningTo true) {
-                        // Dismissed to expanded
-                        tween(durationMillis = InTransitionDuration, easing = LinearOutSlowInEasing)
-                    } else {
-                        // Expanded to dismissed.
-                        tween(durationMillis = 1, delayMillis = OutTransitionDuration - 1)
-                    }
-                }
-            ) {
-                if (it) {
-                    // Menu is expanded.
-                    1f
-                } else {
-                    // Menu is dismissed.
-                    0.8f
-                }
+            transition.animateFloat(transitionSpec = { scaleAnimationSpec }) { expanded ->
+                if (expanded) ExpandedScaleTarget else ClosedScaleTarget
             }
 
             val alpha by
-            transition.animateFloat(
-                transitionSpec = {
-                    if (false isTransitioningTo true) {
-                        // Dismissed to expanded
-                        tween(durationMillis = 30)
-                    } else {
-                        // Expanded to dismissed.
-                        tween(durationMillis = OutTransitionDuration)
-                    }
-                }
-            ) {
-                if (it) {
-                    // Menu is expanded.
-                    1f
-                } else {
-                    // Menu is dismissed.
-                    0f
-                }
+            transition.animateFloat(transitionSpec = { alphaAnimationSpec }) { expanded ->
+                if (expanded) ExpandedAlphaTarget else ClosedAlphaTarget
             }
 
             // Surface
             // FixMe - It seems Popup is not using the app density hence providing here the
             //  app density instead of the popup density provided internally
             CompositionLocalProvider(LocalDensity provides density) {
+                val isInspecting = LocalInspectionMode.current
                 Surface(
                     modifier = Modifier.graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                        this.alpha = alpha
+                        scaleX =
+                            if (!isInspecting) scale
+                            else if (expandedState.targetState) ExpandedScaleTarget else ClosedScaleTarget
+                        scaleY =
+                            if (!isInspecting) scale
+                            else if (expandedState.targetState) ExpandedScaleTarget else ClosedScaleTarget
+                        this.alpha =
+                            if (!isInspecting) alpha
+                            else if (expandedState.targetState) ExpandedAlphaTarget else ClosedAlphaTarget
                         transformOrigin = transformOriginState.value
                     } then modifier,
                     elevation = elevation.takeOrElse { MenuElevation },
@@ -378,7 +363,7 @@ fun DropDownMenu(
     background: Background = Background(AppTheme.colors.background(1.dp)),
     contentColor: Color = AppTheme.colors.onBackground,
     shape: Shape = AppTheme.shapes.small,
-    border: BorderStroke? = null,
+    border: BorderStroke? = if (AppTheme.colors.isLight) null else BorderStroke(0.5.dp, AppTheme.colors.background(20.dp)),
     scrollState: ScrollState? = null,
     properties: PopupProperties = DefaultMenuProperties,
     content: @Composable ColumnScope.() -> Unit

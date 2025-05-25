@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalThemeApi::class)
+
 package com.zs.compose.theme
 
 import androidx.compose.animation.animateColorAsState
@@ -45,6 +47,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.thenIf
+
+// TODO - Add checkmark animation.
 
 /** Constructs a simple CheckMark */
 private fun CheckMark(size: Size) = Path().apply {
@@ -96,7 +100,13 @@ private class DefaultCheckboxColors(
             state == ToggleableState.Off -> unchecked
             else -> indeterminate
         }
-        return animateColorAsState(color)
+        return animateColorAsState(
+            color,
+            animationSpec =if (state == ToggleableState.Off)
+                AppTheme.motionScheme.fastEffectsSpec()  // Box out
+            else
+                AppTheme.motionScheme.defaultEffectsSpec()  // Box in
+        )
     }
 }
 

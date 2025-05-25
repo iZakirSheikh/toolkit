@@ -156,7 +156,7 @@ fun Snackbar(
     SwipeToDismiss(
         dismissState,
         background = { },
-        modifier = Modifier.animateContentSize(),
+        modifier = Modifier.animateContentSize( animationSpec = AppTheme.motionScheme.defaultSpatialSpec()),
         dismissThresholds = { DismissThreshHold },
         dismissContent = {
             Layout(

@@ -250,7 +250,7 @@ object AppBarDefaults {
     @Composable
     fun enterAlwaysScrollBehavior(
         canScroll: () -> Boolean = { true },
-        snapAnimationSpec: AnimationSpec<Float>? = spring(stiffness = Spring.StiffnessMediumLow),
+        snapAnimationSpec: AnimationSpec<Float>? = AppTheme.motionScheme.defaultEffectsSpec(),
         flingAnimationSpec: DecayAnimationSpec<Float>? = rememberSplineBasedDecay()
     ): TopAppBarScrollBehavior =
         EnterAlwaysScrollBehavior(
@@ -281,7 +281,7 @@ object AppBarDefaults {
     @Composable
     fun exitUntilCollapsedScrollBehavior(
         canScroll: () -> Boolean = { true },
-        snapAnimationSpec: AnimationSpec<Float>? = spring(stiffness = Spring.StiffnessMediumLow),
+        snapAnimationSpec: AnimationSpec<Float>? = AppTheme.motionScheme.defaultEffectsSpec(),
         flingAnimationSpec: DecayAnimationSpec<Float>? = rememberSplineBasedDecay()
     ): TopAppBarScrollBehavior =
         ExitUntilCollapsedScrollBehavior(

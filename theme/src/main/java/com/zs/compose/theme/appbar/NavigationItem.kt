@@ -18,7 +18,6 @@
 
 package com.zs.compose.theme.appbar
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -39,7 +38,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -258,10 +256,7 @@ fun BottomNavigationItem(
             .defaultMinSize(minHeight = BottomBarItemMinSize)
     ) {
         val iconColor = colors.iconColor(selected, enabled)
-        val indicatorColor by animateColorAsState(
-            colors.indicatorColor(selected, enabled),
-            BottomBarIndicatorAnimSpec
-        )
+        val indicatorColor = colors.indicatorColor(selected, enabled)
         Box(
             modifier = Modifier
                 .clip(CircleShape)
@@ -274,7 +269,7 @@ fun BottomNavigationItem(
         )
 
         /*Label*/
-        val labelColor by animateColorAsState(colors.textColor(selected, enabled))
+        val labelColor = colors.textColor(selected, enabled)
         CompositionLocalProvider(LocalContentColor provides labelColor) {
             ProvideTextStyle(AppTheme.typography.label3, label)
         }
@@ -307,7 +302,7 @@ fun SideNavigationItem(
         shape = RoundedCornerShape(20),
         modifier = modifier.animateContentSize(
             alignment = Alignment.TopCenter,
-            animationSpec = SideBarIndicatorAnimSpec
+            animationSpec = AppTheme.motionScheme.defaultSpatialSpec()
         ),
         color = indicatorColor,
         contentColor = iconColor,
@@ -322,7 +317,7 @@ fun SideNavigationItem(
             // Label is only shown when not checked.
             // return from here if not checked.
             if (selected) return@Column
-            val labelColor by animateColorAsState(colors.textColor(selected, enabled))
+            val labelColor = colors.textColor(selected, enabled)
             CompositionLocalProvider(LocalContentColor provides labelColor) {
                 ProvideTextStyle(AppTheme.typography.label3, label)
             }

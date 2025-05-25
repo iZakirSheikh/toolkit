@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalThemeApi::class)
+
 package com.zs.compose.theme
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,7 +30,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -47,11 +47,6 @@ import androidx.compose.ui.unit.dp
 
 // copied from material2
 // inspired by fluent2
-
-
-private const val RadioAnimationDuration = 100
-
-private val RadioButtonRippleRadius = 24.dp
 private val RadioButtonPadding = 2.dp
 private val RadioButtonSize = 20.dp
 private val RadioRadius = RadioButtonSize / 2
@@ -95,7 +90,7 @@ private class DefaultRadioButtonColors(
         // If not enabled 'snap' to the disabled state, as there should be no animations between
         // enabled / disabled.
         return if (enabled) {
-            animateColorAsState(target, tween(durationMillis = RadioAnimationDuration))
+            animateColorAsState(target, AppTheme.motionScheme.defaultEffectsSpec())
         } else {
             rememberUpdatedState(target)
         }
@@ -184,7 +179,7 @@ fun RadioButton(
     val dotRadius =
         animateDpAsState(
             targetValue = if (selected) RadioButtonDotSize / 2 else 0.dp,
-            animationSpec = tween(durationMillis = RadioAnimationDuration)
+            animationSpec = AppTheme.motionScheme.fastSpatialSpec(),
         )
     val radioColor = colors.radioColor(enabled, selected)
     val selectableModifier =

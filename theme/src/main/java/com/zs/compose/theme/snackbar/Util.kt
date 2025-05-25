@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalThemeApi::class)
+
 package com.zs.compose.theme.snackbar
 
 import androidx.compose.animation.core.Animatable
@@ -48,6 +50,8 @@ import androidx.compose.ui.util.fastFilterNotNull
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMapTo
+import com.zs.compose.theme.AppTheme
+import com.zs.compose.theme.ExperimentalThemeApi
 import kotlin.coroutines.resume
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.delay
@@ -85,12 +89,7 @@ internal fun FadeInFadeOutWithScale(
                     }
                 val opacity =
                     animatedOpacity(
-                        animation =
-                        tween(
-                            easing = LinearEasing,
-                            delayMillis = animationDelay,
-                            durationMillis = duration
-                        ),
+                        animation = AppTheme.motionScheme.fastEffectsSpec(),
                         visible = isVisible,
                         onAnimationFinish = {
                             if (key != state.current) {
@@ -102,12 +101,7 @@ internal fun FadeInFadeOutWithScale(
                     )
                 val scale =
                     animatedScale(
-                        animation =
-                        tween(
-                            easing = FastOutSlowInEasing,
-                            delayMillis = animationDelay,
-                            durationMillis = duration
-                        ),
+                        animation = AppTheme.motionScheme.fastSpatialSpec(),
                         visible = isVisible
                     )
                 Box(

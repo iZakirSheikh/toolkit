@@ -153,7 +153,8 @@ class MainActivity : ComponentActivity() {
                                 icon = { Icon(Icons.Default.Weekend, null) },
                                 label = { Label("Home") },
                                 selected = selected == 0,
-                                onClick = { selected = 0 }
+                                onClick = { selected = 0 },
+                                isBottomNav = vertical
                             )
                         }
 
@@ -162,7 +163,8 @@ class MainActivity : ComponentActivity() {
                             icon = { Icon(Icons.Default.VideoLibrary, null) },
                             label = { Label("Collections") },
                             selected = selected == 1,
-                            onClick = { selected = 1 }
+                            onClick = { selected = 1 },
+                            isBottomNav = vertical
                         )
 
                         // Strings
@@ -170,7 +172,8 @@ class MainActivity : ComponentActivity() {
                             icon = { Icon(Icons.Default.Textsms, null) },
                             label = { Label("Strings") },
                             selected = selected == 2,
-                            onClick = { selected = 2 }
+                            onClick = { selected = 2 },
+                            isBottomNav = vertical
                         )
 
                         // Settings
@@ -178,7 +181,8 @@ class MainActivity : ComponentActivity() {
                             icon = { Icon(Icons.Default.Settings, null) },
                             label = { Label("Settings") },
                             selected = selected == 3,
-                            onClick = { selected = 3 }
+                            onClick = { selected = 3 },
+                            isBottomNav = vertical
                         )
                     }
                 )

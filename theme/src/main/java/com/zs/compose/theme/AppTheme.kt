@@ -36,11 +36,9 @@ import androidx.compose.animation.SharedTransitionScope.ResizeMode
 import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.ScaleToBounds
 import androidx.compose.animation.SharedTransitionScope.SharedContentState
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.Spring.StiffnessMediumLow
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.LocalIndication
@@ -190,9 +188,6 @@ object AppTheme {
         }
     }
 
-
-    private val DefaultColorSpec = tween<Color>(AnimationConstants.DefaultDurationMillis)
-
     /**
      * Provides a composable function to set up the application's theme using the provided
      * colors, typography, and shapes.
@@ -208,6 +203,8 @@ object AppTheme {
         isLight: Boolean,
         accent: Color = if (!isLight) Color.TrafficYellow else Color.SepiaBrown,
         fontFamily: FontFamily = FontFamily.Default,
+        shapes: Shapes = AppTheme.shapes,
+        motionScheme: MotionScheme = MotionScheme.expressive(),
         content: @Composable () -> Unit
     ) {
         val background by animateColorAsState(
@@ -215,9 +212,9 @@ object AppTheme {
                 !isLight -> Color(0xFF0E0E0F)
                 else -> applyTonalElevation(accent, Color.White, 0.8.dp)
             },
-            animationSpec = DefaultColorSpec, label = "background"
+            animationSpec = motionScheme.slowEffectsSpec(), label = "background"
         )
-        val primary by animateColorAsState(accent, DefaultColorSpec, "accent")
+        val primary by animateColorAsState(accent, motionScheme.defaultEffectsSpec(), "accent")
         val colors = Colors(
             accent = primary,
             background = background,
@@ -230,6 +227,8 @@ object AppTheme {
         invoke(
             colors = colors,
             typography = Typography(defaultFontFamily = fontFamily),
+            shapes = shapes,
+            motionScheme = motionScheme,
             content = content
         )
     }
