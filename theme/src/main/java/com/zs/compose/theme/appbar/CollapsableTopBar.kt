@@ -25,6 +25,7 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.UiComposable
@@ -38,6 +39,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
@@ -169,15 +171,15 @@ private fun Placeable.place(
             val component = IntSize(width, height)
             val iPosition = let {
                 val alignment = data?.alignment ?: when (layoutId) {
-                    APP_BAR_LAYOUT_ID_TITLE, APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE -> Alignment.CenterStart
+                    APP_BAR_LAYOUT_ID_TITLE, APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE -> AbsoluteAlignment.CenterLeft
                     else -> Alignment.Center
                 }
                 alignment.align(component, box, layoutDirection)
             }
             val fPosition = let {
                 val alignment = data?.targetAlignment ?: when (layoutId) {
-                    APP_BAR_LAYOUT_ID_TITLE -> Alignment.CenterStart
-                    APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE -> Alignment.BottomStart
+                    APP_BAR_LAYOUT_ID_TITLE -> AbsoluteAlignment.CenterLeft
+                    APP_BAR_LAYOUT_ID_COLLAPSABLE_TITLE -> AbsoluteAlignment.BottomLeft
                     else -> Alignment.Center
                 }
                 alignment.align(component, targetBox, layoutDirection)

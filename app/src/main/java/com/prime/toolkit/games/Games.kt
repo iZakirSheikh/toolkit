@@ -51,7 +51,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.prime.toolkit.R
 import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.prime.toolkit.core.background
 import com.prime.toolkit.core.observe
@@ -141,7 +143,7 @@ fun Games() {
                 height > width,
                 behavior = behaviour,
                 background = AppTheme.colors.background(surface),
-                title = { Label("Video Games") },
+                title = { Label(stringResource(R.string.video_games)) },
                 navigationIcon = {
                     var showDialog by remember { mutableStateOf(false) }
                     AlertDialog(
@@ -160,7 +162,6 @@ fun Games() {
                                 }
                             )
                         },
-                        margin = PaddingValues(horizontal = 30.dp),
                         background = AppTheme.colors.background(surface),
                         bottomBar = {
                             Button("Confirm", onClick = { showDialog = false })

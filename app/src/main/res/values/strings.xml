@@ -111,4 +111,5 @@
           <font color="gray">\n<i><b>Only available on Android 11 and above</b></i>, when enabled, deleted tracks are moved to Trash Can folder instead of being permanently</font>
     </string>
     <string name="strings_title">Strings<font color='grey' size="11">\nStyle and manipulate as you prefer</font></string>
+    <string name="video_games">Video Games</string>
 </resources>
