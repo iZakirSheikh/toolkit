@@ -158,6 +158,12 @@ object AppTheme {
         @ReadOnlyComposable
         get() = LocalSharedTransitionScope.current
 
+    /**
+     *
+     * [https://m3.material.io/styles/motion/overview/how-it-works#17740687-82eb-4be1-9697-1363643f792c](Docs)
+     * @see MotionScheme
+     *
+     */
     @ExperimentalThemeApi
     val motionScheme: MotionScheme
         @Composable @ReadOnlyComposable get() = LocalMotionScheme.current

@@ -32,14 +32,38 @@ import com.zs.compose.theme.MotionScheme.Companion.standard
 // on 25-05-2025
 
 /**
- * A motion scheme provides all the [FiniteAnimationSpec]s for a [MaterialTheme].
  *
- * Motion schemes are designed to create a harmonious motion for components in the app.
+ * Material introduced the motion physics system with M3 Expressive. This new physics-based system
+ * makes interactions and transitions feel more alive, fluid, and natural. It represents a new
+ * motion language for Google products, and is easier to implement and customize than ever before.
+ *
+ * The physics system is replacing the previous system based on easing and duration.
+ * A motion scheme provides all the [FiniteAnimationSpec]s for a [AppTheme].
+ *
+ * The physics system has two preset motion schemes: [expressive] and [standard]. The motion scheme you
+ * choose defines how your product feels. While most motion in a product should use the same scheme,
+ * products can make advanced customizations to swap the scheme to emphasize key moments.
+ *
+ * Motion schemes use springs. A spring is a combination of three attributes which control all
+ * motion behavior: stiffness, damping, and initial velocity.
+ *
+ * Springs are versatile. One spring can apply to many situations, such as transitions, button
+ * effects, or gestures. This makes the motion and expression feel consistent throughout the
+ * product.
+ *
+ * Spatial and effect spring tokens come in three speeds: default, fast, and slow. Most motion
+ * should use the default speed, while smaller elements may use fast and larger
+ * elements may use slow.
+ * [Speed](https://m3.material.io/styles/motion/overview/how-it-works#947e5ca1-6366-4683-948c-9ee38adf5a42)
+ *
+ * Springs feel natural. Springs are designed to be predictable, like how objects move and bounce.
+ * They handle gestures, interruptions, and retargeting animations seamlessly. Motion schemes are
+ * designed to create a harmonious motion for components in the app.
  *
  * There are two built-in schemes, a [standard] and an [expressive], that can be used as-is or
  * customized.
  *
- * You can customize the motion scheme for all components in the [MaterialTheme].
+ * You can customize the motion scheme for all components in the [AppTheme].
  */
 @ExperimentalThemeApi
 @Immutable

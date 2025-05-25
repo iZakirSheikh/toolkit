@@ -123,9 +123,9 @@ fun Preference(
                     manager.clearFocus()
                     true
                 }
-                .clickable { requester.requestFocus() }
+                .clickable(indication = null, interactionSource = null) { requester.requestFocus() }
                 .then(modifier)
-                .animateContentSize()
+                .animateContentSize(animationSpec = AppTheme.motionScheme.fastSpatialSpec())
         }
     }
     // Main layout for the preference item
