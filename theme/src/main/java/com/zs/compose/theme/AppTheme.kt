@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalSharedTransitionApi::class)
+@file:OptIn(ExperimentalSharedTransitionApi::class, ExperimentalThemeApi::class)
 
 package com.zs.compose.theme
 
@@ -69,6 +69,7 @@ import com.zs.compose.foundation.SepiaBrown
 import com.zs.compose.foundation.SignalWhite
 import com.zs.compose.foundation.TrafficYellow
 import com.zs.compose.foundation.UmbraGrey
+import com.zs.compose.theme.MotionScheme.Companion.standard
 import com.zs.compose.theme.text.ProvideTextStyle
 
 // source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/MaterialTheme.kt;bpv=0
@@ -98,6 +99,22 @@ internal val LocalSharedTransitionScope =
     staticCompositionLocalOf<SharedTransitionScope> {
         error("CompositionLocal LocalSharedTransition not present")
     }
+
+/**
+ * A read-only `CompositionLocal` that provides the current [MotionScheme] to Material 3
+ * components.
+ *
+ * The motion scheme is typically supplied by [AppTheme.motionScheme] and can be overridden
+ * for specific UI subtrees by wrapping it with another [AppTheme].
+ *
+ * This API is exposed to allow retrieving motion values from inside
+ * `CompositionLocalConsumerModifierNode` implementations, but in most cases it's recommended to
+ * read the motion values from [AppTheme.motionScheme].
+ */
+@Suppress("CompositionLocalNaming")
+@ExperimentalThemeApi
+internal val LocalMotionScheme =
+    staticCompositionLocalOf { standard() }
 
 /**
  * Provides a[CompositionLocal] to access the current [AnimatedVisibilityScope].
@@ -143,11 +160,16 @@ object AppTheme {
         @ReadOnlyComposable
         get() = LocalSharedTransitionScope.current
 
+    @ExperimentalThemeApi
+    val motionScheme: MotionScheme
+        @Composable @ReadOnlyComposable get() = LocalMotionScheme.current
+
     @OptIn(ExperimentalSharedTransitionApi::class)
     @Composable
     operator fun invoke(
         colors: Colors = AppTheme.colors,
         shapes: Shapes = AppTheme.shapes,
+        motionScheme: MotionScheme = MotionScheme.expressive(),
         typography: Typography = AppTheme.typography,
         content: @Composable () -> Unit
     ) {
@@ -157,6 +179,7 @@ object AppTheme {
             CompositionLocalProvider(
                 LocalColors provides colors,
                 LocalIndication provides rippleIndication,
+                LocalMotionScheme provides motionScheme,
                 LocalShapes provides shapes,
                 LocalTextSelectionColors provides selectionColors,
                 LocalTypography provides typography,
@@ -338,10 +361,21 @@ fun Modifier.sharedElement(
 @RequiresApi(Build.VERSION_CODES.S)
 fun dynamicAccentColor(context: Context, darkTheme: Boolean): Color {
     val res = context.resources
-    val color = when{
-        Build.VERSION.SDK_INT >= 34 && !darkTheme -> res.getColor(android.R.color.system_primary_light, context.theme)
-        Build.VERSION.SDK_INT >= 34 && !darkTheme -> res.getColor(android.R.color.system_primary_dark, context.theme)
-        !darkTheme ->  res.getColor(android.R.color.system_accent1_600, context.theme)// light, tonalPalette.primary40, // dark tonalPalette.primary80
+    val color = when {
+        Build.VERSION.SDK_INT >= 34 && !darkTheme -> res.getColor(
+            android.R.color.system_primary_light,
+            context.theme
+        )
+
+        Build.VERSION.SDK_INT >= 34 && !darkTheme -> res.getColor(
+            android.R.color.system_primary_dark,
+            context.theme
+        )
+
+        !darkTheme -> res.getColor(
+            android.R.color.system_accent1_600,
+            context.theme
+        )// light, tonalPalette.primary40, // dark tonalPalette.primary80
         else -> res.getColor(android.R.color.system_accent1_200, context.theme)
     }
     return Color(color)

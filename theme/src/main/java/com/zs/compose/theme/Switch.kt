@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalThemeApi::class)
+
 package com.zs.compose.theme
 
 import androidx.compose.animation.animateColorAsState
@@ -94,6 +96,7 @@ private class DefaultSwitchColors(
             } else {
                 if (checked) disabledCheckedThumbColor else disabledUncheckedThumbColor
             },
+            animationSpec = AppTheme.motionScheme.slowEffectsSpec()
         )
     }
 
@@ -104,7 +107,8 @@ private class DefaultSwitchColors(
                 if (checked) checkedTrackColor else uncheckedTrackColor
             } else {
                 if (checked) disabledCheckedTrackColor else disabledUncheckedTrackColor
-            }
+            },
+            animationSpec = AppTheme.motionScheme.slowEffectsSpec()
         )
     }
 
@@ -238,7 +242,7 @@ fun Switch(
         else -> Modifier
     }
     // animates the position
-    val position by animateFloatAsState(if (checked) 1f else 0f)
+    val position by animateFloatAsState(if (checked) 1f else 0f, animationSpec = AppTheme.motionScheme.fastSpatialSpec())
     Canvas(
         modifier
             .thenIf(onCheckedChange != null) { minimumInteractiveComponentSize() }
