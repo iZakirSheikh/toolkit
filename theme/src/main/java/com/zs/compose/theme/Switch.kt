@@ -42,17 +42,21 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import com.zs.compose.foundation.thenIf
 
 // Impl from material2
 // inspired by fluent2 switch
 
-private val TrackStrokeWidth = 1.dp
+private val TrackStrokeWidth = 1.5.dp
 private val DefaultSwitchPadding = 2.dp
+private val HandleHorizontalMargin = 3.dp
+private val HandleRadius = 9.dp
+private val HandleSelectedRadius = 11.dp
 
-private val SwitchWidth = 43.dp
-private val SwitchHeight = 22.dp
+private val SwitchSize = DpSize(52.dp, 27.dp)
 
 @Stable
 interface SwitchColors {
@@ -242,14 +246,17 @@ fun Switch(
         else -> Modifier
     }
     // animates the position
-    val position by animateFloatAsState(if (checked) 1f else 0f, animationSpec = AppTheme.motionScheme.fastSpatialSpec())
+    val progress by animateFloatAsState(
+        if (checked) 1f else 0f,
+        animationSpec = AppTheme.motionScheme.fastSpatialSpec()
+    )
     Canvas(
         modifier
             .thenIf(onCheckedChange != null) { minimumInteractiveComponentSize() }
             .then(checkedModifier)
             .wrapContentSize(Alignment.Center)
             .padding(DefaultSwitchPadding)
-            .requiredSize(43.dp, 22.dp)
+            .requiredSize(SwitchSize)
     ) {
         val stroke = TrackStrokeWidth.toPx()
         when (checked) {
@@ -267,14 +274,17 @@ fun Switch(
                 size = size
             )
         }
-        val radius = 0.33f * size.minDimension
+
+        val radiusPx = lerp(HandleRadius, HandleSelectedRadius, progress).toPx()
+        val marginPx = HandleHorizontalMargin.toPx()
         drawCircle(
             color = thumbColor,
-            radius = radius,
+            radius = radiusPx,
             center = Offset(
-                x = (position * size.width).coerceIn(
-                    1.4f * radius,
-                    size.width - (1.4f * radius)
+                x = com.zs.compose.foundation.lerp(
+                    radiusPx + marginPx,
+                    size.width - radiusPx - marginPx,
+                    progress
                 ),
                 y = center.y
             )

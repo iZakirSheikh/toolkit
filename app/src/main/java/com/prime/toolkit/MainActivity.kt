@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DesignServices
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
@@ -40,6 +41,7 @@ import com.prime.toolkit.core.background
 import com.prime.toolkit.core.observe
 import com.prime.toolkit.core.rememberBackgroundProvider
 import com.prime.toolkit.games.Games
+import com.prime.toolkit.m3.M3
 import com.prime.toolkit.settings.Settings
 import com.prime.toolkit.text.Strings
 import com.zs.compose.foundation.Background
@@ -125,6 +127,7 @@ class MainActivity : ComponentActivity() {
                         0 -> Games()
                         3 -> Settings()
                         2 -> Strings()
+                        1 -> M3()
                     }
                 }
             },
@@ -160,8 +163,8 @@ class MainActivity : ComponentActivity() {
 
                         // @nd
                         NavigationItem(
-                            icon = { Icon(Icons.Default.VideoLibrary, null) },
-                            label = { Label("Collections") },
+                            icon = { Icon(Icons.Default.DesignServices, null) },
+                            label = { Label("M3 Catelog") },
                             selected = selected == 1,
                             onClick = { selected = 1 },
                             isBottomNav = vertical

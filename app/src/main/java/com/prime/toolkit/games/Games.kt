@@ -65,6 +65,7 @@ import com.zs.compose.foundation.plus
 import com.zs.compose.theme.AlertDialog
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Button
+import com.zs.compose.theme.Checkbox
 import com.zs.compose.theme.ColorPickerDialog
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
@@ -228,6 +229,12 @@ fun Games() {
                         onClick = {
                             showMore = true
                         }
+                    )
+
+                    Checkbox(
+                        showMore,
+                        onCheckedChange = {showMore = it},
+
                     )
                 }
             )
