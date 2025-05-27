@@ -19,6 +19,8 @@
 package com.zs.compose.theme
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -195,6 +197,7 @@ fun Surface(
     border: BorderStroke? = null,
     elevation: Dp = 0.dp,
     interactionSource: MutableInteractionSource? = null,
+    indication: Indication? = LocalIndication.current,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
@@ -208,7 +211,7 @@ fun Surface(
                 )
                 .clickable(
                     interactionSource = interactionSource,
-                    indication = ripple(),
+                    indication = indication,
                     enabled = enabled,
                     onClick = onClick
                 ), propagateMinConstraints = true
@@ -293,6 +296,7 @@ fun Surface(
     border: BorderStroke? = null,
     elevation: Dp = 0.dp,
     interactionSource: MutableInteractionSource? = null,
+    indication: Indication? = LocalIndication.current,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
@@ -307,7 +311,7 @@ fun Surface(
                 .selectable(
                     selected = selected,
                     interactionSource = interactionSource,
-                    indication = ripple(),
+                    indication = indication,
                     enabled = enabled,
                     onClick = onClick
                 ), propagateMinConstraints = true
@@ -392,6 +396,7 @@ fun Surface(
     border: BorderStroke? = null,
     elevation: Dp = 0.dp,
     interactionSource: MutableInteractionSource? = null,
+    indication: Indication? = LocalIndication.current,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
@@ -406,7 +411,7 @@ fun Surface(
                 .toggleable(
                     value = checked,
                     interactionSource = interactionSource,
-                    indication = ripple(),
+                    indication = indication,
                     enabled = enabled,
                     onValueChange = onCheckedChange
                 ), propagateMinConstraints = true

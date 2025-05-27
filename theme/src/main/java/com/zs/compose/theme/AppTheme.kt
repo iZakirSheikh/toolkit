@@ -41,6 +41,7 @@ import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -168,21 +169,37 @@ object AppTheme {
     val motionScheme: MotionScheme
         @Composable @ReadOnlyComposable get() = LocalMotionScheme.current
 
+    /**
+     * Composable function to set up the application's theme using the provided
+     * colors, shapes, motion scheme, and typography. It uses [SharedTransitionLayout] to
+     * enable shared element transitions within the content.
+     *
+     * @param colors The [Colors] to be used in the theme. Defaults to [AppTheme.colors].
+     * @param shapes The [Shapes] to be used in the theme. Defaults to [AppTheme.shapes].
+     * @param motionScheme The [MotionScheme] to be used for animations. Defaults to [MotionScheme.expressive].
+     * @param indication The [Indication] to be used for interactive elements. Defaults to [ripple].
+     * @param typography The [Typography] to be used in the theme. Defaults to [AppTheme.typography].
+     * @param content The composable content to be displayed within the theme.
+     *
+     * @see SharedTransitionLayout
+     * @see CompositionLocalProvider
+     * @see ProvideTextStyle
+     */
     @OptIn(ExperimentalSharedTransitionApi::class)
     @Composable
     operator fun invoke(
         colors: Colors = AppTheme.colors,
         shapes: Shapes = AppTheme.shapes,
         motionScheme: MotionScheme = MotionScheme.expressive(),
+        indication: Indication = ripple(),
         typography: Typography = AppTheme.typography,
         content: @Composable () -> Unit
     ) {
-        val rippleIndication = ripple()
         val selectionColors = rememberTextSelectionColors(colors)
         SharedTransitionLayout {
             CompositionLocalProvider(
                 LocalColors provides colors,
-                LocalIndication provides rippleIndication,
+                LocalIndication provides indication,
                 LocalMotionScheme provides motionScheme,
                 LocalShapes provides shapes,
                 LocalTextSelectionColors provides selectionColors,
@@ -201,7 +218,10 @@ object AppTheme {
      * @param isLight  if true, applies the light theme.
      * @param fontFamily  the font family to be used in the theme.
      * @param accent  the accent color to be used in the theme.
+     * @param indication  the indication to be used in the theme; defaults to [ripple()]
      * @param content  the composable content to be displayed within the theme.
+     *
+     * @see invoke
      */
     @Composable
     @Deprecated("Replace this with another version of AppTheme")
@@ -210,6 +230,7 @@ object AppTheme {
         accent: Color = if (!isLight) Color.TrafficYellow else Color.SepiaBrown,
         fontFamily: FontFamily = FontFamily.Default,
         shapes: Shapes = AppTheme.shapes,
+        indication: Indication = ripple(),
         motionScheme: MotionScheme = MotionScheme.expressive(),
         content: @Composable () -> Unit
     ) {
@@ -234,6 +255,7 @@ object AppTheme {
             colors = colors,
             typography = Typography(defaultFontFamily = fontFamily),
             shapes = shapes,
+            indication = indication,
             motionScheme = motionScheme,
             content = content
         )
