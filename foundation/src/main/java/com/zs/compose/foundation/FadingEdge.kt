@@ -167,8 +167,8 @@ private class FadingEdgeNode(
     var length: Dp,
 ): Modifier.Node(), DrawModifierNode, CompositionLocalConsumerModifierNode {
 
-    private val fadeColorsStart = listOf(Color.Transparent, Color.Black)
-    private val fadeColorsEnd = listOf(Color.Black, Color.Transparent)
+    private val fadeColorsStart = listOf(Color.Black, Color.Transparent)
+    private val fadeColorsEnd = listOf(Color.Transparent, Color.Black)
     private lateinit var layer: GraphicsLayer
 
     override fun onAttach() {
@@ -205,7 +205,7 @@ private class FadingEdgeNode(
                         ),
                         topLeft = Offset(0f, 0f),
                         size = Size( lengthPx, height),
-                        blendMode = BlendMode.DstIn
+                        blendMode = BlendMode.DstOut
                     )
 
                     // end
@@ -218,7 +218,7 @@ private class FadingEdgeNode(
                         ),
                         topLeft = Offset(width - lengthPx, 0f),
                         size = Size( lengthPx, height),
-                        blendMode = BlendMode.DstIn
+                        blendMode = BlendMode.DstOut
                     )
                 }
                 else -> {
@@ -232,7 +232,7 @@ private class FadingEdgeNode(
                         ),
                         topLeft = Offset(0f, 0f),
                         size = Size( width, lengthPx),
-                        blendMode = BlendMode.DstIn
+                        blendMode = BlendMode.DstOut
                     )
 
                     // end
@@ -245,7 +245,7 @@ private class FadingEdgeNode(
                         ),
                         topLeft = Offset(0f, height - lengthPx),
                         size = Size( width, lengthPx),
-                        blendMode = BlendMode.DstIn
+                        blendMode = BlendMode.DstOut
                     )
                 }
             }

@@ -20,6 +20,7 @@ package com.zs.compose.theme.text
 
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
@@ -43,11 +44,42 @@ import com.zs.compose.theme.DefaultTextStyle
 import com.zs.compose.theme.LocalContentColor
 
 // source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/Text.kt;bpv=0
-// commit date: 2024-06-07 20:26
 // Note:
 // Adapted from Material 3, this implementation uses a single CharSequence parameter instead of
 // separate String and AnnotatedString parameters for improved conciseness and error reduction.
 // Review `ProvideTextStyle` for potential improvements.
+//
+// Key Modifications:
+// - Unified Text Composable: Instead of distinct composables for `String` and `AnnotatedString`,
+//   a single `Text` composable now accepts a `CharSequence`. This simplifies the API and
+//   reduces potential for errors.
+// - Inline Content Handling: `inlineContent` is intentionally disregarded when the input `text`
+//   is a plain `String`.
+// - Link Styling: Link styling is intentionally omitted here. Links are expected to be styled
+//   automatically by the `getText` functions within the Toolkit.
+
+/**
+ * CompositionLocal containing the preferred [TextStyle] that will be used by [Text] components by
+ * default. To set the value for this CompositionLocal, see [ProvideTextStyle] which will merge any
+ * missing [TextStyle] properties with the existing [TextStyle] set in this CompositionLocal.
+ *
+ * @see ProvideTextStyle
+ */
+val LocalTextStyle = compositionLocalOf(structuralEqualityPolicy()) { DefaultTextStyle }
+
+// TODO(b/156598010): remove this and replace with fold definition on the backing CompositionLocal
+/**
+ * This function is used to set the current value of [LocalTextStyle], merging the given style with
+ * the current style values for any missing attributes. Any [Text] components included in this
+ * component's [content] will be styled with this style unless styled explicitly.
+ *
+ * @see LocalTextStyle
+ */
+@Composable
+fun ProvideTextStyle(value: TextStyle, content: @Composable () -> Unit) {
+    val mergedStyle = LocalTextStyle.current.merge(value)
+    CompositionLocalProvider(LocalTextStyle provides mergedStyle, content = content)
+}
 
 /**
  * High level element that displays text and provides semantics / accessibility information.
@@ -74,6 +106,10 @@ import com.zs.compose.theme.LocalContentColor
  * @param modifier the [Modifier] to be applied to this layout node
  * @param color [Color] to apply to the text. If [Color.Unspecified], and [style] has no color set,
  *   this will be [LocalContentColor].
+ * @param autoSize Enable auto sizing for this text composable. Finds the biggest font size that
+ *   fits in the available space and lays the text out with this size. This performs multiple layout
+ *   passes and can be slower than using a fixed font size. This takes precedence over sizes defined
+ *   through [fontSize] and [style]. See [TextAutoSize].
  * @param fontSize the size of glyphs to use when painting the text. See [TextStyle.fontSize].
  * @param fontStyle the typeface variant to use when drawing the letters (e.g., italic). See
  *   [TextStyle.fontStyle].
@@ -97,7 +133,7 @@ import com.zs.compose.theme.LocalContentColor
  * @param minLines The minimum height in terms of minimum number of visible lines. It is required
  *   that 1 <= [minLines] <= [maxLines].
  * @param inlineContent a map storing composables that replaces certain ranges of the text, used to
- *   insert composables into text layout. See [InlineTextContent].
+ *   insert composables into text layout. See [InlineTextContent]. ignored when [text] is string.
  * @param onTextLayout callback that is executed when a new text layout is calculated. A
  *   [TextLayoutResult] object that callback provides contains paragraph information, size of the
  *   text, baselines and other details. The callback can be used to add additional decoration or
@@ -109,6 +145,7 @@ fun Text(
     text: CharSequence,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
+    autoSize: TextAutoSize? = null,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
@@ -122,63 +159,61 @@ fun Text(
     maxLines: Int = Int.MAX_VALUE,
     minLines: Int = 1,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
-    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
-    style: TextStyle = LocalTextStyle.current
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+    style: TextStyle = LocalTextStyle.current,
 ) {
-    val textColor = color.takeOrElse {
-        style.color.takeOrElse {
-            LocalContentColor.current
-        }
-    }
-    when (text) {
+    val textColor = color.takeOrElse { style.color.takeOrElse { LocalContentColor.current } }
+    // Note: We don't change link style here becasue we use custom API and there style their
+    when(text){
         is String -> BasicText(
-            text,
-            modifier,
-            style.merge(
-                color = textColor,
-                fontSize = fontSize,
-                fontWeight = fontWeight,
-                textAlign = textAlign ?: TextAlign.Unspecified,
-                lineHeight = lineHeight,
-                fontFamily = fontFamily,
-                textDecoration = textDecoration,
-                fontStyle = fontStyle,
-                letterSpacing = letterSpacing
-            ),
-            onTextLayout,
-            overflow,
-            softWrap,
-            maxLines,
-            minLines
+            text = text,
+            modifier = modifier,
+            style =
+                style.merge(
+                    color = textColor,
+                    fontSize = fontSize,
+                    fontWeight = fontWeight,
+                    textAlign = textAlign ?: TextAlign.Unspecified,
+                    lineHeight = lineHeight,
+                    fontFamily = fontFamily,
+                    textDecoration = textDecoration,
+                    fontStyle = fontStyle,
+                    letterSpacing = letterSpacing,
+                ),
+            onTextLayout = onTextLayout,
+            overflow = overflow,
+            softWrap = softWrap,
+            maxLines = maxLines,
+            minLines = minLines,
+            autoSize = autoSize,
         )
 
         is AnnotatedString -> BasicText(
             text = text,
             modifier = modifier,
             style =
-            style.merge(
-                color = textColor,
-                fontSize = fontSize,
-                fontWeight = fontWeight,
-                textAlign = textAlign ?: TextAlign.Unspecified,
-                lineHeight = lineHeight,
-                fontFamily = fontFamily,
-                textDecoration = textDecoration,
-                fontStyle = fontStyle,
-                letterSpacing = letterSpacing
-            ),
+                style.merge(
+                    color = textColor,
+                    fontSize = fontSize,
+                    fontWeight = fontWeight,
+                    textAlign = textAlign ?: TextAlign.Unspecified,
+                    lineHeight = lineHeight,
+                    fontFamily = fontFamily,
+                    textDecoration = textDecoration,
+                    fontStyle = fontStyle,
+                    letterSpacing = letterSpacing,
+                ),
             onTextLayout = onTextLayout,
             overflow = overflow,
             softWrap = softWrap,
             maxLines = maxLines,
             minLines = minLines,
-            inlineContent = inlineContent
+            inlineContent = inlineContent,
+            autoSize = autoSize,
         )
-
-        else -> error("Unsupported text type: ${text::class.java}")
+        else -> error("AppTheme - unsupported text type: ${text::class.java}")
     }
 }
-
 
 @Composable
 @NonRestartableComposable
@@ -186,6 +221,7 @@ fun Label(
     text: CharSequence,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
+    autoSize: TextAutoSize? = null,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     textAlign: TextAlign? = null,
@@ -194,6 +230,7 @@ fun Label(
 ) = Text(
     text = text,
     modifier = modifier,
+    autoSize = autoSize,
     style = style,
     maxLines = maxLines,
     color = color,
@@ -202,28 +239,3 @@ fun Label(
     fontSize = fontSize,
     textAlign = textAlign
 )
-
-
-/**
- * CompositionLocal containing the preferred [TextStyle] that will be used by [Text] components by
- * default. To set the value for this CompositionLocal, see [ProvideTextStyle] which will merge any
- * missing [TextStyle] properties with the existing [TextStyle] set in this CompositionLocal.
- *
- * @see ProvideTextStyle
- */
-val LocalTextStyle = compositionLocalOf(structuralEqualityPolicy()) { DefaultTextStyle }
-
-// TODO(b/156598010): remove this and replace with fold definition on the backing CompositionLocal
-/**
- * This function is used to set the current value of [LocalTextStyle], merging the given style with
- * the current style values for any missing attributes. Any [Text] components included in this
- * component's [content] will be styled with this style unless styled explicitly.
- *
- * @see LocalTextStyle
- */
-@Composable
-fun ProvideTextStyle(value: TextStyle, content: @Composable () -> Unit) {
-    val mergedStyle = LocalTextStyle.current.merge(value)
-    CompositionLocalProvider(LocalTextStyle provides mergedStyle, content = content)
-}
-

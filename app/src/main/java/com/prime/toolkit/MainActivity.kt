@@ -74,7 +74,7 @@ private val SampleTestMessage = buildAnnotatedString {
         append("Network Status")
     }
     withStyle(SpanStyle(color = Color.Gray)) {
-        append("\nYou're currently offline. Please check your internet connection or try again later. This message can be as detailed as necessary, giving users clear context about the issue. Whether it’s a toast, dialog, or snackbar, the goal is to keep them informed in a non-intrusive way.")
+        append("\nYou're currently offline. Please check your internet connection or try again later. This message can be as detailed as necessary, giving users clear context about the issue. Whether it’s a toast, dialog, or snackbar, the goal is to keep them informed in a non-intrusive way. Consider adding specific troubleshooting steps or a link to a help page if appropriate. The key is to be both informative and reassuring, letting the user know that you are aware of the problem and are working to resolve it, or providing them with the means to do so themselves. This proactive approach can significantly enhance user experience, even when things go wrong. Ensure the message is easily dismissible so it doesn't obstruct other functionalities if the user chooses to ignore it for the moment.")
     }
 }
 

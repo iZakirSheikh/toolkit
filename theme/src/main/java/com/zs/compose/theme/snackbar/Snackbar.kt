@@ -66,6 +66,7 @@ import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Button
 import com.zs.compose.theme.ButtonDefaults
 import com.zs.compose.theme.Colors
+import com.zs.compose.theme.ContentAlpha
 import com.zs.compose.theme.DismissValue
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
@@ -240,10 +241,15 @@ fun Snackbar(
                                     onClick = value::action,
                                     colors = ButtonDefaults.buttonColors(
                                         contentColor = actionColor,
-                                        backgroundColor = actionColor.copy(0.15f)
+                                        backgroundColor = actionColor.copy(ContentAlpha.indication)
                                     ),
                                     modifier = SnackButtonScale,
-                                    elevation = null
+                                    elevation = null,
+                                    border = BorderStroke(
+                                        ButtonDefaults.OutlinedBorderSize, actionColor.copy(
+                                            ButtonDefaults.OutlinedBorderOpacity
+                                        )
+                                    )
                                 )
                         }
                     )
