@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Textsms
-import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.Weekend
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -46,15 +45,12 @@ import com.prime.toolkit.settings.Settings
 import com.prime.toolkit.text.Strings
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.BlueLilac
-import com.zs.compose.foundation.ClaretViolet
 import com.zs.compose.foundation.MetroGreen
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Badge
 import com.zs.compose.theme.BadgedBox
-import com.zs.compose.theme.ButtonShapes
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.FloatingActionButton
-import com.zs.compose.theme.FloatingActionButtonDefaults
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.adaptive.NavigationSuiteScaffold
@@ -137,7 +133,7 @@ class MainActivity : ComponentActivity() {
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {darkMode = !darkMode},
-                    shapes = ButtonShapes(AppTheme.shapes.large, AppTheme.shapes.xLarge),
+                    shapes = AppTheme.shapes.large to AppTheme.shapes.xLarge,
                     content = {
                         Icon(Icons.Default.LightMode, null)
                     },

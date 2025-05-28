@@ -853,83 +853,62 @@ fun ElevatedButton(
     Label(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
 }
 
+// Replaced ButtonShapes with Pair; this is safe to use in jetpack compose and comes with infix fun 'to '
+// which makes it fun to use
+
 /**
  * The shapes that will be used in buttons. Button will morph between these shapes depending on the
  * interaction of the button, assuming all of the shapes are [CornerBasedShape]s.
  *
- * @property shape is the active shape.
- * @property pressedShape is the pressed shape.
+ * @property Pair.first is the active shape.
+ * @property Pair.second is the pressed shape.
  */
-@ExperimentalThemeApi
-@Immutable
-class ButtonShapes(val shape: Shape, val pressedShape: Shape) {
-    /** Returns a copy of this ButtonShapes, optionally overriding some of the values. */
-    fun copy(shape: Shape? = this.shape, pressedShape: Shape? = this.pressedShape) =
-        ButtonShapes(
-            shape = shape.takeOrElse { this.shape },
-            pressedShape = pressedShape.takeOrElse { this.pressedShape },
-        )
+private typealias ButtonShapes = Pair<Shape, Shape>
 
-    internal fun Shape?.takeOrElse(block: () -> Shape): Shape = this ?: block()
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || other !is ButtonShapes) return false
+/**
+ * @return shape of the button based on the interaction.
+ */
+@OptIn(ExperimentalThemeApi::class)
+@Composable
+private fun ButtonShapes.shapeByInteraction(source: InteractionSource): Shape {
+    // If both shapes are not RoundedCornerShape, return the default shape directly.
+    if (first !is RoundedCornerShape && second !is RoundedCornerShape) return first
 
-        if (shape != other.shape) return false
-        if (pressedShape != other.pressedShape) return false
+    // Get the default animation specifications for Float values from the motion scheme.
+    val specs = AppTheme.motionScheme.defaultEffectsSpec<Float>()
 
-        return true
+    // Remember the AnimatedShapeState, which holds the current shape and animation spec.
+    // This state is re-created if the animation spec changes.
+    val state = remember(specs) {
+        AnimatedShapeState(shape = first as RoundedCornerShape, spec = specs)
     }
 
-    override fun hashCode(): Int {
-        var result = shape.hashCode()
-        result = 31 * result + pressedShape.hashCode()
+    // Launch an effect that collects interactions from the InteractionSource.
+    LaunchedEffect(source) {
+        source.interactions.collect {
+            // Determine if the interaction is a press event.
+            val pressed = it is PressInteraction.Press
 
-        return result
-    }
+            // If the interaction is not a press, introduce a small delay.
+            // This can help in scenarios where a quick release might not be visually noticeable.
+            // TODO - Find how old version of Material ripple in compose does this.
+            if (!pressed) {
+                delay(100)
+            }
 
-    @Composable
-    fun current(source: InteractionSource): Shape {
-        // If both shapes are not RoundedCornerShape, return the default shape directly.
-        if (shape !is RoundedCornerShape && pressedShape !is RoundedCornerShape) return shape
-
-        // Get the default animation specifications for Float values from the motion scheme.
-        val specs = AppTheme.motionScheme.defaultEffectsSpec<Float>()
-
-        // Remember the AnimatedShapeState, which holds the current shape and animation spec.
-        // This state is re-created if the animation spec changes.
-        val state = remember(specs) {
-            AnimatedShapeState(shape = shape as RoundedCornerShape, spec = specs)
-        }
-
-        // Launch an effect that collects interactions from the InteractionSource.
-        LaunchedEffect(source) {
-            source.interactions.collect {
-                // Determine if the interaction is a press event.
-                val pressed = it is PressInteraction.Press
-
-                // If the interaction is not a press, introduce a small delay.
-                // This can help in scenarios where a quick release might not be visually noticeable.
-                // TODO - Find how old version of Material ripple in compose does this.
-                if (!pressed) {
-                    delay(100)
-                }
-
-                // Launch a new coroutine to animate the shape change.
-                launch {
-                    // Animate to the pressedShape if pressed, otherwise animate to the default shape.
-                    // Both shapes are cast to CornerBasedShape as the animation logic expects it.
-                    state.animateToShape((if (pressed) pressedShape else shape) as CornerBasedShape)
-                }
+            // Launch a new coroutine to animate the shape change.
+            launch {
+                // Animate to the pressedShape if pressed, otherwise animate to the default shape.
+                // Both shapes are cast to CornerBasedShape as the animation logic expects it.
+                state.animateToShape((if (pressed) second else first) as CornerBasedShape)
             }
         }
-        // Return an animated shape that updates based on the AnimatedShapeState.
-        return rememberAnimatedShape(state)
     }
+    // Return an animated shape that updates based on the AnimatedShapeState.
+    return rememberAnimatedShape(state)
 }
 
-// TODO add link to image of pressed button
 /**
  * [Material Design button](https://m3.material.io/components/buttons/overview)
  *
@@ -996,7 +975,7 @@ fun Button(
     val containerColor = colors.backgroundColor(enabled)
     val contentColor = colors.contentColor(enabled)
     val shadowElevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp
-    val buttonShape = shapes.current(interactionSource)
+    val buttonShape = shapes.shapeByInteraction(interactionSource)
     Surface(
         onClick = onClick,
         modifier = modifier.semantics { role = Role.Button },
@@ -1034,6 +1013,7 @@ fun Button(
  * requires visual separation from patterned container.
  *
  * @see Button
+ * @see ButtonShapes
  */
 @Composable
 @NonRestartableComposable
@@ -1069,6 +1049,7 @@ fun ElevatedButton(
  * not the primary action in an app. Outlined buttons pair well with [Button]s to indicate an
  * alternative, secondary action.
  * @see Button
+ * @see ButtonShapes
  */
 @Composable
 @NonRestartableComposable
@@ -1104,6 +1085,7 @@ fun OutlinedButton(
  * and cards. In cards, text buttons help maintain an emphasis on card content. Text buttons are
  * used for the lowest priority actions, especially when presenting multiple options.
  * @see Button
+ * @see ButtonShapes
  */
 @Composable
 @ExperimentalThemeApi
@@ -1141,6 +1123,7 @@ fun TextButton(
  * in an onboarding flow. Tonal buttons use the secondary color mapping.
  *
  * @see Button
+ * @see ButtonShapes
  * */
 @Composable
 @ExperimentalThemeApi

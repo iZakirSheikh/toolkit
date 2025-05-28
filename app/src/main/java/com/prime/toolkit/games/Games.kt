@@ -60,14 +60,11 @@ import com.prime.toolkit.core.background
 import com.prime.toolkit.core.observe
 import com.prime.toolkit.core.rememberBackgroundProvider
 import com.zs.compose.foundation.Background
-import com.zs.compose.foundation.MetroGreen
-import com.zs.compose.foundation.fadingEdge
 import com.zs.compose.foundation.fullLineSpan
 import com.zs.compose.foundation.plus
 import com.zs.compose.theme.AlertDialog
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Button
-import com.zs.compose.theme.ButtonShapes
 import com.zs.compose.theme.Checkbox
 import com.zs.compose.theme.ColorPickerDialog
 import com.zs.compose.theme.ElevatedButton
@@ -268,7 +265,7 @@ fun Games() {
                     item(span = fullLineSpan) {
                         ElevatedButton (
                             onClick = {},
-                            shapes = ButtonShapes(AppTheme.shapes.xLarge, AppTheme.shapes.medium),
+                            shapes = AppTheme.shapes.xLarge to AppTheme.shapes.medium,
                             modifier = Modifier.requiredSize(150.dp, 40.dp)
                         ) {
                             Text("Elevated Button")
