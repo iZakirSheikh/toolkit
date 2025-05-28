@@ -39,6 +39,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Colorize
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.LocalFireDepartment
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.rounded.HomeMax
@@ -65,6 +66,7 @@ import com.zs.compose.foundation.plus
 import com.zs.compose.theme.AlertDialog
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Button
+import com.zs.compose.theme.ButtonDefaults
 import com.zs.compose.theme.Checkbox
 import com.zs.compose.theme.ColorPickerDialog
 import com.zs.compose.theme.ElevatedButton
@@ -72,12 +74,18 @@ import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.LocalWindowSize
+import com.zs.compose.theme.OutlinedButton
+import com.zs.compose.theme.SplitButtonLayout
+import com.zs.compose.theme.TrailingSplitButton
+import com.zs.compose.theme.TrailingSplitElevatedButton
+import com.zs.compose.theme.TrailingSplitOutlinedButton
 import com.zs.compose.theme.adaptive.Scaffold
 import com.zs.compose.theme.adaptive.content
 import com.zs.compose.theme.appbar.AppBarDefaults
 import com.zs.compose.theme.appbar.TopAppBar
 import com.zs.compose.theme.menu.DropDownMenu
 import com.zs.compose.theme.menu.DropDownMenuItem
+import com.zs.compose.theme.text.Header
 import com.zs.compose.theme.text.Label
 import com.zs.compose.theme.text.Text
 
@@ -271,6 +279,37 @@ fun Games() {
                             Text("Elevated Button")
                         }
                     }
+
+                       // button with shapes
+                        item(span = fullLineSpan) {
+                            Header("Split button")
+                        }
+
+                        item(span = fullLineSpan) {
+                            SplitButtonLayout(
+                                leadingButton = {
+                                    ElevatedButton (
+                                        onClick = {},
+                                        shapes = ButtonDefaults.LeadingSplitButtonShapes,
+                                        content = {
+                                            Text("Leading Button")
+                                        }
+                                    )
+                                },
+                                trailingButton = {
+                                    val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                                    TrailingSplitElevatedButton(
+//                                        checked = checked,
+//onCheckedChange = onCheckedChange,
+                                        onClick = {},
+                                        shapes = ButtonDefaults.TrailingSplitButtonActiveCheckedShapes,
+                                        content = {
+                                           Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = null)
+                                        }
+                                    )
+                                }
+                            )
+                        }
 
                     items(Games) { item ->
                         Game(

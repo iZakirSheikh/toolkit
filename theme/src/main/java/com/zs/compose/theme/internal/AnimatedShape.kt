@@ -21,9 +21,12 @@ package com.zs.compose.theme.internal
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Size
@@ -32,7 +35,10 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import com.zs.compose.theme.AppTheme
+import com.zs.compose.theme.ExperimentalThemeApi
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 // Copied from
@@ -108,4 +114,70 @@ internal fun rememberAnimatedShape(state: AnimatedShapeState): Shape {
             }
         }
     }
+}
+
+/**
+ * The shapes that will be used in buttons. Button will morph between these shapes depending on the
+ * interaction of the button, assuming all of the shapes are [CornerBasedShape]s.
+ *
+ * @property Pair.first is the active shape.
+ * @property Pair.second is the pressed shape.
+ */
+internal typealias ActivePressedButtonShape = Pair<Shape, Shape>
+
+/**
+ * Composable function that returns a shape that animates based on interactions.
+ *
+ * This function observes the provided [InteractionSource] and animates the shape
+ * of a button between its default and pressed states. The animation uses the
+ * default effects specification from the [AppTheme.motionScheme].
+ *
+ * If both the default and pressed shapes are not [RoundedCornerShape], the default
+ * shape is returned directly without animation.
+ *
+ * A small delay is introduced when the interaction is not a press, which can help
+ * in scenarios where a quick release might not be visually noticeable.
+ *
+ * @param source The [InteractionSource] to observe for interactions.
+ * @return A [Shape] that animates based on the interaction state.
+ *         If the shapes are not [RoundedCornerShape], it returns the default shape.
+ */
+@OptIn(ExperimentalThemeApi::class)
+@Composable
+internal fun ActivePressedButtonShape.shapeByInteraction(source: InteractionSource): Shape {
+    // If both shapes are not RoundedCornerShape, return the default shape directly.
+    if (first !is RoundedCornerShape && second !is RoundedCornerShape) return first
+
+    // Get the default animation specifications for Float values from the motion scheme.
+    val specs = AppTheme.motionScheme.defaultEffectsSpec<Float>()
+
+    // Remember the AnimatedShapeState, which holds the current shape and animation spec.
+    // This state is re-created if the animation spec changes.
+    val state = remember(specs) {
+        AnimatedShapeState(shape = first as RoundedCornerShape, spec = specs)
+    }
+
+    // Launch an effect that collects interactions from the InteractionSource.
+    LaunchedEffect(source) {
+        source.interactions.collect {
+            // Determine if the interaction is a press event.
+            val pressed = it is PressInteraction.Press
+
+            // If the interaction is not a press, introduce a small delay.
+            // This can help in scenarios where a quick release might not be visually noticeable.
+            // TODO - Find how old version of Material ripple in compose does this.
+            if (!pressed) {
+                delay(100)
+            }
+
+            // Launch a new coroutine to animate the shape change.
+            launch {
+                // Animate to the pressedShape if pressed, otherwise animate to the default shape.
+                // Both shapes are cast to CornerBasedShape as the animation logic expects it.
+                state.animateToShape((if (pressed) second else first) as CornerBasedShape)
+            }
+        }
+    }
+    // Return an animated shape that updates based on the AnimatedShapeState.
+    return rememberAnimatedShape(state)
 }

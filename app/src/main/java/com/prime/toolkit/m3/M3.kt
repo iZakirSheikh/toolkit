@@ -199,8 +199,10 @@ fun M3() {
                                     )
                                 },
                                 trailingButton = {
-                                    SplitButtonDefaults.TrailingButton(
-                                        onClick = {},
+                                    val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                                    SplitButtonDefaults.TrailingButton (
+                                        checked = checked,
+                                        onCheckedChange = onCheckedChange,
                                         content = {
                                             androidx.compose.material3.Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = null)
                                         }

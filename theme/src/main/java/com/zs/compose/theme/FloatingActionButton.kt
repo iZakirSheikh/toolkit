@@ -34,8 +34,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerBasedShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -50,11 +48,10 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.zs.compose.theme.internal.AnimatedShapeState
+import com.zs.compose.theme.internal.ActivePressedButtonShape
 import com.zs.compose.theme.internal.animateElevation
-import com.zs.compose.theme.internal.rememberAnimatedShape
+import com.zs.compose.theme.internal.shapeByInteraction
 import com.zs.compose.theme.text.ProvideTextStyle
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -384,68 +381,14 @@ private val ExtendedFabSize = 48.dp
 private val ExtendedFabIconPadding = 12.dp
 private val ExtendedFabTextPadding = 20.dp
 
-
 /**
- * The shapes that will be used in buttons. Button will morph between these shapes depending on the
- * interaction of the button, assuming all of the shapes are [CornerBasedShape]s.
- *
- * @property Pair.first is the active shape.
- * @property Pair.second is the pressed shape.
- */
-private typealias FabButtonShapes = Pair<Shape, Shape>
-
-/**
- * @return shape of the button based on the interaction.
- */
-@OptIn(ExperimentalThemeApi::class)
-@Composable
-private fun FabButtonShapes.shapeByInteraction(source: InteractionSource): Shape {
-    // If both shapes are not RoundedCornerShape, return the default shape directly.
-    if (first !is RoundedCornerShape && second !is RoundedCornerShape) return first
-
-    // Get the default animation specifications for Float values from the motion scheme.
-    val specs = AppTheme.motionScheme.defaultEffectsSpec<Float>()
-
-    // Remember the AnimatedShapeState, which holds the current shape and animation spec.
-    // This state is re-created if the animation spec changes.
-    val state = remember(specs) {
-        AnimatedShapeState(shape = first as RoundedCornerShape, spec = specs)
-    }
-
-    // Launch an effect that collects interactions from the InteractionSource.
-    LaunchedEffect(source) {
-        source.interactions.collect {
-            // Determine if the interaction is a press event.
-            val pressed = it is PressInteraction.Press
-
-            // If the interaction is not a press, introduce a small delay.
-            // This can help in scenarios where a quick release might not be visually noticeable.
-            // TODO - Find how old version of Material ripple in compose does this.
-            if (!pressed) {
-                delay(100)
-            }
-
-            // Launch a new coroutine to animate the shape change.
-            launch {
-                // Animate to the pressedShape if pressed, otherwise animate to the default shape.
-                // Both shapes are cast to CornerBasedShape as the animation logic expects it.
-                state.animateToShape((if (pressed) second else first) as CornerBasedShape)
-            }
-        }
-    }
-    // Return an animated shape that updates based on the AnimatedShapeState.
-    return rememberAnimatedShape(state)
-}
-
-
-/**
- * @see FabButtonShapes
+ * @see ActivePressedButtonShape
  */
 @ExperimentalThemeApi
 @Composable
 fun FloatingActionButton(
     onClick: () -> Unit,
-    shapes: FabButtonShapes,
+    shapes: ActivePressedButtonShape,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource? = null,
     backgroundColor: Color = AppTheme.colors.accent,
@@ -477,12 +420,12 @@ fun FloatingActionButton(
 }
 
 /**
- * @see FabButtonShapes
+ * @see ActivePressedButtonShape
  */
 @ExperimentalThemeApi
 @Composable
 fun ExtendedFloatingActionButton(
-    shapes: FabButtonShapes,
+    shapes: ActivePressedButtonShape,
     text: @Composable () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

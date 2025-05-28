@@ -56,14 +56,12 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.zs.compose.theme.internal.AnimatedShapeState
+import com.zs.compose.theme.internal.ActivePressedButtonShape
 import com.zs.compose.theme.internal.animateElevation
-import com.zs.compose.theme.internal.rememberAnimatedShape
+import com.zs.compose.theme.internal.shapeByInteraction
 import com.zs.compose.theme.text.Label
 import com.zs.compose.theme.text.ProvideTextStyle
 import com.zs.compose.theme.text.Text
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 // ----------------------------------------- Note --------------------------------------------------
 // This button is a Material 2 button that has been updated to align with Material 3 specifications.
@@ -245,7 +243,29 @@ object ButtonDefaults {
     private val ButtonHorizontalPadding = 16.dp
     private val ButtonVerticalPadding = 8.dp
 
-    val shape = CircleShape
+    /**Represents the default button shape.*/
+    val shape: Shape
+        @Composable inline get() = AppTheme.shapes.small
+
+    /** Represent the default active/pressed button shapes*/
+    val shapes: ActivePressedButtonShape
+        @Composable inline get() = AppTheme.shapes.small to CircleShape
+
+    val LeadingSplitButtonShapes: ActivePressedButtonShape = RoundedCornerShape(
+        topStart = 100.dp,
+        bottomStart = 100.dp,
+        topEnd = 8.dp,
+        bottomEnd = 8.dp
+    ) to CircleShape
+    val TrasilignSplitButtonShapes: ActivePressedButtonShape = RoundedCornerShape(
+        topStart = 8.dp,
+        bottomStart = 8.dp,
+        topEnd = 100.dp,
+        bottomEnd = 100.dp
+    ) to CircleShape
+
+    val TrailingSplitButtonActiveCheckedShapes =
+        TrasilignSplitButtonShapes
 
     /** The default content padding used by [Button] */
     val ContentPadding = PaddingValues(
@@ -519,7 +539,7 @@ fun Button(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = null,
-    shape: Shape = AppTheme.shapes.small,
+    shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -567,7 +587,7 @@ fun Button(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = null,
-    shape: Shape = AppTheme.shapes.small,
+      shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -602,7 +622,7 @@ fun OutlinedButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = null,
-    shape: Shape = AppTheme.shapes.small,
+      shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = ButtonDefaults.outlinedBorder,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -633,7 +653,7 @@ fun OutlinedButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = null,
-    shape: Shape = AppTheme.shapes.small,
+      shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = ButtonDefaults.outlinedBorder,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -668,7 +688,7 @@ fun TextButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = null,
-    shape: Shape = AppTheme.shapes.small,
+      shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
@@ -699,7 +719,7 @@ fun TextButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = null,
-    shape: Shape = AppTheme.shapes.small,
+      shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
@@ -736,7 +756,7 @@ fun FilledTonalButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = null,
-    shape: Shape = AppTheme.shapes.small,
+      shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.filledTonalButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -767,7 +787,7 @@ fun FilledTonalButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = null,
-    shape: Shape = AppTheme.shapes.small,
+      shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.filledTonalButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -803,7 +823,7 @@ fun ElevatedButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = ButtonDefaults.elevatedButtonElevation(),
-    shape: Shape = AppTheme.shapes.small,
+      shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.elevatedButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -834,7 +854,7 @@ fun ElevatedButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
     elevation: ButtonElevation? = ButtonDefaults.elevatedButtonElevation(),
-    shape: Shape = AppTheme.shapes.small,
+      shape: Shape = ButtonDefaults.shape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.elevatedButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -853,61 +873,8 @@ fun ElevatedButton(
     Label(text, modifier = Modifier.padding(start = ButtonDefaults.IconSpacing))
 }
 
-// Replaced ButtonShapes with Pair; this is safe to use in jetpack compose and comes with infix fun 'to '
-// which makes it fun to use
-
-/**
- * The shapes that will be used in buttons. Button will morph between these shapes depending on the
- * interaction of the button, assuming all of the shapes are [CornerBasedShape]s.
- *
- * @property Pair.first is the active shape.
- * @property Pair.second is the pressed shape.
- */
-private typealias ButtonShapes = Pair<Shape, Shape>
-
-
-/**
- * @return shape of the button based on the interaction.
- */
-@OptIn(ExperimentalThemeApi::class)
-@Composable
-private fun ButtonShapes.shapeByInteraction(source: InteractionSource): Shape {
-    // If both shapes are not RoundedCornerShape, return the default shape directly.
-    if (first !is RoundedCornerShape && second !is RoundedCornerShape) return first
-
-    // Get the default animation specifications for Float values from the motion scheme.
-    val specs = AppTheme.motionScheme.defaultEffectsSpec<Float>()
-
-    // Remember the AnimatedShapeState, which holds the current shape and animation spec.
-    // This state is re-created if the animation spec changes.
-    val state = remember(specs) {
-        AnimatedShapeState(shape = first as RoundedCornerShape, spec = specs)
-    }
-
-    // Launch an effect that collects interactions from the InteractionSource.
-    LaunchedEffect(source) {
-        source.interactions.collect {
-            // Determine if the interaction is a press event.
-            val pressed = it is PressInteraction.Press
-
-            // If the interaction is not a press, introduce a small delay.
-            // This can help in scenarios where a quick release might not be visually noticeable.
-            // TODO - Find how old version of Material ripple in compose does this.
-            if (!pressed) {
-                delay(100)
-            }
-
-            // Launch a new coroutine to animate the shape change.
-            launch {
-                // Animate to the pressedShape if pressed, otherwise animate to the default shape.
-                // Both shapes are cast to CornerBasedShape as the animation logic expects it.
-                state.animateToShape((if (pressed) second else first) as CornerBasedShape)
-            }
-        }
-    }
-    // Return an animated shape that updates based on the AnimatedShapeState.
-    return rememberAnimatedShape(state)
-}
+// Replaced ButtonShape with Pair [ActivePressedButtonShape]; this is safe to use in jetpack compose
+// and comes with infix fun 'to ' which makes it fun to use
 
 /**
  * [Material Design button](https://m3.material.io/components/buttons/overview)
@@ -915,7 +882,7 @@ private fun ButtonShapes.shapeByInteraction(source: InteractionSource): Shape {
  * Buttons help people initiate actions, from sending an email, to sharing a document, to liking a
  * post. It also morphs between the shapes provided in [shapes] depending on the state of the
  * interaction with the button as long as the shapes provided our [CornerBasedShape]s. If a shape in
- * [shapes] isn't a [CornerBasedShape], then button will change between the [ButtonShapes] according
+ * [shapes] isn't a [CornerBasedShape], then button will change between the [ActivePressedButtonShape] according
  * to user interaction.
  *
  * ![Filled button image](https://developer.android.com/images/reference/androidx/compose/material3/filled-button.png)
@@ -936,7 +903,7 @@ private fun ButtonShapes.shapeByInteraction(source: InteractionSource): Shape {
  * The default text style for internal [Text] components will be set to [Typography.labelLarge].
  *
  * @param onClick called when this button is clicked
- * @param shapes the [ButtonShapes] that this button with morph between depending on the user's
+ * @param shapes the [ActivePressedButtonShape] that this button with morph between depending on the user's
  *   interaction with the button.
  * @param modifier the [Modifier] to be applied to this button
  * @param enabled controls the enabled state of this button. When `false`, this component will not
@@ -960,7 +927,7 @@ private fun ButtonShapes.shapeByInteraction(source: InteractionSource): Shape {
 @ExperimentalThemeApi
 fun Button(
     onClick: () -> Unit,
-    shapes: ButtonShapes,
+    shapes: ActivePressedButtonShape,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
@@ -1013,14 +980,14 @@ fun Button(
  * requires visual separation from patterned container.
  *
  * @see Button
- * @see ButtonShapes
+ * @see ActivePressedButtonShape
  */
 @Composable
 @NonRestartableComposable
 @ExperimentalThemeApi
 fun ElevatedButton(
     onClick: () -> Unit,
-    shapes: ButtonShapes,
+    shapes: ActivePressedButtonShape,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
@@ -1049,14 +1016,14 @@ fun ElevatedButton(
  * not the primary action in an app. Outlined buttons pair well with [Button]s to indicate an
  * alternative, secondary action.
  * @see Button
- * @see ButtonShapes
+ * @see ActivePressedButtonShape
  */
 @Composable
 @NonRestartableComposable
 @ExperimentalThemeApi
 fun OutlinedButton(
     onClick: () -> Unit,
-    shapes: ButtonShapes,
+    shapes: ActivePressedButtonShape,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
@@ -1085,14 +1052,14 @@ fun OutlinedButton(
  * and cards. In cards, text buttons help maintain an emphasis on card content. Text buttons are
  * used for the lowest priority actions, especially when presenting multiple options.
  * @see Button
- * @see ButtonShapes
+ * @see ActivePressedButtonShape
  */
 @Composable
 @ExperimentalThemeApi
 @NonRestartableComposable
 fun TextButton(
     onClick: () -> Unit,
-    shapes: ButtonShapes,
+    shapes: ActivePressedButtonShape,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
@@ -1123,14 +1090,14 @@ fun TextButton(
  * in an onboarding flow. Tonal buttons use the secondary color mapping.
  *
  * @see Button
- * @see ButtonShapes
+ * @see ActivePressedButtonShape
  * */
 @Composable
 @ExperimentalThemeApi
 @NonRestartableComposable
 fun FilledTonalButton(
     onClick: () -> Unit,
-    shapes: ButtonShapes,
+    shapes: ActivePressedButtonShape,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
