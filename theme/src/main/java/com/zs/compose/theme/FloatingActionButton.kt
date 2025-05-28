@@ -191,32 +191,12 @@ interface FloatingActionButtonElevation {
      *
      * @param interactionSource the [InteractionSource] for this floating action button
      */
-    @Composable fun elevation(interactionSource: InteractionSource): State<Dp>
+    @Composable
+    fun elevation(interactionSource: InteractionSource): State<Dp>
 }
 
 /** Contains the default values used by [FloatingActionButton] */
 object FloatingActionButtonDefaults {
-    /**
-     * Creates a [FloatingActionButtonElevation] that will animate between the provided values
-     * according to the Material specification.
-     *
-     * @param defaultElevation the elevation to use when the [FloatingActionButton] has no
-     *   [Interaction]s
-     * @param pressedElevation the elevation to use when the [FloatingActionButton] is pressed.
-     */
-    @Deprecated("Use another overload of elevation", level = DeprecationLevel.HIDDEN)
-    @Composable
-    fun elevation(
-        defaultElevation: Dp = 6.dp,
-        pressedElevation: Dp = 12.dp,
-    ): FloatingActionButtonElevation =
-        elevation(
-            defaultElevation,
-            pressedElevation,
-            hoveredElevation = 8.dp,
-            focusedElevation = 8.dp,
-        )
-
     /**
      * Creates a [FloatingActionButtonElevation] that will animate between the provided values
      * according to the Material specification.
@@ -229,10 +209,10 @@ object FloatingActionButtonDefaults {
      */
     @Composable
     fun elevation(
-        defaultElevation: Dp = 6.dp,
-        pressedElevation: Dp = 12.dp,
+        defaultElevation: Dp = 2.dp,
+        pressedElevation: Dp = 4.dp,
         hoveredElevation: Dp = 8.dp,
-        focusedElevation: Dp = 8.dp,
+        focusedElevation: Dp = 6.dp,
     ): FloatingActionButtonElevation {
         return remember(defaultElevation, pressedElevation, hoveredElevation, focusedElevation) {
             DefaultFloatingActionButtonElevation(
@@ -281,21 +261,27 @@ private class DefaultFloatingActionButtonElevation(
                     is HoverInteraction.Enter -> {
                         interactions.add(interaction)
                     }
+
                     is HoverInteraction.Exit -> {
                         interactions.remove(interaction.enter)
                     }
+
                     is FocusInteraction.Focus -> {
                         interactions.add(interaction)
                     }
+
                     is FocusInteraction.Unfocus -> {
                         interactions.remove(interaction.focus)
                     }
+
                     is PressInteraction.Press -> {
                         interactions.add(interaction)
                     }
+
                     is PressInteraction.Release -> {
                         interactions.remove(interaction.press)
                     }
+
                     is PressInteraction.Cancel -> {
                         interactions.remove(interaction.press)
                     }
@@ -392,3 +378,81 @@ private val FabSize = 56.dp
 private val ExtendedFabSize = 48.dp
 private val ExtendedFabIconPadding = 12.dp
 private val ExtendedFabTextPadding = 20.dp
+
+//
+/**
+ * @see FloatingActionButton
+ */
+@ExperimentalThemeApi
+@Composable
+fun FloatingActionButton(
+    onClick: () -> Unit,
+    shapes: ButtonShapes,
+    modifier: Modifier = Modifier,
+    interactionSource: MutableInteractionSource? = null,
+    backgroundColor: Color = AppTheme.colors.accent,
+    contentColor: Color = contentColorFor(backgroundColor),
+    elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
+    content: @Composable () -> Unit
+) {
+    @Suppress("NAME_SHADOWING")
+    val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
+    val shape = shapes.current(interactionSource)
+    Surface(
+        onClick = onClick,
+        modifier = modifier.semantics { role = Role.Button },
+        shape = shape,
+        color = backgroundColor,
+        contentColor = contentColor,
+        elevation = elevation.elevation(interactionSource).value,
+        interactionSource = interactionSource
+    ) {
+        ProvideTextStyle(AppTheme.typography.label1) {
+            Box(
+                modifier = Modifier.defaultMinSize(minWidth = FabSize, minHeight = FabSize),
+                contentAlignment = Alignment.Center
+            ) {
+                content()
+            }
+        }
+    }
+}
+
+/**
+ * @see ExtendedFloatingActionButton
+ */
+@ExperimentalThemeApi
+@Composable
+fun ExtendedFloatingActionButton(
+    shapes: ButtonShapes,
+    text: @Composable () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: @Composable (() -> Unit)? = null,
+    interactionSource: MutableInteractionSource? = null,
+    backgroundColor: Color = AppTheme.colors.accent,
+    contentColor: Color = contentColorFor(backgroundColor),
+    elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation()
+) {
+    FloatingActionButton(
+        modifier = modifier.sizeIn(minWidth = ExtendedFabSize, minHeight = ExtendedFabSize),
+        onClick = onClick,
+        interactionSource = interactionSource,
+        shapes = shapes,
+        backgroundColor = backgroundColor,
+        contentColor = contentColor,
+        elevation = elevation
+    ) {
+        val startPadding = if (icon == null) ExtendedFabTextPadding else ExtendedFabIconPadding
+        Row(
+            modifier = Modifier.padding(start = startPadding, end = ExtendedFabTextPadding),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (icon != null) {
+                icon()
+                Spacer(Modifier.width(ExtendedFabIconPadding))
+            }
+            text()
+        }
+    }
+}

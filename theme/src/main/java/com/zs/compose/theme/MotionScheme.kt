@@ -32,33 +32,44 @@ import com.zs.compose.theme.MotionScheme.Companion.standard
 // on 25-05-2025
 
 /**
+ * ##### Motion physics system
+ *The motion physics system makes a UI expressive and easy to use
  *
- * Material introduced the motion physics system with M3 Expressive. This new physics-based system
- * makes interactions and transitions feel more alive, fluid, and natural. It represents a new
- * motion language for Google products, and is easier to implement and customize than ever before.
+ * ###### [The basics: Motion schemes](https://m3.material.io/styles/motion/overview/how-it-works#45a5c33c-e5b4-4f61-afdc-595d2f0ff2b0)
+ * The physics system has two preset motion schemes: [expressive] and [standard].
+ * The motion scheme you choose defines how your product feels. While most motion in a product
+ * should use the same scheme, products can make advanced customizations to swap the scheme to
+ * emphasize key moments.
  *
- * The physics system is replacing the previous system based on easing and duration.
- * A motion scheme provides all the [FiniteAnimationSpec]s for a [AppTheme].
+ * - [Expressive](https://firebasestorage.googleapis.com/v0/b/design-spec/o/projects%2Fgoogle-material-3%2Fimages%2Fm0g74buu-00_Scheme_Spring%20Expressive%20Export.mp4?alt=media&token=36db86e1-4e85-4905-89fb-f82c1fa64091) is Material’s opinionated motion scheme, and should be used for most situations,
+ * particularly hero moments and key interactions.
+ * - [Standard](https://firebasestorage.googleapis.com/v0/b/design-spec/o/projects%2Fgoogle-material-3%2Fimages%2Fm0g75t7b-00_Scheme_Spring%20Standard%20Export.mp4?alt=media&token=37eb508f-ab3e-42e7-8491-1eac28f85f3a) feels more functional with minimal bounce, and should be used for utilitarian
+ * products.
  *
- * The physics system has two preset motion schemes: [expressive] and [standard]. The motion scheme you
- * choose defines how your product feels. While most motion in a product should use the same scheme,
- * products can make advanced customizations to swap the scheme to emphasize key moments.
- *
+ * ###### [How it works: Springs](https://m3.material.io/styles/motion/overview/how-it-works#35281ca6-8849-410d-924c-41e1bfe0cab7)
  * Motion schemes use springs. A spring is a combination of three attributes which control all
  * motion behavior: stiffness, damping, and initial velocity.
- *
- * Springs are versatile. One spring can apply to many situations, such as transitions, button
+ * - Springs are versatile. One spring can apply to many situations, such as transitions, button
  * effects, or gestures. This makes the motion and expression feel consistent throughout the
  * product.
  *
+ * - Springs feel natural. Springs are designed to be predictable, like how objects move and bounce.
+ * They handle gestures, interruptions, and retargeting animations seamlessly.
+ *
+ * ###### [Style](https://m3.material.io/styles/motion/overview/how-it-works#24ac1364-2f3e-4a52-8ba6-86f6e3830375)
+ * - Spatial spring tokens are used for animations that move something on screen, for example the
+ * x and y position, rotation, size, rounded corners. This spring overshoots the final value and
+ * bounces into place.
+ * - Effects spring tokens are used to animate properties such as color and opacity animations,
+ * where there shouldn’t be any overshoot.
  * Spatial and effect spring tokens come in three speeds: default, fast, and slow. Most motion
  * should use the default speed, while smaller elements may use fast and larger
  * elements may use slow.
- * [Speed](https://m3.material.io/styles/motion/overview/how-it-works#947e5ca1-6366-4683-948c-9ee38adf5a42)
  *
- * Springs feel natural. Springs are designed to be predictable, like how objects move and bounce.
- * They handle gestures, interruptions, and retargeting animations seamlessly. Motion schemes are
- * designed to create a harmonious motion for components in the app.
+ * ###### [Speed](https://m3.material.io/styles/motion/overview/how-it-works#947e5ca1-6366-4683-948c-9ee38adf5a42)
+ * Spatial and effect spring tokens come in three speeds: default, fast, and slow. Most motion
+ * should use the default speed, while smaller elements may use fast and larger elements may use
+ * slow.
  *
  * There are two built-in schemes, a [standard] and an [expressive], that can be used as-is or
  * customized.

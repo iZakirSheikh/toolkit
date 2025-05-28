@@ -51,8 +51,10 @@ import com.zs.compose.foundation.MetroGreen
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Badge
 import com.zs.compose.theme.BadgedBox
+import com.zs.compose.theme.ButtonShapes
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.FloatingActionButton
+import com.zs.compose.theme.FloatingActionButtonDefaults
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.adaptive.NavigationSuiteScaffold
@@ -135,6 +137,7 @@ class MainActivity : ComponentActivity() {
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {darkMode = !darkMode},
+                    shapes = ButtonShapes(AppTheme.shapes.large, AppTheme.shapes.xLarge),
                     content = {
                         Icon(Icons.Default.LightMode, null)
                     },

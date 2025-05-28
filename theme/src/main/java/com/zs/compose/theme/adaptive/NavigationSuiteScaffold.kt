@@ -21,6 +21,7 @@
 package com.zs.compose.theme.adaptive
 
 import androidx.annotation.FloatRange
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -308,8 +310,17 @@ fun NavigationSuiteScaffold(
             // Show a determinate progress bar when progress is between 0 and 1
             when {
                 progress == -1f -> LinearProgressIndicator()
-                !progress.isNaN() -> LinearProgressIndicator(progress = progress)
-                else -> Spacer(modifier = Modifier)
+                progress.isNaN() -> Spacer(Modifier)
+                else -> {
+                    // Animate progress toward the target value
+                    val motion = AppTheme.motionScheme.slowSpatialSpec<Float>()
+                    val animatedProgress by animateFloatAsState(
+                        targetValue = progress.coerceIn(0f, 1f),
+                        animationSpec = motion,
+                        label = "Progress Animation"
+                    )
+                    LinearProgressIndicator(progress = animatedProgress)
+                }
             }
         }
     )
