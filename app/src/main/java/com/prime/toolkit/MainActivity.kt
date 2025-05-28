@@ -45,6 +45,7 @@ import com.prime.toolkit.m3.M3
 import com.prime.toolkit.settings.Settings
 import com.prime.toolkit.text.Strings
 import com.zs.compose.foundation.Background
+import com.zs.compose.foundation.BlueLilac
 import com.zs.compose.foundation.ClaretViolet
 import com.zs.compose.foundation.MetroGreen
 import com.zs.compose.theme.AppTheme
@@ -244,7 +245,7 @@ class MainActivity : ComponentActivity() {
 
             AppTheme(
                 isLight = !darkMode,
-                accent = if (!darkMode) Color.ClaretViolet else Color(0xFFD8A25E),
+                accent = if (!darkMode) /*Color.ClaretViolet*/ Color.BlueLilac else Color(0xFFD8A25E),
                 content = {
                     val clazz = calculateWindowSizeClass(this)
                     CompositionLocalProvider(

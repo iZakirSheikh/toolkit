@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -61,12 +62,15 @@ import com.prime.toolkit.core.rememberBackgroundProvider
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.MetroGreen
 import com.zs.compose.foundation.fadingEdge
+import com.zs.compose.foundation.fullLineSpan
 import com.zs.compose.foundation.plus
 import com.zs.compose.theme.AlertDialog
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Button
+import com.zs.compose.theme.ButtonShapes
 import com.zs.compose.theme.Checkbox
 import com.zs.compose.theme.ColorPickerDialog
+import com.zs.compose.theme.ElevatedButton
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
@@ -171,14 +175,18 @@ fun Games() {
                             Text("Computer games can improve reflexes, problem-solving skills, and hand-eye coordination. Just remember to take regular breaks!")
                         }
                     )
-                   IconButton(Icons.Outlined.Info, onClick = { showDialog = !showDialog}, contentDescription = null)
+                    IconButton(
+                        Icons.Outlined.Info,
+                        onClick = { showDialog = !showDialog },
+                        contentDescription = null
+                    )
                 },
                 actions = {
                     var showColorPickerDialog by remember { mutableStateOf(false) }
                     IconButton(
                         Icons.Outlined.Colorize,
                         contentDescription = null,
-                        onClick = {showColorPickerDialog = true}
+                        onClick = { showColorPickerDialog = true }
                     )
 
                     val (color, onColorPicked) = remember { mutableStateOf(Color.Yellow) }
@@ -190,7 +198,7 @@ fun Games() {
                             onColorPicked(it)
                             showColorPickerDialog = false
                         },
-                         //       background = AppTheme.colors.background(surface),
+                        //       background = AppTheme.colors.background(surface),
                     )
 
                     IconButton(
@@ -203,7 +211,7 @@ fun Games() {
                     IconButton(
                         content = {
                             Icon(Icons.Outlined.MoreVert, contentDescription = null)
-                            DropDownMenu(showMore, onDismissRequest = {showMore = false}) {
+                            DropDownMenu(showMore, onDismissRequest = { showMore = false }) {
                                 DropDownMenuItem(
                                     "Dropdown Item 1",
                                     icon = Icons.Rounded.HomeMax,
@@ -233,9 +241,9 @@ fun Games() {
 
                     Checkbox(
                         showMore,
-                        onCheckedChange = {showMore = it},
+                        onCheckedChange = { showMore = it },
 
-                    )
+                        )
                 }
             )
         },
@@ -257,6 +265,16 @@ fun Games() {
                     .nestedScroll(behaviour.nestedScrollConnection)
                     .observe(surface)/*.fadingEdge(state,  false, length = 50.dp)*/,
                 content = {
+                    item(span = fullLineSpan) {
+                        ElevatedButton (
+                            onClick = {},
+                            shapes = ButtonShapes(AppTheme.shapes.xLarge, AppTheme.shapes.medium),
+                            modifier = Modifier.requiredSize(150.dp, 40.dp)
+                        ) {
+                            Text("Elevated Button")
+                        }
+                    }
+
                     items(Games) { item ->
                         Game(
                             item,
