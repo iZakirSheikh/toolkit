@@ -22,26 +22,34 @@ package com.prime.toolkit.games
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Colorize
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.LocalFireDepartment
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.rounded.HomeMax
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Tune
@@ -61,6 +69,7 @@ import com.prime.toolkit.core.background
 import com.prime.toolkit.core.observe
 import com.prime.toolkit.core.rememberBackgroundProvider
 import com.zs.compose.foundation.Background
+import com.zs.compose.foundation.fadingEdge
 import com.zs.compose.foundation.fullLineSpan
 import com.zs.compose.foundation.plus
 import com.zs.compose.theme.AlertDialog
@@ -68,6 +77,7 @@ import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Button
 import com.zs.compose.theme.ButtonDefaults
 import com.zs.compose.theme.Checkbox
+import com.zs.compose.theme.Chip
 import com.zs.compose.theme.ColorPickerDialog
 import com.zs.compose.theme.ElevatedButton
 import com.zs.compose.theme.ExperimentalThemeApi
@@ -75,6 +85,7 @@ import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.OutlinedButton
+import com.zs.compose.theme.SelectableChip
 import com.zs.compose.theme.SplitButtonLayout
 import com.zs.compose.theme.TrailingSplitButton
 import com.zs.compose.theme.TrailingSplitElevatedButton
@@ -87,7 +98,9 @@ import com.zs.compose.theme.menu.DropDownMenu
 import com.zs.compose.theme.menu.DropDownMenuItem
 import com.zs.compose.theme.text.Header
 import com.zs.compose.theme.text.Label
+import com.zs.compose.theme.text.OutlinedTextField
 import com.zs.compose.theme.text.Text
+import com.zs.compose.theme.text.TextField
 
 
 /**
@@ -285,31 +298,95 @@ fun Games() {
                             Header("Split button")
                         }
 
-                        item(span = fullLineSpan) {
-                            SplitButtonLayout(
-                                leadingButton = {
-                                    ElevatedButton (
-                                        onClick = {},
-                                        shapes = ButtonDefaults.LeadingSplitButtonShapes,
-                                        content = {
-                                            Text("Leading Button")
-                                        }
-                                    )
-                                },
-                                trailingButton = {
-                                    val (checked, onCheckedChange) = remember { mutableStateOf(false) }
-                                    TrailingSplitElevatedButton(
+                    item(span = fullLineSpan) {
+                        SplitButtonLayout(
+                            leadingButton = {
+                                ElevatedButton (
+                                    onClick = {},
+                                    shapes = ButtonDefaults.LeadingSplitButtonShapes,
+                                    content = {
+                                        Text("Leading Button")
+                                    }
+                                )
+                            },
+                            trailingButton = {
+                                val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                                TrailingSplitElevatedButton(
 //                                        checked = checked,
 //onCheckedChange = onCheckedChange,
-                                        onClick = {},
-                                        shapes = ButtonDefaults.TrailingSplitButtonActiveCheckedShapes,
-                                        content = {
-                                           Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = null)
-                                        }
-                                    )
-                                }
+                                    onClick = {},
+                                    shapes = ButtonDefaults.TrailingSplitButtonActiveCheckedShapes,
+                                    content = {
+                                        Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = null)
+                                    }
+                                )
+                            }
+                        )
+                    }
+
+                    // TextFiled
+                    // button with shapes
+                    item(span = fullLineSpan) {
+                        Header("Text Filed")
+                    }
+                    item(span = fullLineSpan) {
+                        val state = rememberTextFieldState()
+                        TextField(
+                            state = state,
+                            label = { Label("Label") },
+                            placeholder = { Label("Placeholder") },
+                            modifier = Modifier.requiredWidthIn(max = 300.dp),
+                            leadingIcon = {
+                                Label("$")
+                            },
+                            trailingIcon = {
+                                Label(".00")
+                            },
+
+                        )
+                    }
+
+                    item(span = fullLineSpan) {
+                        val state = rememberTextFieldState()
+                        OutlinedTextField(
+                            state = state,
+                            label = { Label("Label") },
+                            placeholder = { Label("Placeholder") },
+                            modifier = Modifier.requiredWidthIn(max = 300.dp),
+                            leadingIcon = {
+                                Label("$")
+                            },
+                            trailingIcon = {
+                                Label(".00")
+                            },
+                            isError = state.text.length > 40
                             )
+                    }
+
+                    item(span = fullLineSpan){
+                        val state = rememberScrollState()
+                        Row(modifier = Modifier.horizontalScroll(state).fadingEdge(
+                            state, false
+                        ), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Chip(onClick = {}) {
+                                Icon(Icons.Outlined.Sort, contentDescription = null)
+                            }
+
+                            //
+                            var selected  by remember { mutableStateOf(0) }
+                            SelectableChip( onClick = {selected = 0}, selected=selected == 0) {
+                                Text("Chip 1")
+                            }
+                            SelectableChip(onClick = {selected = 1}, selected = selected == 1) {
+                                Text("Chip 2")
                         }
+                            SelectableChip(onClick = {selected = 2}, selected = selected == 2) {
+                                Text("Chip 3")
+                            }
+                        }
+
+                    }
+
 
                     items(Games) { item ->
                         Game(

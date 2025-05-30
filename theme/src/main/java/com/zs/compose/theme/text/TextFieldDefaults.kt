@@ -223,14 +223,14 @@ object TextFieldDefaults {
         @Composable
         @ReadOnlyComposable
         get() =
-            AppTheme.shapes.xSmall.copy(
+            AppTheme.shapes.small.copy(
                 bottomEnd = ZeroCornerSize,
                 bottomStart = ZeroCornerSize
             )
 
     /** The default shape used for a [OutlinedTextField]'s background and border */
     val OutlinedTextFieldShape: Shape
-        @Composable @ReadOnlyComposable get() = AppTheme.shapes.xSmall
+        @Composable @ReadOnlyComposable get() = AppTheme.shapes.small
 
     /**
      * The default thickness of the border in [OutlinedTextField] or indicator line in [TextField]

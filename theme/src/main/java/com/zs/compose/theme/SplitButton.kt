@@ -86,7 +86,7 @@ private fun ActiveCheckedButtonState.shapeByState(checked: Boolean): Shape {
     if (first !is RoundedCornerShape && second !is RoundedCornerShape) return first
     val shape = if (checked) second else first
     // Get the default animation specifications for Float values from the motion scheme.
-    val specs = AppTheme.motionScheme.defaultEffectsSpec<Float>()
+    val specs = AppTheme.motionScheme.fastSpatialSpec<Float>()
     val state =
         remember(specs) { AnimatedShapeState(shape = shape as RoundedCornerShape, spec = specs) }
 

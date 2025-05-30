@@ -36,6 +36,8 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
@@ -49,9 +51,11 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MotionScheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SplitButtonDefaults
 import androidx.compose.material3.SplitButtonLayout
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -207,6 +211,46 @@ fun M3() {
                                             androidx.compose.material3.Icon(Icons.Outlined.KeyboardArrowDown, contentDescription = null)
                                         }
                                     )
+                                }
+                            )
+                        }
+
+                        item(span = fullLineSpan) {
+                            val state = rememberTextFieldState()
+                            TextField(
+                                state,
+                                isError = state.text.length > 30,
+                                prefix = {
+                                    Label("$")
+                                },
+                                label = {
+                                    Label("Enter amount")
+                                },
+                                suffix = {
+                                    Label(".00")
+                                },
+                                supportingText = {
+                                    Label("Enter a valid amount.")
+                                }
+                            )
+                        }
+
+                        item(span = fullLineSpan) {
+                            val state = rememberTextFieldState()
+                            OutlinedTextField(
+                                state,
+                                isError = state.text.length > 30,
+                                prefix = {
+                                    Label("$")
+                                },
+                                suffix = {
+                                    Label(".00")
+                                },
+                                label = {
+                                    Label("Enter amount")
+                                },
+                                supportingText = {
+                                    Label("Enter a valid amount.")
                                 }
                             )
                         }

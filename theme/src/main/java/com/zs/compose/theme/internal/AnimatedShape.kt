@@ -149,7 +149,7 @@ internal fun ActivePressedButtonShape.shapeByInteraction(source: InteractionSour
     if (first !is RoundedCornerShape && second !is RoundedCornerShape) return first
 
     // Get the default animation specifications for Float values from the motion scheme.
-    val specs = AppTheme.motionScheme.defaultEffectsSpec<Float>()
+    val specs = AppTheme.motionScheme.fastSpatialSpec<Float>()
 
     // Remember the AnimatedShapeState, which holds the current shape and animation spec.
     // This state is re-created if the animation spec changes.
