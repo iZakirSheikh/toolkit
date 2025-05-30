@@ -1,3 +1,5 @@
+// Games
+
 /*
  * Copyright 2025 sheik
  *
@@ -24,6 +26,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,22 +35,25 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.ZeroCornerSize
+import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlaylistAddCheckCircle
 import androidx.compose.material.icons.outlined.Colorize
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.LocalFireDepartment
+import androidx.compose.material.icons.outlined.MonetizationOn
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.rounded.HomeMax
@@ -58,8 +64,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -84,18 +92,18 @@ import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.LocalWindowSize
-import com.zs.compose.theme.OutlinedButton
 import com.zs.compose.theme.SelectableChip
 import com.zs.compose.theme.SplitButtonLayout
-import com.zs.compose.theme.TrailingSplitButton
 import com.zs.compose.theme.TrailingSplitElevatedButton
-import com.zs.compose.theme.TrailingSplitOutlinedButton
 import com.zs.compose.theme.adaptive.Scaffold
 import com.zs.compose.theme.adaptive.content
 import com.zs.compose.theme.appbar.AppBarDefaults
 import com.zs.compose.theme.appbar.TopAppBar
 import com.zs.compose.theme.menu.DropDownMenu
 import com.zs.compose.theme.menu.DropDownMenuItem
+import com.zs.compose.theme.menu.ExposedDropdownMenuAnchorType
+import com.zs.compose.theme.menu.ExposedDropdownMenuBox
+import com.zs.compose.theme.minimumInteractiveComponentSize
 import com.zs.compose.theme.text.Header
 import com.zs.compose.theme.text.Label
 import com.zs.compose.theme.text.OutlinedTextField
@@ -293,10 +301,10 @@ fun Games() {
                         }
                     }
 
-                       // button with shapes
-                        item(span = fullLineSpan) {
-                            Header("Split button")
-                        }
+                    // button with shapes
+                    item(span = fullLineSpan) {
+                        Header("Split button")
+                    }
 
                     item(span = fullLineSpan) {
                         SplitButtonLayout(
@@ -330,20 +338,55 @@ fun Games() {
                         Header("Text Filed")
                     }
                     item(span = fullLineSpan) {
-                        val state = rememberTextFieldState()
-                        TextField(
-                            state = state,
-                            label = { Label("Label") },
-                            placeholder = { Label("Placeholder") },
-                            modifier = Modifier.requiredWidthIn(max = 300.dp),
-                            leadingIcon = {
-                                Label("$")
-                            },
-                            trailingIcon = {
-                                Label(".00")
-                            },
+                        Box(contentAlignment = Alignment.Center) {
+                            val state = rememberTextFieldState()
+                            val (expanded, onExpandedChange) = remember { mutableStateOf(false)}
+                            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = onExpandedChange) {
+                                ExposedDropdownMenu (
+                                    expanded,
+                                    onDismissRequest = { onExpandedChange(false) },
+                                    matchAnchorWidth = true,
+                                    modifier = Modifier,
+                                    shape = AppTheme.shapes.small.copy(topStart = ZeroCornerSize, topEnd = ZeroCornerSize)
+                                ) {
+                                    repeat(5) {
+                                        DropDownMenuItem(
+                                            "Item $it",
+                                            icon = Icons.Default.PlaylistAddCheckCircle,
 
-                        )
+                                            onClick = {
+                                                state.setTextAndPlaceCursorAtEnd("Item $it")
+                                            },
+
+                                            )
+                                    }
+                                }
+
+                                TextField(
+                                    state = state,
+                                    label = { Label("Label") },
+                                    placeholder = { Label("Placeholder") },
+                                    modifier = Modifier.requiredWidthIn(max = 280.dp),
+                                    outputTransformation = {
+                                        insert(0,"$")
+                                    },
+                                    leadingIcon = {
+                                        Icon(Icons.Outlined.MonetizationOn, contentDescription = null)
+                                    },
+                                    trailingIcon = {
+                                        Icon(
+                                            Icons.Outlined.KeyboardArrowDown,
+                                            contentDescription = null,
+                                            modifier = Modifier.minimumInteractiveComponentSize()
+                                                .graphicsLayer(){
+                                                    rotationZ = if (expanded) 180f else 0f
+                                                }
+                                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
+                                        )
+                                    },
+                                )
+                            }
+                        }
                     }
 
                     item(span = fullLineSpan) {
@@ -360,7 +403,7 @@ fun Games() {
                                 Label(".00")
                             },
                             isError = state.text.length > 40
-                            )
+                        )
                     }
 
                     item(span = fullLineSpan){
@@ -379,7 +422,7 @@ fun Games() {
                             }
                             SelectableChip(onClick = {selected = 1}, selected = selected == 1) {
                                 Text("Chip 2")
-                        }
+                            }
                             SelectableChip(onClick = {selected = 2}, selected = selected == 2) {
                                 Text("Chip 3")
                             }
