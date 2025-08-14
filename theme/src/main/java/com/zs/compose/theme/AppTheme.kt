@@ -28,7 +28,6 @@ import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionDefaults
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SharedTransitionScope.OverlayClip
@@ -292,14 +291,15 @@ private val DefaultClipInOverlayDuringTransition: (LayoutDirection, Density) -> 
  */
 fun Modifier.renderInSharedTransitionScopeOverlay(
     zIndexInOverlay: Float = 0f,
-    renderInOverlay: (SharedTransitionScope) -> Boolean =
-        SharedTransitionDefaults.RenderInOverlay,
+    renderInOverlay: (() -> Boolean)? = null,
+    clipInOverlayDuringTransition: (LayoutDirection, Density) -> Path? = DefaultClipInOverlayDuringTransition
 ) = composed {
     val sharedTransitionScope = LocalSharedTransitionScope.current
     with(sharedTransitionScope) {
         renderInSharedTransitionScopeOverlay(
+            renderInOverlay = renderInOverlay ?: { isTransitionActive },
             zIndexInOverlay = zIndexInOverlay,
-            renderInOverlay,
+            clipInOverlayDuringTransition = clipInOverlayDuringTransition
         )
     }
 }
