@@ -816,7 +816,7 @@ private fun BoxScope.SliderThumb(
             .align(Alignment.CenterStart)
     ) {
         val color by colors.thumbColor(enabled)
-        val bg = AppTheme.colors.background
+        val bg = Color.Transparent
         Canvas(
             modifier
                 .size(thumbSize, thumbSize)

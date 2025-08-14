@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.prime.toolkit"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.prime.toolkit"
-        minSdk = 21
-        targetSdk = 35
+        minSdk = 23
+        targetSdk = 36
         versionCode = 1
         versionName = "3.0.0-dev"
 
@@ -52,7 +52,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
     implementation(libs.chrisbanes.haze)
     implementation("androidx.compose.material3:material3:1.4.0-alpha15")
 }

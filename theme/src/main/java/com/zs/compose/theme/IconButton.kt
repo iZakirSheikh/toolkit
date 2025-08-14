@@ -29,6 +29,7 @@ import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -66,19 +67,21 @@ fun IconButton(
 ) {
     Box(
         modifier =
-        modifier
-            .minimumInteractiveComponentSize()
-            .clickable(
-                onClick = onClick,
-                enabled = enabled,
-                role = Role.Button,
-                interactionSource = interactionSource,
-                indication = ripple(bounded = false, radius = RippleRadius)
-            ),
+            modifier
+                .minimumInteractiveComponentSize()
+                .clickable(
+                    onClick = onClick,
+                    enabled = enabled,
+                    role = Role.Button,
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = false, radius = RippleRadius)
+                ),
         contentAlignment = Alignment.Center
     ) {
-        val contentColor = if (enabled) LocalContentColor.current else LocalContentColor.current.copy(
-            ContentAlpha.disabled)
+        val contentColor =
+            if (enabled) LocalContentColor.current else LocalContentColor.current.copy(
+                ContentAlpha.disabled
+            )
         CompositionLocalProvider(
             LocalContentColor provides contentColor,
             content = content
@@ -97,10 +100,10 @@ fun IconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    tint: Color = LocalContentColor.current,
+    tint: Color = Color.Unspecified,
     interactionSource: MutableInteractionSource? = null
 ) = IconButton(onClick, modifier, enabled, interactionSource) {
-    Icon(icon, contentDescription, tint = tint)
+    Icon(icon, contentDescription, tint = tint.takeOrElse { LocalContentColor.current })
 }
 
 /**
@@ -131,20 +134,22 @@ fun IconToggleButton(
 ) {
     Box(
         modifier =
-        modifier
-            .minimumInteractiveComponentSize()
-            .toggleable(
-                value = checked,
-                onValueChange = onCheckedChange,
-                enabled = enabled,
-                role = Role.Checkbox,
-                interactionSource = interactionSource,
-                indication = ripple(bounded = false, radius = RippleRadius)
-            ),
+            modifier
+                .minimumInteractiveComponentSize()
+                .toggleable(
+                    value = checked,
+                    onValueChange = onCheckedChange,
+                    enabled = enabled,
+                    role = Role.Checkbox,
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = false, radius = RippleRadius)
+                ),
         contentAlignment = Alignment.Center
     ) {
-        val contentColor = if (enabled) LocalContentColor.current else LocalContentColor.current.copy(
-            ContentAlpha.disabled)
+        val contentColor =
+            if (enabled) LocalContentColor.current else LocalContentColor.current.copy(
+                ContentAlpha.disabled
+            )
         CompositionLocalProvider(LocalContentColor provides contentColor, content = content)
     }
 }
@@ -171,4 +176,3 @@ fun IconToggleButton(
 
 // Default radius of an unbounded ripple in an IconButton
 private val RippleRadius = 24.dp
-

@@ -28,6 +28,7 @@ import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionDefaults
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SharedTransitionScope.OverlayClip
@@ -68,6 +69,7 @@ import com.zs.compose.foundation.SepiaBrown
 import com.zs.compose.foundation.SignalWhite
 import com.zs.compose.foundation.TrafficYellow
 import com.zs.compose.foundation.UmbraGrey
+import com.zs.compose.theme.AppTheme.invoke
 import com.zs.compose.theme.MotionScheme.Companion.standard
 import com.zs.compose.theme.text.ProvideTextStyle
 
@@ -204,7 +206,7 @@ object AppTheme {
                 LocalShapes provides shapes,
                 LocalTextSelectionColors provides selectionColors,
                 LocalTypography provides typography,
-                LocalSharedTransitionScope provides this
+                LocalSharedTransitionScope provides this,
             ) {
                 ProvideTextStyle(value = typography.body1, content = content)
             }
@@ -290,15 +292,14 @@ private val DefaultClipInOverlayDuringTransition: (LayoutDirection, Density) -> 
  */
 fun Modifier.renderInSharedTransitionScopeOverlay(
     zIndexInOverlay: Float = 0f,
-    renderInOverlay: (() -> Boolean)? = null,
-    clipInOverlayDuringTransition: (LayoutDirection, Density) -> Path? = DefaultClipInOverlayDuringTransition
+    renderInOverlay: (SharedTransitionScope) -> Boolean =
+        SharedTransitionDefaults.RenderInOverlay,
 ) = composed {
     val sharedTransitionScope = LocalSharedTransitionScope.current
     with(sharedTransitionScope) {
         renderInSharedTransitionScopeOverlay(
-            renderInOverlay = renderInOverlay ?: { isTransitionActive },
             zIndexInOverlay = zIndexInOverlay,
-            clipInOverlayDuringTransition = clipInOverlayDuringTransition
+            renderInOverlay,
         )
     }
 }

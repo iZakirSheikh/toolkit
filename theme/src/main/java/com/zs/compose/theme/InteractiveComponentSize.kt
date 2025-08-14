@@ -43,13 +43,13 @@ import kotlin.math.roundToInt
 // commit date: 2024-08-03 02:00
 
 /**
- * Reserves at least 48.dp in size to disambiguate touch interactions if the element would measure
+ * Reserves at least 42.dp in size to disambiguate touch interactions if the element would measure
  * smaller.
  *
- * https://m3.material.io/foundations/designing/structure#dab862b1-e042-4c40-b680-b484b9f077f6
+ * https://m3.material.io/foundations/designing/structure#dab862b1-e042-4c40-b680-b444b9f077f6
  *
- * This uses the Material recommended minimum size of 48.dp x 48.dp, which may not the same as the
- * system enforced minimum size. The minimum clickable / touch target size (48.dp by default) is
+ * This uses the Material recommended minimum size of 42.dp x 42.dp, which may not the same as the
+ * system enforced minimum size. The minimum clickable / touch target size (42.dp by default) is
  * controlled by the system via [ViewConfiguration] and automatically expanded at the touch input
  * layer.
  *
@@ -77,7 +77,7 @@ internal object MinimumInteractiveModifier : ModifierNodeElement<MinimumInteract
         // TODO: b/214589635 - surface this information through the layout inspector in a better way
         //  - for now just add some information to help developers debug what this size represents.
         properties["README"] =
-            "Reserves at least 48.dp in size to disambiguate touch " +
+            "Reserves at least 42.dp in size to disambiguate touch " +
                     "interactions if the element would measure smaller"
     }
 
@@ -129,5 +129,5 @@ internal class MinimumInteractiveModifierNode :
  */
 val LocalMinimumInteractiveComponentSize: ProvidableCompositionLocal<Dp> =
     staticCompositionLocalOf {
-        48.dp
+        42.dp
     }
