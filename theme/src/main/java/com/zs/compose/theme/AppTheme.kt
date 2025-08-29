@@ -289,17 +289,15 @@ private val DefaultClipInOverlayDuringTransition: (LayoutDirection, Density) -> 
  * @param renderInOverlay pass null to make this fun handle with default strategy.
  * @see androidx.compose.animation.SharedTransitionScope.renderInSharedTransitionScopeOverlay
  */
-fun Modifier.renderInSharedTransitionScopeOverlay(
+fun Modifier.renderInSharedTransitionScopeOverlay2(
     zIndexInOverlay: Float = 0f,
-    renderInOverlay: (() -> Boolean)? = null,
-    clipInOverlayDuringTransition: (LayoutDirection, Density) -> Path? = DefaultClipInOverlayDuringTransition
+    renderInOverlay: SharedTransitionScope.() -> Boolean = { isTransitionActive },
 ) = composed {
     val sharedTransitionScope = LocalSharedTransitionScope.current
     with(sharedTransitionScope) {
         renderInSharedTransitionScopeOverlay(
-            renderInOverlay = renderInOverlay ?: { isTransitionActive },
-            zIndexInOverlay = zIndexInOverlay,
-            clipInOverlayDuringTransition = clipInOverlayDuringTransition
+            renderInOverlay = renderInOverlay,
+            zIndexInOverlay = zIndexInOverlay
         )
     }
 }
