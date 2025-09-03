@@ -121,22 +121,13 @@ fun Strings() {
                     AlertDialog(
                         showDialog,
                         onDismissRequest = { showDialog = false },
-                        topBar = {
-                            TopAppBar(
-                                title = { Label("String Tip") },
-                                background = Background(AppTheme.colors.background(1.dp)),
-                                navigationIcon = {
-                                    IconButton(
-                                        Icons.Outlined.Info,
-                                        contentDescription = null,
-                                        onClick = {}
-                                    )
-                                }
+                        title = { Label("String Tip") },
+                        navigationIcon = {
+                            IconButton(
+                                Icons.Outlined.Info,
+                                contentDescription = null,
+                                onClick = {}
                             )
-                        },
-                        background = AppTheme.colors.background(surface),
-                        bottomBar = {
-                            Button("Confirm", onClick = { showDialog = false })
                         },
                         content = {
                             Text(textResource(R.string.styled_string))
@@ -180,7 +171,8 @@ fun Strings() {
                     .observe(surface)
                     .padding(horizontal = 16.dp),
                 contentPadding = navInsets.union(WindowInsets.content).union(
-                    WindowInsets.systemBars.only(WindowInsetsSides.Vertical)).asPaddingValues(),
+                    WindowInsets.systemBars.only(WindowInsetsSides.Vertical)
+                ).asPaddingValues(),
                 content = {
                     // Sample Text
                     item { SectionHeader("Sample Text") }

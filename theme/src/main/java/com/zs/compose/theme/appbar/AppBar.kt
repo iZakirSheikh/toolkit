@@ -22,12 +22,11 @@ package com.zs.compose.theme.appbar
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.DecayAnimationSpec
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -333,7 +332,7 @@ fun TopAppBar(
 ) {
     Surface(
         background = background,
-        contentColor = contentColor.copy(ContentAlpha.medium),
+        contentColor = contentColor,
         elevation = elevation,
         shape = shape,
         border = border,
@@ -347,36 +346,36 @@ fun TopAppBar(
                 .height(TopAppBarHeight),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
-            content = {
-                if (navigationIcon == null) Spacer(TitleInsetWithoutIcon) else {
-                    Row(TitleIconModifier, verticalAlignment = Alignment.CenterVertically) {
-                        CompositionLocalProvider(
-                            LocalContentColor provides contentColor.copy(ContentAlpha.high),
-                            content = navigationIcon
-                        )
-                    }
-                }
+           content = {
+               // NavIcon
+               if (navigationIcon == null) Spacer(TitleInsetWithoutIcon) else {
+                   Box(TitleIconModifier, contentAlignment = Alignment.Center) {
+                       CompositionLocalProvider(
+                           LocalContentColor provides contentColor.copy(ContentAlpha.high),
+                           content = navigationIcon
+                       )
+                   }
+               }
 
-                Row(Modifier
-                    .fillMaxHeight()
-                    .weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                    ProvideTextStyle(value = AppTheme.typography.title2) {
-                        CompositionLocalProvider(
-                            LocalContentColor provides contentColor.copy(ContentAlpha.high),
-                            content = title
-                        )
-                    }
-                }
+               // Title
+               Box(Modifier.fillMaxHeight().weight(1f), contentAlignment = Alignment.CenterStart){
+                   ProvideTextStyle(value = AppTheme.typography.title2) {
+                       CompositionLocalProvider(
+                           LocalContentColor provides contentColor.copy(ContentAlpha.high),
+                           content = title
+                       )
+                   }
 
-                CompositionLocalProvider(LocalContentColor provides contentColor.copy(ContentAlpha.medium)) {
-                    Row(
-                        Modifier.fillMaxHeight(),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically,
-                        content = actions
-                    )
-                }
-            }
+               }
+
+               // Actions
+               Row(
+                   Modifier.fillMaxHeight(),
+                   horizontalArrangement = Arrangement.End,
+                   verticalAlignment = Alignment.CenterVertically,
+                   content = actions
+               )
+           }
         )
     }
 }

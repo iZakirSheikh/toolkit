@@ -77,6 +77,7 @@ import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.LocalWindowSize
+import com.zs.compose.theme.TonalIconButton
 import com.zs.compose.theme.adaptive.Scaffold
 import com.zs.compose.theme.adaptive.content
 import com.zs.compose.theme.appbar.AppBarDefaults
@@ -112,7 +113,7 @@ fun M3() {
                         )
                     },
                     actions = {
-                        IconButton(
+                        TonalIconButton(
                             Icons.Outlined.LocalFireDepartment,
                             contentDescription = null,
                             onClick = {}

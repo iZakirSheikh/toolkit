@@ -22,6 +22,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.util.Log
+import android.view.Gravity
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -36,14 +37,17 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
 
 private const val TAG = "Util"
 
@@ -212,11 +216,12 @@ val LazyGridScope.fullLineSpan
  */
 @Composable
 @NonRestartableComposable
-fun Dialog(
+inline fun Dialog(
     expanded: Boolean,
-    onDismissRequest: () -> Unit,
+    noinline onDismissRequest: () -> Unit,
+    gravity: Int = Gravity.CENTER,
     properties: DialogProperties = DialogProperties(),
-    content: @Composable () -> Unit
+    noinline content: @Composable () -> Unit
 ) {
     // Do not show when not expanded
     if (!expanded) return
@@ -226,6 +231,16 @@ fun Dialog(
     // current density to the dialog's content via CompositionLocalProvider.
     val density = LocalDensity.current
     Dialog(onDismissRequest, properties) {
+        // Enhance the dialog with additional features:
+        // - Explore possibilities for true full-screen dialogs.
+        // - Investigate implementing blur-behind and background blur effects.
+        // - Consider adding scrim effects and other visual enhancements.
+        val view = LocalView.current
+        SideEffect {
+            val dialogWindowProvider = view.parent as? DialogWindowProvider ?: return@SideEffect
+            val window = dialogWindowProvider.window
+            window.setGravity(gravity)
+        }
         CompositionLocalProvider(LocalDensity provides density, content)
     }
 }

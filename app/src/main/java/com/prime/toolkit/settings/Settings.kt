@@ -106,6 +106,7 @@ import com.zs.compose.theme.SliderPreference
 import com.zs.compose.theme.Surface
 import com.zs.compose.theme.SwitchPreference
 import com.zs.compose.theme.TextButton
+import com.zs.compose.theme.TonalIconButton
 import com.zs.compose.theme.WindowSize.Category
 import com.zs.compose.theme.adaptive.HorizontalTwoPaneStrategy
 import com.zs.compose.theme.adaptive.SinglePaneStrategy
@@ -474,25 +475,25 @@ fun Settings() {
                 },
                 actions = {
                     // Feedback
-                    IconButton(
+                    TonalIconButton(
                         icon = Icons.Outlined.AlternateEmail,
                         contentDescription = null,
                         onClick = {  },
                     )
                     // Star on Github
-                    IconButton(
+                    TonalIconButton(
                         icon = Icons.Outlined.DataObject,
                         contentDescription = null,
                         onClick = {  },
                     )
                     // Report Bugs on Github.
-                    IconButton(
+                    TonalIconButton(
                         icon = Icons.Outlined.BugReport,
                         contentDescription = null,
                         onClick = { },
                     )
                     // Join our telegram channel
-                    IconButton(
+                    TonalIconButton(
                         icon = Icons.Outlined.Textsms,
                         contentDescription = null,
                         onClick = { },

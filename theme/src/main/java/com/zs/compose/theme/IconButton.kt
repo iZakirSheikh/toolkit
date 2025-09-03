@@ -18,17 +18,23 @@
 
 package com.zs.compose.theme
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
@@ -164,14 +170,86 @@ fun IconToggleButton(
     icon: ImageVector,
     contentDescription: String?,
     onCheckedChange: (Boolean) -> Unit,
-    tint: Color = LocalContentColor.current,
     modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
 ) = IconToggleButton(
     checked, onCheckedChange, modifier, enabled, interactionSource
 ) {
     Icon(icon, contentDescription, tint = tint)
+}
+
+
+/**
+ * TonalIconButton is a clickable icon with a background color, used to represent actions.
+ *
+ * This component is similar to [IconButton], but it has a background color that provides
+ * a visual cue for interaction.
+ *
+ * @param onClick the lambda to be invoked when this icon is pressed
+ * @param modifier optional [Modifier] for this TonalIconButton
+ * @param enabled whether or not this TonalIconButton will handle input events and appear enabled for semantics purposes
+ * @param color the color to be used for the background and content of this TonalIconButton. If [Color.Unspecified] is provided, [LocalContentColor] will be used.
+ * @param shape the shape of the TonalIconButton's background
+ * @param border optional [BorderStroke] to be applied to the TonalIconButton's background
+ * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and emitting [Interaction]s for this TonalIconButton.
+ * @param content the content (icon) to be drawn inside the TonalIconButton. This is typically an [Icon].
+ */
+@Composable
+fun TonalIconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    color: Color = Color.Unspecified,
+    shape: Shape = CircleShape,
+    border: BorderStroke? = null,
+    interactionSource: MutableInteractionSource? = null,
+    content: @Composable () -> Unit
+) {
+    val color = color.takeOrElse { LocalContentColor.current }
+    val tint = color.copy(ContentAlpha.indication)
+    Box(
+        modifier = modifier
+            .then(if (border != null) Modifier.border(border, shape) else Modifier)
+            // only apply background color to non-transparent colors
+            .background(tint, shape)
+            .clip(shape)
+            .minimumInteractiveComponentSize()
+            .clickable(
+                onClick = onClick,
+                enabled = enabled,
+                role = Role.Button,
+                interactionSource = interactionSource,
+                indication = ripple(bounded = false, radius = RippleRadius)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        val contentColor = color.copy(if (enabled) ContentAlpha.high else ContentAlpha.disabled)
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor,
+            content = content
+        )
+    }
+}
+
+/**
+ * @see TonalIconButton
+ */
+@NonRestartableComposable
+@Composable
+fun TonalIconButton(
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    contentDescription: String? = null,
+    color: Color = Color.Unspecified,
+    shape: Shape = CircleShape,
+    border: BorderStroke? = null,
+    interactionSource: MutableInteractionSource? = null,
+) = TonalIconButton(onClick, modifier, enabled, color, shape, border, interactionSource) {
+    Icon(icon, contentDescription)
 }
 
 // Default radius of an unbounded ripple in an IconButton

@@ -22,6 +22,7 @@
 
 package com.prime.toolkit.games
 
+import android.view.Gravity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -71,6 +72,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.prime.toolkit.R
 import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.prime.toolkit.core.background
@@ -177,26 +179,20 @@ fun Games() {
                 title = { Label(stringResource(R.string.video_games)) },
                 navigationIcon = {
                     var showDialog by remember { mutableStateOf(false) }
+                    val (width, heihgt) = LocalWindowSize.current
                     AlertDialog(
                         showDialog,
                         onDismissRequest = { showDialog = false },
-                        topBar = {
-                            TopAppBar(
-                                title = { Label("Gaming Tip") },
-                                background = Background(AppTheme.colors.background(1.dp)),
-                                navigationIcon = {
-                                    IconButton(
-                                        Icons.Outlined.Info,
-                                        contentDescription = null,
-                                        onClick = {}
-                                    )
-                                }
+                        title = { Label("Gaming Tip") },
+                        navigationIcon = {
+                            IconButton(
+                                Icons.Outlined.Info,
+                                contentDescription = null,
+                                onClick = {}
                             )
                         },
-                        background = AppTheme.colors.background(surface),
-                        bottomBar = {
-                            Button("Confirm", onClick = { showDialog = false })
-                        },
+                        properties = DialogProperties(usePlatformDefaultWidth = false),
+                        gravity = if (width > height) Gravity.CENTER else Gravity.BOTTOM,
                         content = {
                             Text("Computer games can improve reflexes, problem-solving skills, and hand-eye coordination. Just remember to take regular breaks!")
                         }
