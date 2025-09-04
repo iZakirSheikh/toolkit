@@ -25,6 +25,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -39,6 +40,9 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+
+// Default radius of an unbounded ripple in an IconButton
+private val RippleRadius = 24.dp
 
 /**
  * IconButton is a clickable icon, used to represent actions. An IconButton has an overall minimum
@@ -212,10 +216,10 @@ fun TonalIconButton(
     Box(
         modifier = modifier
             .then(if (border != null) Modifier.border(border, shape) else Modifier)
-            // only apply background color to non-transparent colors
             .background(tint, shape)
             .clip(shape)
-            .minimumInteractiveComponentSize()
+            // Using MinimumInteractiveSize here seems too much.
+            .sizeIn(minWidth = 40.dp, minHeight = 40.dp)
             .clickable(
                 onClick = onClick,
                 enabled = enabled,
@@ -251,6 +255,3 @@ fun TonalIconButton(
 ) = TonalIconButton(onClick, modifier, enabled, color, shape, border, interactionSource) {
     Icon(icon, contentDescription)
 }
-
-// Default radius of an unbounded ripple in an IconButton
-private val RippleRadius = 24.dp
