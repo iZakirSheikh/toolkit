@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -58,6 +59,7 @@ import com.zs.compose.theme.appbar.FloatingBottomNavigationBar
 import com.zs.compose.theme.appbar.NavigationItem
 import com.zs.compose.theme.appbar.SideBar
 import com.zs.compose.theme.calculateWindowSizeClass
+import com.zs.compose.theme.dynamicAccentColor
 import com.zs.compose.theme.snackbar.SnackbarDuration
 import com.zs.compose.theme.snackbar.SnackbarHostState
 import com.zs.compose.theme.text.Label
@@ -244,12 +246,12 @@ class MainActivity : ComponentActivity() {
 
             AppTheme(
                 isLight = !darkMode,
-                accent = if (!darkMode) /*Color.ClaretViolet*/ Color.BlueLilac else Color(0xFFD8A25E),
+               // accent = if (!darkMode) /*Color.ClaretViolet*/ Color.BlueLilac else Color(0xFFD8A25E),
+                accent = dynamicAccentColor(LocalContext.current, darkMode),
                 content = {
                     val clazz = calculateWindowSizeClass(this)
                     CompositionLocalProvider(
                         LocalWindowSize provides clazz,
-                        LocalDensity provides Density(LocalDensity.current.density, 1.0f),
                         content = content
                     )
                 }

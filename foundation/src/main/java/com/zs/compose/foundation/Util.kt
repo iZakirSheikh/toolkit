@@ -40,7 +40,6 @@ import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.constrainHeight
@@ -221,15 +220,10 @@ inline fun Dialog(
     noinline onDismissRequest: () -> Unit,
     gravity: Int = Gravity.CENTER,
     properties: DialogProperties = DialogProperties(),
-    noinline content: @Composable () -> Unit
+    crossinline content: @Composable () -> Unit
 ) {
     // Do not show when not expanded
     if (!expanded) return
-    // There is a known issue with Android dialogs where the system's density overrides
-    // the custom density set by the developer in the app.
-    // This leads to dialogs appearing incorrectly. To address this, we provide the
-    // current density to the dialog's content via CompositionLocalProvider.
-    val density = LocalDensity.current
     Dialog(onDismissRequest, properties) {
         // Enhance the dialog with additional features:
         // - Explore possibilities for true full-screen dialogs.
@@ -241,7 +235,7 @@ inline fun Dialog(
             val window = dialogWindowProvider.window
             window.setGravity(gravity)
         }
-        CompositionLocalProvider(LocalDensity provides density, content)
+        content()
     }
 }
 

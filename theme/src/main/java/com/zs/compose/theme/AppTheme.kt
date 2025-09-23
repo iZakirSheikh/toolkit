@@ -391,7 +391,7 @@ fun dynamicAccentColor(context: Context, darkTheme: Boolean): Color {
             context.theme
         )
 
-        Build.VERSION.SDK_INT >= 34 && !darkTheme -> res.getColor(
+        Build.VERSION.SDK_INT >= 34 && darkTheme -> res.getColor(
             android.R.color.system_primary_dark,
             context.theme
         )

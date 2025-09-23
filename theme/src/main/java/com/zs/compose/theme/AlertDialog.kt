@@ -92,7 +92,7 @@ fun AlertDialog(
         Surface(
             color = if (colors.isLight) colors.accent else colors.background(3.dp),
             shape = shape,
-            modifier = DialogSize,
+            modifier = if (properties.usePlatformDefaultWidth) Modifier else DialogSize,
             border = if (colors.isLight) null else colors.shine,
             content = {
                 Column {
