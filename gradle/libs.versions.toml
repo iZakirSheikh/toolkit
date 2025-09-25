@@ -1,13 +1,8 @@
 [versions]
-compose = "1.9.1"
+compose = "1.9.2"
 kotlin = "2.2.20"
 agp = "8.13.0"
 material_icons = "1.7.8"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-appcompat = "1.7.0"
-material = "1.12.0"
 
 [plugins]
 # Jetbrains Compose Compiler
@@ -18,7 +13,8 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 maven-publish = { id = "maven-publish", version = "0.0.0" }
 
 [libraries]
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.10.1" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.11.0" }
+androidx-material3 = { module = "androidx.compose.material3:material3", version = "1.4.0" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "compose" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
@@ -37,10 +33,5 @@ androidx-preferences = { group = "androidx.datastore", name = "datastore-prefere
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version = "3.3.0" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.17.0" }
 
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 chrisbanes-haze = {module= "dev.chrisbanes.haze:haze", version = "1.6.10" }
-androidx-window = { group = "androidx.window", name = "window", version = "1.4.0" }
+androidx-window = { group = "androidx.window", name = "window", version = "1.5.0" }

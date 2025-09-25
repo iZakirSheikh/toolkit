@@ -17,8 +17,7 @@
  */
 
 @file:OptIn(
-    ExperimentalThemeApi::class, ExperimentalFoundationApi::class,
-    ExperimentalMaterial3ExpressiveApi::class
+    ExperimentalThemeApi::class, ExperimentalFoundationApi::class
 )
 
 package com.prime.toolkit.m3
@@ -46,14 +45,9 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.rounded.HomeMax
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Tune
-import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialExpressiveTheme
-import androidx.compose.material3.MotionScheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SplitButtonDefaults
-import androidx.compose.material3.SplitButtonLayout
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.darkColorScheme
@@ -77,6 +71,7 @@ import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.LocalWindowSize
+import com.zs.compose.theme.MotionScheme
 import com.zs.compose.theme.TonalIconButton
 import com.zs.compose.theme.adaptive.Scaffold
 import com.zs.compose.theme.adaptive.content
@@ -87,7 +82,7 @@ import com.zs.compose.theme.text.Label
 
 @Composable
 fun M3() {
-    val behaviour = AppBarDefaults.exitUntilCollapsedScrollBehavior()
+    /*val behaviour = AppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navInsets = WindowInsets.content
     val surface = rememberBackgroundProvider()
     val (width, height) = LocalWindowSize.current
@@ -97,7 +92,7 @@ fun M3() {
         background = AppTheme.colors.background
     ) else
         darkColorScheme(primary = AppTheme.colors.accent, background = AppTheme.colors.background)
-    MaterialExpressiveTheme(motionScheme = MotionScheme.expressive(), colorScheme = colors) {
+    MaterialTheme (motionScheme = MaterialTheme., colorScheme = colors) {
         Scaffold(
             topBar = {
                 AdaptiveLargeTopAppBar(
@@ -169,7 +164,7 @@ fun M3() {
                     modifier = Modifier
                         .fillMaxSize()
                         .nestedScroll(behaviour.nestedScrollConnection)
-                        .observe(surface)/*.fadingEdge(state,  false, length = 50.dp)*/,
+                        .observe(surface)*//*.fadingEdge(state,  false, length = 50.dp)*//*,
                     content = {
                         // button with shapes
                         item(span = fullLineSpan) {
@@ -259,5 +254,5 @@ fun M3() {
                 )
             }
         )
-    }
+    }*/
 }

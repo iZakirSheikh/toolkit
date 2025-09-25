@@ -54,5 +54,5 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
     implementation(libs.chrisbanes.haze)
-    implementation("androidx.compose.material3:material3:1.4.0-alpha15")
+    implementation(libs.androidx.material3)
 }
