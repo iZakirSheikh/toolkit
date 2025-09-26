@@ -255,10 +255,10 @@ private data class TwoPaneVerticalMeasurePolicy(
             // place fab according to fabPosition.
             val fabSpacingPx = FabSpacing.roundToPx()
             fabPlaceable.placeRelative(
-                y = contentPlaceable.height - fabPlaceable.height - fabSpacingPx,
+                y = height - fabPlaceable.height - fabSpacingPx,
                 x = when (fabPosition) {
-                    FabPosition.End -> contentPlaceable.width - fabPlaceable.width - fabSpacingPx
-                    FabPosition.Center -> (contentPlaceable.width - fabPlaceable.width) / 2
+                    FabPosition.End -> width - fabPlaceable.width - fabSpacingPx
+                    FabPosition.Center -> (width - fabPlaceable.width) / 2
                     FabPosition.Start -> fabSpacingPx
                     else -> error("Invalid fab position")
                 }
@@ -316,10 +316,10 @@ private data class TwoPaneHorizontalMeasurePolicy(
             // place fab according to fabPosition.
             val fabSpacingPx = FabSpacing.roundToPx()
             fabPlaceable.placeRelative(
-                y = contentPlaceable.height - fabPlaceable.height - fabSpacingPx,
+                y = height - fabPlaceable.height - fabSpacingPx,
                 x = when (fabPosition) {
-                    FabPosition.End -> contentPlaceable.width - fabPlaceable.width - fabSpacingPx
-                    FabPosition.Center -> (contentPlaceable.width - fabPlaceable.width) / 2
+                    FabPosition.End -> width - fabPlaceable.width - fabSpacingPx
+                    FabPosition.Center -> (width - fabPlaceable.width) / 2
                     FabPosition.Start -> fabSpacingPx
                     else -> error("Invalid fab position")
                 }

@@ -35,9 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.window.DialogProperties
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.Dialog
@@ -46,10 +44,9 @@ import com.zs.compose.theme.text.ProvideTextStyle
 
 
 private val TitleBarHeight = Modifier.height(46.dp)
-private val DialogHorizontalMargin = Modifier.padding(horizontal = 16.dp)
-
 private val DialogSize = Modifier
-    .widthIn(280.dp, 560.dp) then DialogHorizontalMargin
+    .widthIn(280.dp, 460.dp)
+    .padding(horizontal = 16.dp)
 
 /**
  * Adds a subtle shine effect to components, particularly [Acrylic] ones,
@@ -97,9 +94,6 @@ val ItemSpace = Arrangement.spacedBy(8.dp)
  * @param properties [DialogProperties] for configuring the dialog's behavior, such as
  *   whether it's dismissible.
  * @param shape The [Shape] to be used for the dialog's container. Defaults to `AppTheme.shapes.xLarge`.
- * @param dialogMaxWidth The maximum width the dialog can occupy. If `Dp.Unspecified`,
- *   the dialog will use a default width range. If `properties.usePlatformDefaultWidth` is true,
- *   this parameter is ignored.
  * @param gravity The gravity of the dialog on the screen. See [android.view.Gravity].
  *   Defaults to `Gravity.CENTER`.
  * @param content A composable lambda that defines the main content of the dialog,
@@ -113,7 +107,6 @@ fun AlertDialog(
     actions: @Composable RowScope.() -> Unit = {},
     properties: DialogProperties = DialogProperties(),
     shape: Shape = AppTheme.shapes.xLarge,
-    dialogMaxWidth: Dp = Dp.Unspecified,
     gravity: Int = Gravity.CENTER,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -122,12 +115,8 @@ fun AlertDialog(
         Surface(
             color = if (colors.isLight) colors.accent else colors.background(3.dp),
             shape = shape,
+            modifier = if (properties.usePlatformDefaultWidth) Modifier else DialogSize,
             border = if (colors.isLight) null else colors.shine,
-            modifier = when {
-                properties.usePlatformDefaultWidth -> Modifier
-                dialogMaxWidth.isSpecified -> Modifier.widthIn(280.dp, dialogMaxWidth)  then DialogHorizontalMargin
-                else -> DialogSize
-            },
             content = {
                 Column {
                     // Top AppBar
@@ -175,7 +164,6 @@ inline fun AlertDialog(
     noinline actions: @Composable RowScope.() -> Unit = {},
     properties: DialogProperties = DialogProperties(),
     shape: Shape = AppTheme.shapes.xLarge,
-    dialogMaxWidth: Dp = Dp.Unspecified,
     gravity: Int = Gravity.CENTER,
     noinline content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -188,7 +176,6 @@ inline fun AlertDialog(
         actions,
         properties,
         shape,
-        dialogMaxWidth,
         gravity,
         content
     )
