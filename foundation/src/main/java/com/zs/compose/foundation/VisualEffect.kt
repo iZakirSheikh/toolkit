@@ -55,6 +55,7 @@ private const val TAG = "VisualEffect"
  *
  * @see [ShaderBrush]
  */
+@Deprecated("This is API is obsolete and will be removed in future.")
 sealed interface ImageBrush {
 
     companion object {
@@ -288,6 +289,7 @@ private class EffectElement(
  *
  * @return A new modifier with the visual effect applied.
  */
+@Deprecated("This is API is obsolete and will be removed in future.")
 fun Modifier.visualEffect(
     brush: ImageBrush,
     @FloatRange(from = 0.0, to = 1.0) alpha: Float = 1.0f,

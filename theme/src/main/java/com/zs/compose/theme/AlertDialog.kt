@@ -46,7 +46,7 @@ import com.zs.compose.theme.text.ProvideTextStyle
 private val TitleBarHeight = Modifier.height(46.dp)
 private val DialogSize = Modifier
     .widthIn(280.dp, 460.dp)
-    .padding(horizontal = 16.dp)
+    .padding(horizontal = 16.dp, vertical = 10.dp)
 
 /**
  * Adds a subtle shine effect to components, particularly [Acrylic] ones,

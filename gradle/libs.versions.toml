@@ -1,7 +1,7 @@
 [versions]
-compose = "1.9.2"
-kotlin = "2.2.20"
-agp = "8.13.0"
+compose = "1.9.5"
+kotlin = "2.2.21"
+agp = "8.13.1"
 material_icons = "1.7.8"
 
 [plugins]
@@ -13,7 +13,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 maven-publish = { id = "maven-publish", version = "0.0.0" }
 
 [libraries]
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.11.0" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.12.0" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version = "1.4.0" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "compose" }
@@ -29,9 +29,9 @@ androidx-material-ripple  = { group = "androidx.compose.material", name = "mater
 androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "material_icons" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material_icons"}
 
-androidx-preferences = { group = "androidx.datastore", name = "datastore-preferences", version = "1.1.7" }
+androidx-preferences = { group = "androidx.datastore", name = "datastore-preferences", version = "1.2.0" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version = "3.3.0" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.17.0" }
 
-chrisbanes-haze = {module= "dev.chrisbanes.haze:haze", version = "1.6.10" }
+chrisbanes-haze = {module= "dev.chrisbanes.haze:haze", version = "1.7.0" }
 androidx-window = { group = "androidx.window", name = "window", version = "1.5.0" }
