@@ -246,8 +246,8 @@ class MainActivity : ComponentActivity() {
 
             AppTheme(
                 isLight = !darkMode,
-               // accent = if (!darkMode) /*Color.ClaretViolet*/ Color.BlueLilac else Color(0xFFD8A25E),
-                accent = dynamicAccentColor(LocalContext.current, darkMode),
+                accent = if (!darkMode) /*Color.ClaretViolet*/ Color.BlueLilac else Color(0xFFD8A25E),
+                //accent = dynamicAccentColor(LocalContext.current, darkMode),
                 content = {
                     val clazz = calculateWindowSizeClass(this)
                     CompositionLocalProvider(

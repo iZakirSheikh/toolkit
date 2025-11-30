@@ -28,17 +28,16 @@ import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionDefaults
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SharedTransitionScope.OverlayClip
-import androidx.compose.animation.SharedTransitionScope.PlaceHolderSize
+import androidx.compose.animation.SharedTransitionScope.PlaceholderSize
+import androidx.compose.animation.SharedTransitionScope.PlaceholderSize.Companion.ContentSize
 import androidx.compose.animation.SharedTransitionScope.ResizeMode
-import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.ScaleToBounds
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.scaleToBounds
 import androidx.compose.animation.SharedTransitionScope.SharedContentState
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring.StiffnessMediumLow
-import androidx.compose.animation.core.VisibilityThreshold
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Indication
@@ -51,7 +50,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Rect
@@ -71,6 +70,40 @@ import com.zs.compose.foundation.UmbraGrey
 import com.zs.compose.theme.AppTheme.invoke
 import com.zs.compose.theme.MotionScheme.Companion.standard
 import com.zs.compose.theme.text.ProvideTextStyle
+
+
+/**
+ * Retrieves a dynamic accent color based on the device's API level and the current theme (light or dark).
+ *
+ * On Android 14 (API level 34) and above, it uses the system's primary light or dark color.
+ * On older devices, it uses system_accent1_600 for light themes and system_accent1_200 for dark themes.
+ *
+ * @param context The application context.
+ * @param darkTheme `true` if the current theme is dark, `false` if it's light.
+ * @return A [Color] object representing the dynamic accent color.
+ */
+@RequiresApi(Build.VERSION_CODES.S)
+fun dynamicAccentColor(context: Context, darkTheme: Boolean): Color {
+    val res = context.resources
+    val color = when {
+        Build.VERSION.SDK_INT >= 34 && !darkTheme -> res.getColor(
+            android.R.color.system_primary_light,
+            context.theme
+        )
+
+        Build.VERSION.SDK_INT >= 34 && darkTheme -> res.getColor(
+            android.R.color.system_primary_dark,
+            context.theme
+        )
+
+        !darkTheme -> res.getColor(
+            android.R.color.system_accent1_600,
+            context.theme
+        )// light, tonalPalette.primary40, // dark tonalPalette.primary80
+        else -> res.getColor(android.R.color.system_accent1_200, context.theme)
+    }
+    return Color(color)
+}
 
 // source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/MaterialTheme.kt;bpv=0
 // commit date: 2024-09-26 23:43
@@ -263,42 +296,27 @@ object AppTheme {
     }
 }
 
-private val DefaultSpring =
-    spring(stiffness = StiffnessMediumLow, visibilityThreshold = Rect.VisibilityThreshold)
-
-@ExperimentalSharedTransitionApi
-private val DefaultBoundsTransform = BoundsTransform { _, _ -> DefaultSpring }
-
-@ExperimentalSharedTransitionApi
-private val ParentClip: OverlayClip =
-    object : OverlayClip {
-        override fun getClipPath(
-            state: SharedContentState,
-            bounds: Rect,
-            layoutDirection: LayoutDirection,
-            density: Density
-        ): Path? {
-            return state.parentSharedContentState?.clipPathInOverlay
-        }
-    }
-
-private val DefaultClipInOverlayDuringTransition: (LayoutDirection, Density) -> Path? =
-    { _, _ -> null }
-
 /**
  * @param renderInOverlay pass null to make this fun handle with default strategy.
  * @see androidx.compose.animation.SharedTransitionScope.renderInSharedTransitionScopeOverlay
  */
 fun Modifier.renderInSharedTransitionScopeOverlay(
     zIndexInOverlay: Float = 0f,
+    renderInOverlay: (() -> Boolean)? = null ,
 ) = composed {
+    // TODO - Find new way to avoid using composed modifier.
+    // Retrieve the current SharedTransitionScope from the composition local.
     val sharedTransitionScope = LocalSharedTransitionScope.current
+    // Apply the original modifier from the scope.
+    // If renderInOverlay is not provided, use the default behavior of rendering when a transition is active.
     with(sharedTransitionScope) {
         renderInSharedTransitionScopeOverlay(
-            zIndexInOverlay = zIndexInOverlay
+            zIndexInOverlay = zIndexInOverlay,
+            renderInOverlay = renderInOverlay ?: { isTransitionActive },
         )
     }
 }
+
 
 /**
  * @return the state of shared contnet corresponding to [key].
@@ -310,20 +328,34 @@ private inline fun rememberSharedContentState(key: Any) =
         rememberSharedContentState(key = key)
     }
 
+
+private val ParentClip: OverlayClip =
+    object : OverlayClip {
+        override fun getClipPath(
+            sharedContentState: SharedContentState,
+            bounds: Rect,
+            layoutDirection: LayoutDirection,
+            density: Density,
+        ): Path? {
+            return sharedContentState.parentSharedContentState?.clipPathInOverlay
+        }
+    }
+
 /**
  * A shared bounds modifier that uses scope from [AppTheme]'s [AppTheme.sharedTransitionScope] and
  * [AnimatedVisibilityScope] from [LocalNavAnimatedVisibilityScope]
+ * @see androidx.compose.animation.SharedTransitionScope.sharedBounds
  */
 fun Modifier.sharedBounds(
     key: Any,
     enter: EnterTransition = fadeIn(),
     exit: ExitTransition = fadeOut(),
-    boundsTransform: BoundsTransform = DefaultBoundsTransform,
-    resizeMode: ResizeMode = ScaleToBounds(ContentScale.FillWidth, Alignment.Center),
-    placeHolderSize: PlaceHolderSize = PlaceHolderSize.contentSize,
+    boundsTransform: BoundsTransform = SharedTransitionDefaults.BoundsTransform,
+    resizeMode: ResizeMode = scaleToBounds(ContentScale.FillWidth, Center),
+    placeholderSize: PlaceholderSize = ContentSize,
     renderInOverlayDuringTransition: Boolean = true,
     zIndexInOverlay: Float = 0f,
-    clipInOverlayDuringTransition: OverlayClip = ParentClip
+    clipInOverlayDuringTransition: OverlayClip = ParentClip,
 ) = composed {
     val navAnimatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
     val sharedTransitionScope = LocalSharedTransitionScope.current
@@ -336,7 +368,7 @@ fun Modifier.sharedBounds(
             exit = exit,
             boundsTransform = boundsTransform,
             resizeMode = resizeMode,
-            placeHolderSize = placeHolderSize,
+            placeholderSize = placeholderSize,
             renderInOverlayDuringTransition = renderInOverlayDuringTransition,
             zIndexInOverlay = zIndexInOverlay,
             clipInOverlayDuringTransition = clipInOverlayDuringTransition
@@ -345,16 +377,19 @@ fun Modifier.sharedBounds(
 }
 
 /**
+ * A shared Element modifier that uses scope from [AppTheme]'s [AppTheme.sharedTransitionScope] and
+ * [AnimatedVisibilityScope] from [LocalNavAnimatedVisibilityScope]
  * @see androidx.compose.animation.SharedTransitionScope.sharedElement
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 fun Modifier.sharedElement(
     key: Any,
-    boundsTransform: BoundsTransform = DefaultBoundsTransform,
-    placeHolderSize: PlaceHolderSize = PlaceHolderSize.contentSize,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    boundsTransform: BoundsTransform = SharedTransitionDefaults.BoundsTransform,
+    placeholderSize: PlaceholderSize = ContentSize,
     renderInOverlayDuringTransition: Boolean = true,
     zIndexInOverlay: Float = 0f,
-    clipInOverlayDuringTransition: OverlayClip = ParentClip
+    clipInOverlayDuringTransition: OverlayClip = ParentClip,
 ) = composed {
     val sharedContentState = rememberSharedContentState(key = key)
     val navAnimatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
@@ -362,7 +397,7 @@ fun Modifier.sharedElement(
     with(sharedTransitionScope) {
         sharedElement(
             sharedContentState = sharedContentState,
-            placeHolderSize = placeHolderSize,
+            placeholderSize = placeholderSize,
             renderInOverlayDuringTransition = renderInOverlayDuringTransition,
             zIndexInOverlay = zIndexInOverlay,
             animatedVisibilityScope = navAnimatedVisibilityScope,
@@ -370,37 +405,4 @@ fun Modifier.sharedElement(
             clipInOverlayDuringTransition = clipInOverlayDuringTransition
         )
     }
-}
-
-/**
- * Retrieves a dynamic accent color based on the device's API level and the current theme (light or dark).
- *
- * On Android 14 (API level 34) and above, it uses the system's primary light or dark color.
- * On older devices, it uses system_accent1_600 for light themes and system_accent1_200 for dark themes.
- *
- * @param context The application context.
- * @param darkTheme `true` if the current theme is dark, `false` if it's light.
- * @return A [Color] object representing the dynamic accent color.
- */
-@RequiresApi(Build.VERSION_CODES.S)
-fun dynamicAccentColor(context: Context, darkTheme: Boolean): Color {
-    val res = context.resources
-    val color = when {
-        Build.VERSION.SDK_INT >= 34 && !darkTheme -> res.getColor(
-            android.R.color.system_primary_light,
-            context.theme
-        )
-
-        Build.VERSION.SDK_INT >= 34 && darkTheme -> res.getColor(
-            android.R.color.system_primary_dark,
-            context.theme
-        )
-
-        !darkTheme -> res.getColor(
-            android.R.color.system_accent1_600,
-            context.theme
-        )// light, tonalPalette.primary40, // dark tonalPalette.primary80
-        else -> res.getColor(android.R.color.system_accent1_200, context.theme)
-    }
-    return Color(color)
 }
