@@ -268,7 +268,7 @@ fun LazyListScope.stickyHeader(
                 layout(width, height) {
                     val posY = coordinates?.positionInParent()?.y?.toInt() ?: 0
                     val paddingTop = state.layoutInfo.beforeContentPadding
-                    var top = (paddingTop - posY).coerceIn(0, paddingTop)
+                    val top = (paddingTop - posY).coerceIn(0, paddingTop)
                     placeable.placeRelative(0, top)
                 }
             }

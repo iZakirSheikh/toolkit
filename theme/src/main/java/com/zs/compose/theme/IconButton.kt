@@ -25,7 +25,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -218,8 +217,7 @@ fun TonalIconButton(
             .then(if (border != null) Modifier.border(border, shape) else Modifier)
             .background(tint, shape)
             .clip(shape)
-            // Using MinimumInteractiveSize here seems too much.
-            .sizeIn(minWidth = 40.dp, minHeight = 40.dp)
+            .minimumInteractiveComponentSize()
             .clickable(
                 onClick = onClick,
                 enabled = enabled,

@@ -128,4 +128,4 @@ internal class MinimumInteractiveModifierNode :
  * an accessible touch target.
  */
 val LocalMinimumInteractiveComponentSize: ProvidableCompositionLocal<Dp> =
-    staticCompositionLocalOf { 48.dp }
+    staticCompositionLocalOf { 40.dp }
