@@ -384,7 +384,6 @@ fun Modifier.sharedBounds(
 @OptIn(ExperimentalSharedTransitionApi::class)
 fun Modifier.sharedElement(
     key: Any,
-    animatedVisibilityScope: AnimatedVisibilityScope,
     boundsTransform: BoundsTransform = SharedTransitionDefaults.BoundsTransform,
     placeholderSize: PlaceholderSize = ContentSize,
     renderInOverlayDuringTransition: Boolean = true,
