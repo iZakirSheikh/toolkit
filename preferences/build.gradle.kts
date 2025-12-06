@@ -36,6 +36,13 @@ android {
             "-Xnon-local-break-continue"
         )
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies { implementation(libs.androidx.preferences) }

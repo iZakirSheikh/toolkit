@@ -40,9 +40,17 @@ android {
         )
     }
     buildFeatures { compose = true }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
+    implementation(platform(libs.compose.bom))
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.core.ktx)
 //    implementation(libs.chrisbanes.haze)

@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -58,12 +59,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.prime.toolkit.core.background
 import com.prime.toolkit.core.observe
 import com.prime.toolkit.core.rememberBackgroundProvider
+import com.zs.compose.foundation.SepiaBrown
 import com.zs.compose.foundation.fullLineSpan
 import com.zs.compose.foundation.plus
 import com.zs.compose.theme.AppTheme
@@ -72,8 +75,12 @@ import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.MotionScheme
+import com.zs.compose.theme.Surface
 import com.zs.compose.theme.TonalIconButton
+import com.zs.compose.theme.adaptive.HorizontalTwoPaneStrategy
 import com.zs.compose.theme.adaptive.Scaffold
+import com.zs.compose.theme.adaptive.TwoPane
+import com.zs.compose.theme.adaptive.VerticalTwoPaneStrategy
 import com.zs.compose.theme.adaptive.content
 import com.zs.compose.theme.appbar.AppBarDefaults
 import com.zs.compose.theme.menu.DropDownMenuItem
@@ -255,4 +262,33 @@ fun M3() {
             }
         )
     }*/
+    TwoPane(
+        primary = {
+            Surface(color = Color.Green, shape = AppTheme.shapes.xLarge, modifier = Modifier.fillMaxSize()) {
+                Text("" +
+                        "\n" +
+                        "\n" +
+                        "Where does it come from?\n" +
+                        "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.\n" +
+                        "\n" +
+                        "The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.")
+            }
+        },
+        secondary = {
+            Surface(color = Color.SepiaBrown, shape = AppTheme.shapes.xLarge, modifier = Modifier.fillMaxSize()) {
+                Text("" +
+                        "Where does it come from?\n" +
+                        "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.\n" +
+                        "\n" +
+                        "\n" +
+                        "\n" +
+                        "The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.")
+
+            }
+        },
+        strategy = VerticalTwoPaneStrategy(0.5f),
+        spacing = 16.dp,
+        modifier = Modifier.padding(vertical = 16.dp),
+        containerColor = Color.Black
+    )
 }

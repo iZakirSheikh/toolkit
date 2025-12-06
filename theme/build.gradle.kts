@@ -38,9 +38,17 @@ android {
         )
     }
     buildFeatures { compose = true }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
+    implementation(platform(libs.compose.bom))
     implementation(project(":foundation"))
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.material.ripple)

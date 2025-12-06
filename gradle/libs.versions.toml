@@ -1,5 +1,4 @@
 [versions]
-compose = "1.10.0-rc01"
 kotlin = "2.2.21"
 agp = "8.13.1"
 material_icons = "1.7.8"
@@ -13,18 +12,19 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 maven-publish = { id = "maven-publish", version = "0.0.0" }
 
 [libraries]
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.12.0" }
+compose-bom = { group = "androidx.compose", name = "compose-bom", version = "2025.12.00" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.12.1" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version = "1.4.0" }
-androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "compose" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 #///
-androidx-animation =  { group = "androidx.compose.animation", name = "animation", version.ref = "compose" }
-androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "compose" }
-androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "compose" }
-androidx-ui-util = { group = "androidx.compose.ui", name = "ui-util", version.ref = "compose" }
-androidx-material-ripple  = { group = "androidx.compose.material", name = "material-ripple", version.ref = "compose" }
+androidx-animation =  { group = "androidx.compose.animation", name = "animation" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+androidx-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
+androidx-material-ripple  = { group = "androidx.compose.material", name = "material-ripple" }
 
 androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "material_icons" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material_icons"}

@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -74,6 +75,7 @@ object SinglePaneStrategy : TwoPaneStrategy {
  *                  Must be between 0.0 (exclusive) and 1.0 (inclusive).
  */
 @JvmInline
+@Stable
 value class HorizontalTwoPaneStrategy(
     @FloatRange(from = 0.0, to = 1.0) val fraction: Float
 ) : TwoPaneStrategy {
@@ -99,6 +101,7 @@ value class HorizontalTwoPaneStrategy(
  *                  Must be between 0.0 (exclusive) and 1.0 (inclusive).
  */
 @JvmInline
+@Stable
 value class VerticalTwoPaneStrategy(
     @FloatRange(from = 0.0, to = 1.0) val fraction: Float,
 ) : TwoPaneStrategy {
@@ -118,6 +121,7 @@ value class VerticalTwoPaneStrategy(
  */
 inline val TwoPaneStrategy.padding: PaddingValues
     @Composable
+    @Stable
     inline get() = when (this) {
         is HorizontalTwoPaneStrategy -> WindowInsets.systemBars.asPaddingValues()
         is VerticalTwoPaneStrategy -> WindowInsets.navigationBars.asPaddingValues()
@@ -128,6 +132,7 @@ inline val TwoPaneStrategy.padding: PaddingValues
  * The recommended details pane margin for the given [TwoPaneStrategy].
  */
 inline val TwoPaneStrategy.margin: PaddingValues
+    @Stable
     inline get() = when (this) {
         is VerticalTwoPaneStrategy -> PaddingValues(horizontal = 16.dp)
         else -> PaddingValues.Zero
@@ -138,6 +143,7 @@ inline val TwoPaneStrategy.margin: PaddingValues
  */
 inline val TwoPaneStrategy.shape
     @ReadOnlyComposable @Composable
+    @Stable
     inline get() = when (this) {
         is HorizontalTwoPaneStrategy -> RoundedCornerShape(4)
         is VerticalTwoPaneStrategy -> RoundedCornerShape(4)

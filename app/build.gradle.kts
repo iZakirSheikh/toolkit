@@ -43,6 +43,9 @@ android {
 }
 
 dependencies {
+    // Import BOM
+    implementation(platform(libs.compose.bom))
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.coil.compose)
     implementation(project(":theme"))
