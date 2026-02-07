@@ -1,18 +1,58 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+// -----------------------------------------------------------------------------
+// PLUGINS
+// -----------------------------------------------------------------------------
+// 📦 Core plugins required for Android Library + Maven publishing.
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    id(libs.plugins.maven.publish.get().pluginId)
+    alias(libs.plugins.android.library)       // Android library plugin
+    id(libs.plugins.maven.publish.get().pluginId) // Maven publishing plugin
 }
 
+
+// -----------------------------------------------------------------------------
+// KOTLIN COMPILER OPTIONS
+// -----------------------------------------------------------------------------
+// ⚙️ Configure Kotlin compiler for JVM + advanced language features.
+kotlin {
+    compilerOptions {
+        // Target JVM bytecode version (typed enum instead of raw string)
+        jvmTarget = JvmTarget.JVM_17
+
+        // Enable experimental + advanced compiler flags
+        freeCompilerArgs.addAll(
+            // "-XXLanguage:+ExplicitBackingFields", // Explicit backing fields (disabled for now)
+            "-XXLanguage:+NestedTypeAliases",       // Nested type aliases support
+            "-Xopt-in=kotlin.RequiresOptIn",        // Opt-in to @RequiresOptIn APIs
+            "-Xwhen-guards",                        // Experimental when-guards
+            "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi", // Compose foundation experimental
+            "-Xopt-in=com.zs.compose.theme.ExperimentalThemeApi",             // Custom theme experimental
+            "-Xnon-local-break-continue",           // Allow non-local break/continue
+            "-Xcontext-sensitive-resolution",       // Context-sensitive overload resolution
+            "-Xcontext-parameters"                  // Context parameters (experimental)
+        )
+    }
+}
+
+
+// -----------------------------------------------------------------------------
+// ANDROID CONFIGURATION
+// -----------------------------------------------------------------------------
+// 📱 Android library setup: namespace, SDK levels, build types, and publishing.
 android {
     namespace = "com.zs.preferences"
     compileSdk = 36
 
+    // Java 17 compatibility
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
     defaultConfig {
         minSdk = 23
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
+        consumerProguardFiles("consumer-rules.pro") // ProGuard rules for consumers
     }
 
     buildTypes {
@@ -24,19 +64,8 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs = listOf(
-            "-Xopt-in=kotlin.RequiresOptIn",
-            "-Xwhen-guards",
-            "-Xnon-local-break-continue"
-        )
-    }
 
+    // Configure publishing artifacts (sources + Javadoc)
     publishing {
         singleVariant("release") {
             withSourcesJar()
@@ -45,21 +74,29 @@ android {
     }
 }
 
-dependencies { implementation(libs.androidx.preferences) }
 
-// Because the components are created only during the afterEvaluate phase, you must
-// configure your publications using the afterEvaluate() lifecycle method.
+// -----------------------------------------------------------------------------
+// DEPENDENCIES
+// -----------------------------------------------------------------------------
+// 📚 Core library: AndroidX DataStore Preferences.
+dependencies {
+    implementation(libs.androidx.preferences) // DataStore Preferences API
+}
+
+
+// -----------------------------------------------------------------------------
+// PUBLISHING CONFIGURATION
+// -----------------------------------------------------------------------------
+// 📤 Configure Maven publication after evaluation phase.
 afterEvaluate {
     publishing {
         publications {
             // Create a Maven publication named "release"
             create<MavenPublication>("release") {
-                // Use the release build variant component
-                from(components["release"])
-                // Customize publication attributes
-                groupId = "com.zs"
-                artifactId = "preferences"
-                version = "3.0.0-dev01"
+                from(components["release"])        // Use release build variant
+                groupId = "com.zs"                 // Maven group ID
+                artifactId = "preferences"         // Artifact ID
+                version = "3.0.0-dev01"            // Version tag
             }
         }
     }

@@ -1,19 +1,26 @@
+// -----------------------------------------------------------------------------
+// PLUGINS
+// -----------------------------------------------------------------------------
+// 📦 Core plugins required for Android Library + Compose + Maven publishing.
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose.compiler)
-    id(libs.plugins.maven.publish.get().pluginId)
+    alias(libs.plugins.android.library)       // Android library plugin
+    alias(libs.plugins.compose.compiler)      // Jetpack Compose compiler plugin
+    id(libs.plugins.maven.publish.get().pluginId) // Maven publishing plugin
 }
 
+
+// -----------------------------------------------------------------------------
+// ANDROID CONFIGURATION
+// -----------------------------------------------------------------------------
+// 🎨 Android library setup for Compose theme utilities.
 android {
     namespace = "com.zs.compose.theme"
     compileSdk = 36
 
     defaultConfig {
         minSdk = 23
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
+        consumerProguardFiles("consumer-rules.pro") // ProGuard rules for consumers
     }
 
     buildTypes {
@@ -25,20 +32,17 @@ android {
             )
         }
     }
+
+    // Java 17 compatibility
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs = listOf(
-            "-Xopt-in=kotlin.RequiresOptIn",
-            "-Xwhen-guards",
-            "-Xnon-local-break-continue"
-        )
-    }
+
+    // Enable Jetpack Compose
     buildFeatures { compose = true }
 
+    // Configure publishing artifacts (sources + Javadoc)
     publishing {
         singleVariant("release") {
             withSourcesJar()
@@ -47,24 +51,30 @@ android {
     }
 }
 
+
+// -----------------------------------------------------------------------------
+// DEPENDENCIES
+// -----------------------------------------------------------------------------
+// 📚 Core libraries: Compose foundation, ripple effects, window APIs, and project modules.
 dependencies {
-    implementation(platform(libs.compose.bom))
-    implementation(project(":foundation"))
-    implementation(libs.androidx.foundation)
-    implementation(libs.androidx.material.ripple)
-    implementation(libs.androidx.window)
+    implementation(platform(libs.compose.bom))        // Compose BOM for version alignment
+    implementation(project(":foundation"))            // Internal foundation module
+    implementation(libs.androidx.foundation)          // Compose foundation components
+    implementation(libs.androidx.material.ripple)     // Ripple effect for touch feedback
+    implementation(libs.androidx.window)              // WindowManager APIs (foldables, multi-window)
 }
 
-// Because the components are created only during the afterEvaluate phase, you must
-// configure your publications using the afterEvaluate() lifecycle method.
+
+// -----------------------------------------------------------------------------
+// PUBLISHING CONFIGURATION
+// -----------------------------------------------------------------------------
+// 📤 Configure Maven publication after evaluation phase.
 afterEvaluate {
     publishing {
         publications {
             // Create a Maven publication named "release"
             create<MavenPublication>("release") {
-                // Use the release build variant component
                 from(components["release"])
-                // Customize publication attributes
                 groupId = "com.zs.compose"
                 artifactId = "theme"
                 version = "3.0.0-dev01"

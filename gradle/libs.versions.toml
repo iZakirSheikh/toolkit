@@ -1,37 +1,59 @@
+# -----------------------------------------------------------------------------
+# VERSIONS – Centralized version catalog
+#           Only versions that are required globally or shared across multiple dependencies
+#           are declared here. For single-use cases, inline values are preferred.
+# -----------------------------------------------------------------------------
 [versions]
-kotlin = "2.2.21"
-agp = "8.13.1"
-material_icons = "1.7.8"
+coilNetworkOkhttp = "3.3.0"
+kotlin = "2.3.10"          # Kotlin language version
+agp = "9.0.0"              # Android Gradle Plugin
+material_icons = "1.7.8"   # Jetpack Compose Material Icons
 
+
+# -----------------------------------------------------------------------------
+# PLUGINS
+# -----------------------------------------------------------------------------
 [plugins]
-# Jetbrains Compose Compiler
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-android-application = { id = "com.android.application", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-maven-publish = { id = "maven-publish", version = "0.0.0" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" } # JetBrains Compose Compiler
+android-application = { id = "com.android.application", version.ref = "agp" }             # For app modules
+android-library = { id = "com.android.library", version.ref = "agp" }                     # For library modules
+maven-publish = { id = "maven-publish", version = "0.0.0" }                               # Publishing plugin (placeholder)
 
+
+# -----------------------------------------------------------------------------
+# LIBRARIES
+# -----------------------------------------------------------------------------
 [libraries]
-compose-bom = { group = "androidx.compose", name = "compose-bom", version = "2025.12.00" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.12.1" }
+
+# -----------------------------------------------------------------------------
+# Compose
+# -----------------------------------------------------------------------------
+compose-bom = { group = "androidx.compose", name = "compose-bom", version = "2026.01.01" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.12.3" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version = "1.4.0" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-#///
 androidx-animation =  { group = "androidx.compose.animation", name = "animation" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
 androidx-material-ripple  = { group = "androidx.compose.material", name = "material-ripple" }
 
-androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "material_icons" }
-androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material_icons"}
 
+# -----------------------------------------------------------------------------
+# LIBRARIES : Material Icons - Vector icons for Compose UI.
+# -----------------------------------------------------------------------------
+androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "material_icons" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material_icons" }
+
+
+# -----------------------------------------------------------------------------
+# MISC
+# -----------------------------------------------------------------------------
 androidx-preferences = { group = "androidx.datastore", name = "datastore-preferences", version = "1.2.0" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version = "3.3.0" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.17.0" }
-
-chrisbanes-haze = {module= "dev.chrisbanes.haze:haze", version = "1.7.0" }
+chrisbanes-haze = { module = "dev.chrisbanes.haze:haze", version = "1.7.0" }
 androidx-window = { group = "androidx.window", name = "window", version = "1.5.1" }
