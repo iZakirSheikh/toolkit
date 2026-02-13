@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -110,6 +111,7 @@ internal val IsRunningInPreview = android.os.Build.DEVICE == "layoutlib"
  */
 @Composable
 @NonRestartableComposable
+@Stable
 operator fun PaddingValues.plus(value: PaddingValues): PaddingValues {
     val direction = LocalLayoutDirection.current
     return PaddingValues(

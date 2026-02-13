@@ -10,9 +10,7 @@ agp = "9.0.0"              # Android Gradle Plugin
 material_icons = "1.7.8"   # Jetpack Compose Material Icons
 
 
-# -----------------------------------------------------------------------------
-# PLUGINS
-# -----------------------------------------------------------------------------
+# ==================================PLUGINS====================================
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" } # JetBrains Compose Compiler
 android-application = { id = "com.android.application", version.ref = "agp" }             # For app modules
@@ -20,16 +18,14 @@ android-library = { id = "com.android.library", version.ref = "agp" }           
 maven-publish = { id = "maven-publish", version = "0.0.0" }                               # Publishing plugin (placeholder)
 
 
-# -----------------------------------------------------------------------------
-# LIBRARIES
-# -----------------------------------------------------------------------------
+# ===============================  LIBRARIES  =================================
 [libraries]
 
 # -----------------------------------------------------------------------------
 # Compose
 # -----------------------------------------------------------------------------
-compose-bom = { group = "androidx.compose", name = "compose-bom", version = "2026.01.01" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.12.3" }
+compose-bom = { group = "androidx.compose", name = "compose-bom", version = "2026.02.00" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.12.4" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version = "1.4.0" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
@@ -55,5 +51,5 @@ androidx-material-icons-extended = { group = "androidx.compose.material", name =
 androidx-preferences = { group = "androidx.datastore", name = "datastore-preferences", version = "1.2.0" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version = "3.3.0" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.17.0" }
-chrisbanes-haze = { module = "dev.chrisbanes.haze:haze", version = "1.7.0" }
+chrisbanes-haze = { module = "dev.chrisbanes.haze:haze", version = "1.7.2" }
 androidx-window = { group = "androidx.window", name = "window", version = "1.5.1" }
