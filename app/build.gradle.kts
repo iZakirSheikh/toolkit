@@ -15,8 +15,6 @@ plugins {
 // -----------------------------------------------------------------------------
 kotlin {
     compilerOptions {
-        // Target JVM bytecode version (was "11" string, now typed enum)
-        jvmTarget = JvmTarget.JVM_17
 
         // Add experimental/advanced compiler flags
         freeCompilerArgs.addAll(
@@ -43,8 +41,8 @@ android {
     buildFeatures { compose = true }  // Enable Jetpack Compose
     // Java 17 compatibility
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     // -----------------------------------------------------------------------------

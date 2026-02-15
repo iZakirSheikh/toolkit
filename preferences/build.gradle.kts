@@ -16,17 +16,13 @@ plugins {
 // ⚙️ Configure Kotlin compiler for JVM + advanced language features.
 kotlin {
     compilerOptions {
-        // Target JVM bytecode version (typed enum instead of raw string)
-        jvmTarget = JvmTarget.JVM_17
-
-        // Enable experimental + advanced compiler flags
+       // Enable experimental + advanced compiler flags
         freeCompilerArgs.addAll(
             // "-XXLanguage:+ExplicitBackingFields", // Explicit backing fields (disabled for now)
             "-XXLanguage:+NestedTypeAliases",       // Nested type aliases support
             "-Xopt-in=kotlin.RequiresOptIn",        // Opt-in to @RequiresOptIn APIs
             "-Xwhen-guards",                        // Experimental when-guards
             "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi", // Compose foundation experimental
-            "-Xopt-in=com.zs.compose.theme.ExperimentalThemeApi",             // Custom theme experimental
             "-Xnon-local-break-continue",           // Allow non-local break/continue
             "-Xcontext-sensitive-resolution",       // Context-sensitive overload resolution
             "-Xcontext-parameters"                  // Context parameters (experimental)
@@ -45,8 +41,8 @@ android {
 
     // Java 17 compatibility
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     defaultConfig {

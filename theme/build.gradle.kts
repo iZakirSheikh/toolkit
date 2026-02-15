@@ -8,6 +8,26 @@ plugins {
     id(libs.plugins.maven.publish.get().pluginId) // Maven publishing plugin
 }
 
+// -----------------------------------------------------------------------------
+// KOTLIN COMPILER OPTIONS
+// -----------------------------------------------------------------------------
+kotlin {
+    compilerOptions {
+
+        // Add experimental/advanced compiler flags
+        freeCompilerArgs.addAll(
+            //   "-XXLanguage:+ExplicitBackingFields", //  Explicit backing fields
+            "-XXLanguage:+NestedTypeAliases",
+            "-Xopt-in=kotlin.RequiresOptIn", // Opt-in to @RequiresOptIn APIs
+            "-Xwhen-guards",                 // Enable experimental when-guards
+            "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi", // Compose foundation experimental
+            "-Xnon-local-break-continue",    // Allow non-local break/continue
+            "-Xcontext-sensitive-resolution",// Context-sensitive overload resolution
+            "-Xcontext-parameters"           // Enable context parameters (experimental)
+        )
+    }
+}
+
 
 // -----------------------------------------------------------------------------
 // ANDROID CONFIGURATION
@@ -35,8 +55,8 @@ android {
 
     // Java 17 compatibility
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     // Enable Jetpack Compose
