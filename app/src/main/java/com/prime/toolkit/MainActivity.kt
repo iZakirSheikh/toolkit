@@ -91,7 +91,7 @@ fun ToolkitNavBar(
         modifier = modifier,
         content = { content() },
         background = background,
-        border = _root_ide_package_.androidx.compose.foundation.BorderStroke(
+        border = androidx.compose.foundation.BorderStroke(
             0.6.dp,
             AppTheme.colors.background(5.dp)
         )
