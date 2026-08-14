@@ -16,7 +16,7 @@ dependencyResolutionManagement {
         maven(url = "https://jitpack.io")
     }
 }
-rootProject.name = "Toolkit"
+rootProject.name = "toolkit"
 include (":app")
 include(":foundation")
 include(":theme")

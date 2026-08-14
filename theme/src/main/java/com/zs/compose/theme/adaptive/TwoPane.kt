@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.zs.compose.foundation.Slot
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.None
-import com.zs.compose.theme.internal.Slot
 import androidx.compose.runtime.CompositionLocalProvider as Provider
 
 private const val TAG = "TwoPane"

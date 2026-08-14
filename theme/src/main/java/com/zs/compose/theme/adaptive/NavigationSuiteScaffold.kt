@@ -44,12 +44,12 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import com.zs.compose.foundation.Slot
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.LinearProgressIndicator
 import com.zs.compose.theme.LocalContentColor
 import com.zs.compose.theme.None
-import com.zs.compose.theme.internal.Slot
 import com.zs.compose.theme.internal.component1
 import com.zs.compose.theme.internal.component2
 import com.zs.compose.theme.internal.component3

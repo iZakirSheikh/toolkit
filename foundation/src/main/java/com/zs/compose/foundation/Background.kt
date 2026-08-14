@@ -76,6 +76,7 @@ import androidx.compose.ui.graphics.isUnspecified
 @ExperimentalFoundationApi
 @JvmInline
 @Stable
+@Deprecated("This is not the recommanded way to provide style modiifers.")
 value class Background(@PublishedApi internal val modifier: Modifier) {
 
     /**

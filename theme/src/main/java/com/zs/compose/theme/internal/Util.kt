@@ -18,20 +18,7 @@
 
 package com.zs.compose.theme.internal
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.dp
-
-/**
- * A simple slot for holding content within the TwoPane layout.
- *
- * @param content The composable content to be displayed within the slot.
- */
-@Composable
-internal inline fun Slot(content: @Composable () -> Unit) = Box(content = { content() })
 
 internal operator fun Constraints.component1(): Int = minWidth
 internal operator fun Constraints.component2(): Int = maxWidth
