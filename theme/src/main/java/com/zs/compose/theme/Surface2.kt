@@ -73,6 +73,7 @@ private fun Modifier.surface(
  */
 @ExperimentalThemeApi
 @Composable
+@Deprecated("Avoid using this fun since its params are depricated.")
 fun Surface(
     background: Background,
     modifier: Modifier = Modifier,

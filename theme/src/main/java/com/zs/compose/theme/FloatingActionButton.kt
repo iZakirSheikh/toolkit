@@ -26,7 +26,6 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -48,6 +47,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zs.compose.foundation.Slot
 import com.zs.compose.theme.internal.ActivePressedButtonShape
 import com.zs.compose.theme.internal.animateElevation
 import com.zs.compose.theme.internal.shapeByInteraction
@@ -104,12 +104,10 @@ fun FloatingActionButton(
         interactionSource = interactionSource
     ) {
         ProvideTextStyle(AppTheme.typography.label1) {
-            Box(
+            Slot (
                 modifier = Modifier.defaultMinSize(minWidth = FabSize, minHeight = FabSize),
-                contentAlignment = Alignment.Center
-            ) {
-                content()
-            }
+                content = content
+            )
         }
     }
 }
@@ -409,12 +407,10 @@ fun FloatingActionButton(
         interactionSource = interactionSource
     ) {
         ProvideTextStyle(AppTheme.typography.label1) {
-            Box(
+            Slot(
                 modifier = Modifier.defaultMinSize(minWidth = FabSize, minHeight = FabSize),
-                contentAlignment = Alignment.Center
-            ) {
-                content()
-            }
+                content = content
+            )
         }
     }
 }

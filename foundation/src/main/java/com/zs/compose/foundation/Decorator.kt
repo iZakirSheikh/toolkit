@@ -1,6 +1,7 @@
 package com.zs.compose.foundation
 
 import androidx.annotation.FloatRange
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -97,6 +98,45 @@ fun Modifier.decorator(
     borderColor = borderColor,
     borderBrush = borderBrush,
     borderWidth = borderWidth,
+    //
+    elevation = elevation
+)
+
+@Stable
+fun Modifier.decorator(
+    // background
+    backgroundColor: Color,
+    backgroundBrush: Brush? = null,
+    @FloatRange(from = 0.0, to = 1.0) backgroundAlpha: Float = 1.0f,
+
+    // foreground
+    foregroundColor: Color = Color.Unspecified,
+    foregroundBrush: Brush? = null,
+    @FloatRange(from = 0.0, to = 1.0) foregroundAlpha: Float = 1f,
+
+    // shape
+    shape: Shape = RectangleShape,
+    // border
+    border: BorderStroke? = null,
+
+    //
+    elevation: Dp = Dp.Unspecified
+) = decorator(
+    // background
+    backgroundColor = backgroundColor,
+    backgroundBrush = backgroundBrush,
+    backgroundAlpha = backgroundAlpha,
+
+    // foreground
+    foregroundColor = foregroundColor,
+    foregroundBrush = foregroundBrush,
+    foregroundAlpha = foregroundAlpha,
+
+    // shape
+    shape = shape,
+    //
+    borderBrush = border?.brush,
+    borderWidth = border?.width ?: Dp.Unspecified,
     //
     elevation = elevation
 )

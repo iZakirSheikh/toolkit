@@ -16,55 +16,36 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalThemeApi::class)
+
 package com.zs.compose.theme
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
 // Default radius of an unbounded ripple in an IconButton
-private val RippleRadius = 24.dp
+private val RippleRadius get() = 24.dp
 
 /**
- * IconButton is a clickable icon, used to represent actions. An IconButton has an overall minimum
- * touch target size of 48 x 48dp, to meet accessibility guidelines. [content] is centered inside
- * the IconButton.
+ * Icon buttons help people take minor actions and move through screens.
  *
- * This component is typically used inside an App Bar for the navigation icon / actions. See App Bar
- * documentation for samples of this.
- *
- * [content] should typically be an [Icon], using an icon from
- * [androidx.compose.material.icons.Icons]. If using a custom icon, note that the typical size for
- * the internal icon is 24 x 24 dp.
- *
- * @sample androidx.compose.material.samples.IconButtonSample
- * @param onClick the lambda to be invoked when this icon is pressed
- * @param modifier optional [Modifier] for this IconButton
- * @param enabled whether or not this IconButton will handle input events and appear enabled for
- *   semantics purposes
- * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and
- *   emitting [Interaction]s for this IconButton. You can use this to change the IconButton's
- *   appearance or preview the IconButton in different states. Note that if `null` is provided,
- *   interactions will still happen internally.
- * @param content the content (icon) to be drawn inside the IconButton. This is typically an [Icon].
+ * @param onClick called when this icon button is clicked
+ * @param modifier the [Modifier] to be applied to this icon button
+ * @param enabled controls the enabled state of this icon button. When `false`, this component will
+ * not respond to user input, and it will appear visually disabled and disabled to accessibility services.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this icon button. You can create and pass in your own `remember`ed instance to observe
+ * Interactions and customize the appearance / behavior of this icon button in different states.
+ * @param content the content of this icon button, typically an [Icon]
  */
 @Composable
 fun IconButton(
@@ -74,63 +55,57 @@ fun IconButton(
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit
 ) {
-    Box(
-        modifier =
-            modifier
-                .minimumInteractiveComponentSize()
-                .clickable(
-                    onClick = onClick,
-                    enabled = enabled,
-                    role = Role.Button,
-                    interactionSource = interactionSource,
-                    indication = ripple(bounded = false, radius = RippleRadius)
-                ),
-        contentAlignment = Alignment.Center
-    ) {
-        val contentColor =
-            if (enabled) LocalContentColor.current else LocalContentColor.current.copy(
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        interactionSource = interactionSource,
+        content = content,
+        color = Color.Unspecified,
+        shape = CircleShape,
+        indication = ripple(bounded = false, radius = RippleRadius),
+        contentColor = when {
+            enabled -> LocalContentColor.current
+            else -> LocalContentColor.current.copy(
                 ContentAlpha.disabled
             )
-        CompositionLocalProvider(
-            LocalContentColor provides contentColor,
-            content = content
-        )
-    }
+        }
+    )
 }
+
 
 /**
  * @see IconButton
  */
 @Composable
-@NonRestartableComposable
-fun IconButton(
+inline fun IconButton(
     icon: ImageVector,
     contentDescription: String?,
-    onClick: () -> Unit,
+    noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     tint: Color = Color.Unspecified,
     interactionSource: MutableInteractionSource? = null
-) = IconButton(onClick, modifier, enabled, interactionSource) {
+) = IconButton(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource, content = {
     Icon(icon, contentDescription, tint = tint.takeOrElse { LocalContentColor.current })
 }
+)
 
 /**
- * An [IconButton] with two states, for icons that can be toggled 'on' and 'off', such as a bookmark
- * icon, or a navigation icon that opens a drawer.
+ * A toggle button that displays an icon and can be toggled between two states (checked and unchecked).
  *
- * @sample androidx.compose.material.samples.IconToggleButtonSample
- * @param checked whether this IconToggleButton is currently checked
- * @param onCheckedChange callback to be invoked when this icon is selected
- * @param modifier optional [Modifier] for this IconToggleButton
- * @param enabled enabled whether or not this [IconToggleButton] will handle input events and appear
- *   enabled for semantics purposes
- * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and
- *   emitting [Interaction]s for this IconButton. You can use this to change the IconButton's
- *   appearance or preview the IconButton in different states. Note that if `null` is provided,
- *   interactions will still happen internally.
- * @param content the content (icon) to be drawn inside the IconToggleButton. This is typically an
- *   [Icon].
+ * @param checked whether this toggle button is currently checked
+ * @param onCheckedChange callback to be invoked when the toggle button is clicked
+ * @param modifier the [Modifier] to be applied to this toggle button
+ * @param enabled controls the enabled state of this toggle button. When `false`, this component will
+ * not respond to user input, and it will appear visually disabled and alpha-reduced.
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this toggle button. You can create and pass in your own `remember`ed instance to observe
+ * Interactions and customize the appearance / behavior of this toggle button in different states.
+ * @param content the content to be drawn inside the toggle button, typically an [Icon]
  */
 @Composable
 fun IconToggleButton(
@@ -141,63 +116,56 @@ fun IconToggleButton(
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit
 ) {
-    Box(
-        modifier =
-            modifier
-                .minimumInteractiveComponentSize()
-                .toggleable(
-                    value = checked,
-                    onValueChange = onCheckedChange,
-                    enabled = enabled,
-                    role = Role.Checkbox,
-                    interactionSource = interactionSource,
-                    indication = ripple(bounded = false, radius = RippleRadius)
-                ),
-        contentAlignment = Alignment.Center
-    ) {
-        val contentColor =
-            if (enabled) LocalContentColor.current else LocalContentColor.current.copy(
+    Surface(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        modifier = modifier,
+        interactionSource = interactionSource,
+        color = Color.Unspecified,
+        shape = CircleShape,
+        indication = ripple(bounded = false, radius = RippleRadius),
+        contentColor = when {
+            enabled -> LocalContentColor.current
+            else -> LocalContentColor.current.copy(
                 ContentAlpha.disabled
             )
-        CompositionLocalProvider(LocalContentColor provides contentColor, content = content)
-    }
+        },
+        content = content
+    )
 }
 
 /**
  * @see IconToggleButton
  */
 @Composable
-@NonRestartableComposable
-fun IconToggleButton(
+inline fun IconToggleButton(
     checked: Boolean,
     icon: ImageVector,
     contentDescription: String?,
-    onCheckedChange: (Boolean) -> Unit,
+    noinline onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
 ) = IconToggleButton(
-    checked, onCheckedChange, modifier, enabled, interactionSource
-) {
-    Icon(icon, contentDescription, tint = tint)
-}
-
+    checked = checked,
+    onCheckedChange = onCheckedChange,
+    modifier = modifier,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    content = { Icon(icon, contentDescription, tint = tint) }
+)
 
 /**
- * TonalIconButton is a clickable icon with a background color, used to represent actions.
+ * Tonal icon buttons are a medium-emphasis alternative to standard icon buttons,
+ * using a surface color with a low-opacity background.
  *
- * This component is similar to [IconButton], but it has a background color that provides
- * a visual cue for interaction.
- *
- * @param onClick the lambda to be invoked when this icon is pressed
- * @param modifier optional [Modifier] for this TonalIconButton
- * @param enabled whether or not this TonalIconButton will handle input events and appear enabled for semantics purposes
- * @param color the color to be used for the background and content of this TonalIconButton. If [Color.Unspecified] is provided, [LocalContentColor] will be used.
- * @param shape the shape of the TonalIconButton's background
- * @param border optional [BorderStroke] to be applied to the TonalIconButton's background
- * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and emitting [Interaction]s for this TonalIconButton.
- * @param content the content (icon) to be drawn inside the TonalIconButton. This is typically an [Icon].
+ * @param onClick called when this icon button is clicked
+ * @param modifier the [Modifier] to be applied to this icon button
+ * @param enabled controls the enabled state of this icon button. When `false`, this component will
+ * not respond to user input, and it will appear visually disabled and disabled to accessibility services.
+ * @param color the color to be used for the background and content. The background will be a
+ * transparent version of this color, while the content will use the full opacity.
  */
 @Composable
 fun TonalIconButton(
@@ -210,29 +178,17 @@ fun TonalIconButton(
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit
 ) {
-    val color = color.takeOrElse { LocalContentColor.current }
-    val tint = color.copy(ContentAlpha.indication)
-    Box(
-        modifier = modifier
-            .then(if (border != null) Modifier.border(border, shape) else Modifier)
-            .background(tint, shape)
-            .clip(shape)
-            .minimumInteractiveComponentSize()
-            .clickable(
-                onClick = onClick,
-                enabled = enabled,
-                role = Role.Button,
-                interactionSource = interactionSource,
-                indication = ripple(bounded = false, radius = RippleRadius)
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        val contentColor = color.copy(if (enabled) ContentAlpha.high else ContentAlpha.disabled)
-        CompositionLocalProvider(
-            LocalContentColor provides contentColor,
-            content = content
-        )
-    }
+    Surface(
+        modifier = modifier,
+        onClick = onClick,
+        enabled = enabled,
+        color = color.takeOrElse { LocalContentColor.current }.copy(ContentAlpha.indication),
+        shape = shape,
+        border = border,
+        interactionSource = interactionSource,
+        contentColor = color.copy(if (enabled) ContentAlpha.high else ContentAlpha.disabled),
+        content = content
+    )
 }
 
 /**
@@ -250,6 +206,14 @@ fun TonalIconButton(
     shape: Shape = CircleShape,
     border: BorderStroke? = null,
     interactionSource: MutableInteractionSource? = null,
-) = TonalIconButton(onClick, modifier, enabled, color, shape, border, interactionSource) {
-    Icon(icon, contentDescription)
-}
+) = TonalIconButton(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    color = color,
+    shape = shape,
+    border = border,
+    interactionSource = interactionSource,
+    content = {Icon(icon, contentDescription)}
+)
+

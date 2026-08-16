@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.offset
 import androidx.compose.ui.util.fastFirst
 import androidx.compose.ui.util.fastMaxOfOrNull
 import androidx.compose.ui.util.fastSumBy
+import com.zs.compose.foundation.Slot
 import com.zs.compose.theme.internal.ActivePressedButtonShape
 import com.zs.compose.theme.internal.AnimatedShapeState
 import com.zs.compose.theme.internal.rememberAnimatedShape
@@ -149,15 +150,13 @@ fun SplitButtonLayout(
             // Override min component size enforcement to avoid create extra padding internally
             // Enforce it on the parent instead
             CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
-                Box(
+                Slot (
                     modifier = Modifier.layoutId(LeadingButtonLayoutId),
-                    contentAlignment = Alignment.Center,
-                    content = { leadingButton() },
+                    content = leadingButton,
                 )
-                Box(
+                Slot(
                     modifier = Modifier.layoutId(TrailingButtonLayoutId),
-                    contentAlignment = Alignment.Center,
-                    content = { trailingButton() },
+                    content = trailingButton,
                 )
             }
         },

@@ -21,174 +21,96 @@ package com.zs.compose.theme
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.zs.compose.foundation.thenIf
+import com.zs.compose.foundation.Slot
+import com.zs.compose.foundation.decorator
+
+@PublishedApi
+internal val BlockInputModifier = Modifier.pointerInput(Unit, {})
 
 /**
- * <a href="https://material.io/design/environment/surfaces.html" class="external"
- * target="_blank">Material Design surface</a>.
+ * A central piece of the UI hierarchy that provides a background color, content color, and
+ * elevation to its content. It also handles common tasks like clipping to a shape and
+ * blocking pointer input from leaking through to the background.
  *
- * Material surface is the central metaphor in material design. Each surface exists at a given
- * elevation, which influences how that piece of surface visually relates to other surfaces and how
- * that surface casts shadows.
- *
- * See the other overloads for clickable, selectable, and toggleable surfaces.
- *
- * The Surface is responsible for:
- * 1) Clipping: Surface clips its children to the shape specified by [shape]
- * 2) Elevation: Surface draws a shadow to represent depth, where [elevation] represents the depth
- *    of this surface. If the passed [shape] is concave the shadow will not be drawn on Android
- *    versions less than 10.
- * 3) Borders: If [shape] has a border, then it will also be drawn.
- * 4) Background: Surface fills the shape specified by [shape] with the [color]. If [color] is
- *    [Colors.surface], the [ElevationOverlay] from [LocalElevationOverlay] will be used to apply an
- *    overlay - by default this will only occur in dark theme. The color of the overlay depends on
- *    the [elevation] of this Surface, and the [LocalAbsoluteElevation] set by any parent surfaces.
- *    This ensures that a Surface never appears to have a lower elevation overlay than its
- *    ancestors, by summing the elevation of all previous Surfaces.
- * 5) Content color: Surface uses [contentColor] to specify a preferred color for the content of
- *    this surface - this is used by the [Text] and [Icon] components as a default color.
- * 6) Blocking touch propagation behind the surface.
- *
- * If no [contentColor] is set, this surface will try and match its background color to a color
- * defined in the theme [Colors], and return the corresponding content color. For example, if the
- * [color] of this surface is [Colors.surface], [contentColor] will be set to [Colors.onSurface]. If
- * [color] is not part of the theme palette, [contentColor] will keep the same value set above this
- * Surface.
- *
- * @sample androidx.compose.material.samples.SurfaceSample
- *
- * To modify these default style values used by text, use [com.zs.compose.theme.text.ProvideTextStyle] or explicitly pass a
- * new [TextStyle] to your text.
- *
- * To manually retrieve the content color inside a surface, use [LocalContentColor].
- *
- * @param modifier Modifier to be applied to the layout corresponding to the surface
- * @param shape Defines the surface's shape as well its shadow. A shadow is only displayed if the
- *   [elevation] is greater than zero.
- * @param color The background color. Use [Color.Transparent] to have no color.
- * @param contentColor The preferred content color provided by this Surface to its children.
- *   Defaults to either the matching content color for [color], or if [color] is not a color from
- *   the theme, this will keep the same value set above this Surface.
- * @param border Optional border to draw on top of the surface
- * @param elevation The size of the shadow below the surface. Note that It will not affect z index
- *   of the Surface. If you want to change the drawing order you can use `Modifier.zIndex`.
- * @param content The content to be displayed on this Surface
+ * @param modifier The [Modifier] to be applied to this surface.
+ * @param shape The [Shape] of the surface and its shadow.
+ * @param color The background color of the surface.
+ * @param contentColor The preferred color for content within this surface, used as the
+ * default [LocalContentColor] for child composables.
+ * @param border Optional [BorderStroke] to be drawn around the edge of the surface.
+ * @param elevation The thickness of the shadow drawn below the surface.
+ * @param content The composable content to be displayed inside the surface.
  */
 @Composable
-fun Surface(
+inline fun Surface(
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
     color: Color = AppTheme.colors.background,
     contentColor: Color = contentColorFor(color),
     border: BorderStroke? = null,
     elevation: Dp = 0.dp,
-    content: @Composable () -> Unit
+    crossinline content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
         LocalContentColor provides contentColor
     ) {
-        Box(
+        Slot(
+            content = content,
             modifier = modifier
-                .surface(
-                    shape = shape, backgroundColor = color, border = border, elevation = elevation
+                .decorator(
+                    shape = shape,
+                    backgroundColor = color,
+                    elevation = elevation,
+                    border = border,
                 )
                 .semantics(mergeDescendants = false) {
-                    @Suppress("DEPRECATION") isContainer = true
+                    @Suppress("DEPRECATION")
+                    isContainer = true
                 }
-                .pointerInput(Unit) {}, propagateMinConstraints = true
-        ) {
-            content()
-        }
+                .then(BlockInputModifier)
+        )
     }
 }
 
 /**
- * Material surface is the central metaphor in material design. Each surface exists at a given
- * elevation, which influences how that piece of surface visually relates to other surfaces and how
- * that surface casts shadows.
+ * Clickable variant of [Surface].
  *
- * This version of Surface is responsible for a click handling as well al everything else that a
- * regular Surface does:
+ * This version of Surface provides a clickable interaction, making it suitable for
+ * components like cards or list items that should respond to user taps.
  *
- * This clickable Surface is responsible for:
- * 1) Clipping: Surface clips its children to the shape specified by [shape]
- * 2) Elevation: Surface draws a shadow to represent depth, where [elevation] represents the depth
- *    of this surface. If the passed [shape] is convex the shadow will not be drawn on Android
- *    versions less than 10.
- * 3) Borders: If [shape] has a border, then it will also be drawn.
- * 4) Background: Surface fills the shape specified by [shape] with the [color]. If [color] is
- *    [Colors.surface], the [ElevationOverlay] from [LocalElevationOverlay] will be used to apply an
- *    overlay - by default this will only occur in dark theme. The color of the overlay depends on
- *    the [elevation] of this Surface, and the [LocalAbsoluteElevation] set by any parent surfaces.
- *    This ensures that a Surface never appears to have a lower elevation overlay than its
- *    ancestors, by summing the elevation of all previous Surfaces.
- * 5) Content color: Surface uses [contentColor] to specify a preferred color for the content of
- *    this surface - this is used by the [Text] and [Icon] components as a default color. If no
- *    [contentColor] is set, this surface will try and match its background color to a color defined
- *    in the theme [Colors], and return the corresponding content color. For example, if the [color]
- *    of this surface is [Colors.surface], [contentColor] will be set to [Colors.onSurface]. If
- *    [color] is not part of the theme palette, [contentColor] will keep the same value set above
- *    this Surface.
- * 6) Click handling. This version of surface will react to the clicks, calling [onClick] lambda,
- *    updating the [interactionSource] when [PressInteraction] occurs, and showing ripple indication
- *    in response to press events. If you don't need click handling, consider using the Surface
- *    function that doesn't require [onClick] param.
- * 7) Semantics for clicks. Just like with [Modifier.clickable], clickable version of Surface will
- *    produce semantics to indicate that it is clicked. No semantic role is set by default, you may
- *    specify one by passing a desired [Role] with a [Modifier.semantics].
- *
- * @sample androidx.compose.material.samples.ClickableSurfaceSample
- *
- * To modify these default style values used by text, use [com.zs.compose.theme.text.ProvideTextStyle] or explicitly pass a
- * new [TextStyle] to your text.
- *
- * To manually retrieve the content color inside a surface, use [LocalContentColor].
- *
- * @param onClick callback to be called when the surface is clicked
- * @param modifier Modifier to be applied to the layout corresponding to the surface
- * @param enabled Controls the enabled state of the surface. When `false`, this surface will not be
- *   clickable
- * @param shape Defines the surface's shape as well its shadow. A shadow is only displayed if the
- *   [elevation] is greater than zero.
- * @param color The background color. Use [Color.Transparent] to have no color.
- * @param contentColor The preferred content color provided by this Surface to its children.
- *   Defaults to either the matching content color for [color], or if [color] is not a color from
- *   the theme, this will keep the same value set above this Surface.
- * @param border Optional border to draw on top of the surface
- * @param elevation The size of the shadow below the surface. Note that It will not affect z index
- *   of the Surface. If you want to change the drawing order you can use `Modifier.zIndex`.
- * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and
- *   emitting [Interaction]s for this surface. You can use this to change the surface's appearance
- *   or preview the surface in different states. Note that if `null` is provided, interactions will
- *   still happen internally.
- * @param content The content to be displayed on this Surface
+ * @param onClick Callback to be invoked when the surface is clicked.
+ * @param modifier The [Modifier] to be applied to this surface.
+ * @param enabled Controls the enabled state of the surface. When `false`, this component will
+ * not respond to user input, and it will appear visually disabled.
+ * @param shape The [Shape] of the surface and its shadow.
+ * @param color The background color of the surface.
+ * @param contentColor The preferred color for content within this surface.
+ * @param border Optional [BorderStroke] to be drawn around the edge of the surface.
+ * @param elevation The thickness of the shadow drawn below the surface.
+ * @param interactionSource The [MutableInteractionSource] representing the stream of
+ * interactions for this surface.
+ * @param indication [Indication] to be shown when surface is pressed.
+ * @param content The composable content to be displayed inside the surface.
  */
 @ExperimentalThemeApi
 @Composable
-fun Surface(
-    onClick: () -> Unit,
+inline fun Surface(
+    noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     shape: Shape = RectangleShape,
@@ -198,96 +120,55 @@ fun Surface(
     elevation: Dp = 0.dp,
     interactionSource: MutableInteractionSource? = null,
     indication: Indication? = LocalIndication.current,
-    content: @Composable () -> Unit
+    crossinline content: @Composable () -> Unit
 ) {
-    CompositionLocalProvider(
-        LocalContentColor provides contentColor,
-    ) {
-        Box(
+    CompositionLocalProvider(LocalContentColor provides contentColor) {
+        Slot(
             modifier = modifier
-                .minimumInteractiveComponentSize()
-                .surface(
-                    shape = shape, backgroundColor = color, border = border, elevation = elevation
+                .decorator(
+                    shape = shape,
+                    backgroundColor = color,
+                    border = border,
+                    elevation = elevation
                 )
                 .clickable(
                     interactionSource = interactionSource,
                     indication = indication,
                     enabled = enabled,
                     onClick = onClick
-                ), propagateMinConstraints = true
-        ) {
-            content()
-        }
+                )
+                .minimumInteractiveComponentSize(),
+            content = content
+        )
     }
 }
 
 /**
- * Material surface is the central metaphor in material design. Each surface exists at a given
- * elevation, which influences how that piece of surface visually relates to other surfaces and how
- * that surface casts shadows.
+ * Selectable variant of [Surface].
  *
- * This version of Surface is responsible for a selection handling as well as everything else that a
- * regular Surface does:
+ * This version of Surface provides a selectable interaction, making it suitable for
+ * components like tabs or radio buttons that exist within a selection group.
  *
- * This selectable Surface is responsible for:
- * 1) Clipping: Surface clips its children to the shape specified by [shape]
- * 2) Elevation: Surface draws a shadow to represent depth, where [elevation] represents the depth
- *    of this surface. If the passed [shape] is convex the shadow will not be drawn on Android
- *    versions less than 10.
- * 3) Borders: If [shape] has a border, then it will also be drawn.
- * 4) Background: Surface fills the shape specified by [shape] with the [color]. If [color] is
- *    [Colors.surface], the [ElevationOverlay] from [LocalElevationOverlay] will be used to apply an
- *    overlay - by default this will only occur in dark theme. The color of the overlay depends on
- *    the [elevation] of this Surface, and the [LocalAbsoluteElevation] set by any parent surfaces.
- *    This ensures that a Surface never appears to have a lower elevation overlay than its
- *    ancestors, by summing the elevation of all previous Surfaces.
- * 5) Content color: Surface uses [contentColor] to specify a preferred color for the content of
- *    this surface - this is used by the [Text] and [Icon] components as a default color. If no
- *    [contentColor] is set, this surface will try and match its background color to a color defined
- *    in the theme [Colors], and return the corresponding content color. For example, if the [color]
- *    of this surface is [Colors.surface], [contentColor] will be set to [Colors.onSurface]. If
- *    [color] is not part of the theme palette, [contentColor] will keep the same value set above
- *    this Surface.
- * 6) Click handling. This version of surface will react to the clicks, calling [onClick] lambda,
- *    updating the [interactionSource] when [PressInteraction] occurs, and showing ripple indication
- *    in response to press events. If you don't need click handling, consider using the Surface
- *    function that doesn't require [onClick] param.
- * 7) Semantics for selection. Just like with [Modifier.selectable], selectable version of Surface
- *    will produce semantics to indicate that it is selected. No semantic role is set by default,
- *    you may specify one by passing a desired [Role] with a [Modifier.semantics].
- *
- * @sample androidx.compose.material.samples.SelectableSurfaceSample
- *
- * To modify these default style values used by text, use [com.zs.compose.theme.text.ProvideTextStyle] or explicitly pass a
- * new [TextStyle] to your text.
- *
- * To manually retrieve the content color inside a surface, use [LocalContentColor].
- *
- * @param selected whether this Surface is selected
- * @param onClick callback to be called when the surface is clicked
- * @param modifier Modifier to be applied to the layout corresponding to the surface
- * @param enabled Controls the enabled state of the surface. When `false`, this surface will not be
- *   selectable
- * @param shape Defines the surface's shape as well its shadow. A shadow is only displayed if the
- *   [elevation] is greater than zero.
- * @param color The background color. Use [Color.Transparent] to have no color.
- * @param contentColor The preferred content color provided by this Surface to its children.
- *   Defaults to either the matching content color for [color], or if [color] is not a color from
- *   the theme, this will keep the same value set above this Surface.
- * @param border Optional border to draw on top of the surface
- * @param elevation The size of the shadow below the surface. Note that It will not affect z index
- *   of the Surface. If you want to change the drawing order you can use `Modifier.zIndex`.
- * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and
- *   emitting [Interaction]s for this surface. You can use this to change the surface's appearance
- *   or preview the surface in different states. Note that if `null` is provided, interactions will
- *   still happen internally.
- * @param content The content to be displayed on this Surface
+ * @param selected Whether this surface is currently selected.
+ * @param onClick Callback to be invoked when the surface is clicked.
+ * @param modifier The [Modifier] to be applied to this surface.
+ * @param enabled Controls the enabled state of the surface. When `false`, this component will
+ * not respond to user input, and it will appear visually disabled.
+ * @param shape The [Shape] of the surface and its shadow.
+ * @param color The background color of the surface.
+ * @param contentColor The preferred color for content within this surface.
+ * @param border Optional [BorderStroke] to be drawn around the edge of the surface.
+ * @param elevation The thickness of the shadow drawn below the surface.
+ * @param interactionSource The [MutableInteractionSource] representing the stream of
+ * interactions for this surface.
+ * @param indication [Indication] to be shown when surface is pressed.
+ * @param content The composable content to be displayed inside the surface.
  */
 @ExperimentalThemeApi
 @Composable
-fun Surface(
+inline fun Surface(
     selected: Boolean,
-    onClick: () -> Unit,
+    noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     shape: Shape = RectangleShape,
@@ -297,16 +178,16 @@ fun Surface(
     elevation: Dp = 0.dp,
     interactionSource: MutableInteractionSource? = null,
     indication: Indication? = LocalIndication.current,
-    content: @Composable () -> Unit
+    crossinline content: @Composable () -> Unit
 ) {
-    CompositionLocalProvider(
-        LocalContentColor provides contentColor
-    ) {
-        Box(
+    CompositionLocalProvider(LocalContentColor provides contentColor) {
+        Slot(
             modifier = modifier
-                .minimumInteractiveComponentSize()
-                .surface(
-                    shape = shape, backgroundColor = color, border = border, elevation = elevation
+                .decorator(
+                    shape = shape,
+                    backgroundColor = color,
+                    border = border,
+                    elevation = elevation
                 )
                 .selectable(
                     selected = selected,
@@ -314,80 +195,39 @@ fun Surface(
                     indication = indication,
                     enabled = enabled,
                     onClick = onClick
-                ), propagateMinConstraints = true
-        ) {
-            content()
-        }
+                )
+                .minimumInteractiveComponentSize(),
+            content = content
+        )
     }
 }
 
 /**
- * Material surface is the central metaphor in material design. Each surface exists at a given
- * elevation, which influences how that piece of surface visually relates to other surfaces and how
- * that surface casts shadows.
+ * Toggleable variant of [Surface].
  *
- * This version of Surface is responsible for a toggling its checked state as well as everything
- * else that a regular Surface does:
+ * This version of Surface provides a toggleable interaction, making it suitable for
+ * components like switches, checkboxes, or toggle buttons.
  *
- * This toggleable Surface is responsible for:
- * 1) Clipping: Surface clips its children to the shape specified by [shape]
- * 2) Elevation: Surface draws a shadow to represent depth, where [elevation] represents the depth
- *    of this surface. If the passed [shape] is convex the shadow will not be drawn on Android
- *    versions less than 10.
- * 3) Borders: If [shape] has a border, then it will also be drawn.
- * 4) Background: Surface fills the shape specified by [shape] with the [color]. If [color] is
- *    [Colors.surface], the [ElevationOverlay] from [LocalElevationOverlay] will be used to apply an
- *    overlay - by default this will only occur in dark theme. The color of the overlay depends on
- *    the [elevation] of this Surface, and the [LocalAbsoluteElevation] set by any parent surfaces.
- *    This ensures that a Surface never appears to have a lower elevation overlay than its
- *    ancestors, by summing the elevation of all previous Surfaces.
- * 5) Content color: Surface uses [contentColor] to specify a preferred color for the content of
- *    this surface - this is used by the [Text] and [Icon] components as a default color. If no
- *    [contentColor] is set, this surface will try and match its background color to a color defined
- *    in the theme [Colors], and return the corresponding content color. For example, if the [color]
- *    of this surface is [Colors.surface], [contentColor] will be set to [Colors.onSurface]. If
- *    [color] is not part of the theme palette, [contentColor] will keep the same value set above
- *    this Surface.
- * 6) Click handling. This version of surface will react to the check toggles, calling
- *    [onCheckedChange] lambda, updating the [interactionSource] when [PressInteraction] occurs, and
- *    showing ripple indication in response to press events. If you don't need check handling,
- *    consider using a Surface function that doesn't require [onCheckedChange] param.
- * 7) Semantics for toggle. Just like with [Modifier.toggleable], toggleable version of Surface will
- *    produce semantics to indicate that it is checked. No semantic role is set by default, you may
- *    specify one by passing a desired [Role] with a [Modifier.semantics].
- *
- * @sample androidx.compose.material.samples.ToggleableSurfaceSample
- *
- * To modify these default style values used by text, use [com.zs.compose.theme.text.ProvideTextStyle] or explicitly pass a
- * new [TextStyle] to your text.
- *
- * To manually retrieve the content color inside a surface, use [LocalContentColor].
- *
- * @param checked whether or not this Surface is toggled on or off
- * @param onCheckedChange callback to be invoked when the toggleable Surface is clicked
- * @param modifier Modifier to be applied to the layout corresponding to the surface
- * @param enabled Controls the enabled state of the surface. When `false`, this surface will not be
- *   selectable
- * @param shape Defines the surface's shape as well its shadow. A shadow is only displayed if the
- *   [elevation] is greater than zero.
- * @param color The background color. Use [Color.Transparent] to have no color.
- * @param contentColor The preferred content color provided by this Surface to its children.
- *   Defaults to either the matching content color for [color], or if [color] is not a color from
- *   the theme, this will keep the same value set above this Surface.
- * @param border Optional border to draw on top of the surface
- * @param elevation The size of the shadow below the surface. Note that It will not affect z index
- *   of the Surface. If you want to change the drawing order you can use `Modifier.zIndex`.
- * @param interactionSource an optional hoisted [MutableInteractionSource] for observing and
- *   emitting [Interaction]s for this surface. You can use this to change the surface's appearance
- *   or preview the surface in different states. Note that if `null` is provided, interactions will
- *   still happen internally.
- * @param content The content to be displayed on this Surface
+ * @param checked Whether this surface is currently checked/active.
+ * @param onCheckedChange Callback to be invoked when the toggle state changes.
+ * @param modifier The [Modifier] to be applied to this surface.
+ * @param enabled Controls the enabled state of the surface. When `false`, this component will
+ * not respond to user input, and it will appear visually disabled.
+ * @param shape The [Shape] of the surface and its shadow.
+ * @param color The background color of the surface.
+ * @param contentColor The preferred color for content within this surface.
+ * @param border Optional [BorderStroke] to be drawn around the edge of the surface.
+ * @param elevation The thickness of the shadow drawn below the surface.
+ * @param interactionSource The [MutableInteractionSource] representing the stream of
+ * interactions for this surface.
+ * @param indication [Indication] to be shown when surface is pressed.
+ * @param content The composable content to be displayed inside the surface.
  */
 @ExperimentalThemeApi
 @Composable
-fun Surface(
+inline fun Surface(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    noinline onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     shape: Shape = RectangleShape,
@@ -397,16 +237,16 @@ fun Surface(
     elevation: Dp = 0.dp,
     interactionSource: MutableInteractionSource? = null,
     indication: Indication? = LocalIndication.current,
-    content: @Composable () -> Unit
+    crossinline content: @Composable () -> Unit
 ) {
-    CompositionLocalProvider(
-        LocalContentColor provides contentColor
-    ) {
-        Box(
+    CompositionLocalProvider(LocalContentColor provides contentColor) {
+        Slot(
             modifier = modifier
-                .minimumInteractiveComponentSize()
-                .surface(
-                    shape = shape, backgroundColor = color, border = border, elevation = elevation
+                .decorator(
+                    shape = shape,
+                    backgroundColor = color,
+                    border = border,
+                    elevation = elevation
                 )
                 .toggleable(
                     value = checked,
@@ -414,26 +254,9 @@ fun Surface(
                     indication = indication,
                     enabled = enabled,
                     onValueChange = onCheckedChange
-                ), propagateMinConstraints = true
-        ) {
-            content()
-        }
-    }
-}
-
-// TODO - Keep an eye on this from material2 or material3
-private fun Modifier.surface(
-    shape: Shape, backgroundColor: Color, border: BorderStroke?, elevation: Dp
-) = this
-    .shadow(elevation, shape, clip = false)
-    .then(if (border != null) Modifier.border(border, shape) else Modifier)
-    // only apply background color to non-transparent colors
-    .thenIf(backgroundColor != Color.Transparent || backgroundColor != Color.Unspecified) {
-        background(
-            color = backgroundColor,
-            shape = shape
+                )
+                .minimumInteractiveComponentSize(),
+            content = content
         )
     }
-    .clip(shape)
-
-
+}

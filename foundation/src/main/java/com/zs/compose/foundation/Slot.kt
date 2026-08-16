@@ -14,10 +14,12 @@ import kotlin.math.max
 // SlotMeasurePolicy: A simple layout policy that centers its child(ren)
 val SlotMeasurePolicy: MeasurePolicy = MeasurePolicy { measurables, constraints ->
 
+    val constraints = constraints.copyMaxDimensions()
     // Case 1: No children → return an empty layout with minimum constraints.
     if (measurables.isEmpty()) {
         return@MeasurePolicy layout(constraints.minWidth, constraints.minHeight) {}
     }
+    val alignment = Alignment.Center
 
     // Case 2: Exactly one child → measure and center it inside the box.
     if (measurables.size == 1) {
@@ -29,7 +31,7 @@ val SlotMeasurePolicy: MeasurePolicy = MeasurePolicy { measurables, constraints 
 
         return@MeasurePolicy layout(width, height) {
             // Compute centered position using Alignment.Center.
-            val pos = Alignment.Center.align(
+            val pos = alignment.align(
                 IntSize(placeable.width, placeable.height),
                 IntSize(width, height),
                 layoutDirection,
@@ -94,3 +96,10 @@ val SlotMeasurePolicy: MeasurePolicy = MeasurePolicy { measurables, constraints 
 @Composable
 inline fun Slot(content: @Composable () -> Unit) =
     Layout(content, Modifier, SlotMeasurePolicy)
+
+/**
+ * @see Slot
+ */
+@Composable
+inline fun Slot(modifier: Modifier, content: @Composable () -> Unit) =
+    Layout(content, modifier, SlotMeasurePolicy)
