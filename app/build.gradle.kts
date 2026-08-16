@@ -37,7 +37,7 @@ kotlin {
 // 📱 Android project setup: namespace, SDK levels, build types, and features.
 android {
     namespace = "com.prime.toolkit"
-    compileSdk = 36
+    compileSdk = 37
     buildFeatures { compose = true }  // Enable Jetpack Compose
     // Java 17 compatibility
     compileOptions {
@@ -52,7 +52,7 @@ android {
     defaultConfig {
         applicationId = "com.prime.toolkit"
         minSdk = 23
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "3.0.0-dev"
 
@@ -96,7 +96,7 @@ dependencies {
 
     // Image loading
     implementation(libs.coil.compose)                    // Coil integration for Compose
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0") // Coil with OkHttp backend
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.5.0") // Coil with OkHttp backend
 
     // Project modules
     implementation(project(":theme"))                    // Custom theme module

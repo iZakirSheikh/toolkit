@@ -38,7 +38,7 @@ kotlin {
 // 📱 Android library setup: namespace, SDK levels, build types, and publishing.
 android {
     namespace = "com.zs.compose.foundation"
-    compileSdk = 36
+    compileSdk = 37
     buildFeatures { compose = true }  // Enable Jetpack Compose
 
     // Java 17 compatibility

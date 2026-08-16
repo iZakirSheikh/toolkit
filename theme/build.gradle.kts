@@ -35,7 +35,7 @@ kotlin {
 // 🎨 Android library setup for Compose theme utilities.
 android {
     namespace = "com.zs.compose.theme"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 23

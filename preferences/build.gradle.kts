@@ -37,7 +37,7 @@ kotlin {
 // 📱 Android library setup: namespace, SDK levels, build types, and publishing.
 android {
     namespace = "com.zs.preferences"
-    compileSdk = 36
+    compileSdk = 37
 
     // Java 17 compatibility
     compileOptions {

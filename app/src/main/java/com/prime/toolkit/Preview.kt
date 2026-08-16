@@ -68,7 +68,7 @@ import com.zs.compose.theme.snackbar.SnackbarHostState
 @androidx.compose.ui.tooling.preview.Preview
 @Composable
 private fun Preview() {
-    Row() {
+    Row {
         Column() {
             Box(
                 Modifier
