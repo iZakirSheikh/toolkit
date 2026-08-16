@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DesignServices
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Textsms
 import androidx.compose.material.icons.filled.Weekend
@@ -129,6 +130,7 @@ class MainActivity : ComponentActivity() {
                         3 -> Settings()
                         2 -> Strings()
                         1 -> M3()
+                        4 -> PreviewNode()
                     }
                 }
             },
@@ -187,6 +189,15 @@ class MainActivity : ComponentActivity() {
                             label = { Label("Settings") },
                             selected = selected == 3,
                             onClick = { selected = 3 },
+                            isBottomNav = vertical
+                        )
+
+                        // Preview
+                        NavigationItem(
+                            icon = { Icon(Icons.Default.Preview, null) },
+                            label = { Label("Preview") },
+                            selected = selected == 4,
+                            onClick = { selected = 4 },
                             isBottomNav = vertical
                         )
                     }
