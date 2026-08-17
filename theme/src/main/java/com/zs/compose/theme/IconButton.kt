@@ -178,11 +178,12 @@ fun TonalIconButton(
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit
 ) {
+    val color  = color.takeOrElse { LocalContentColor.current }
     Surface(
         modifier = modifier,
         onClick = onClick,
         enabled = enabled,
-        color = color.takeOrElse { LocalContentColor.current }.copy(ContentAlpha.indication),
+        color = color.copy(ContentAlpha.indication),
         shape = shape,
         border = border,
         interactionSource = interactionSource,

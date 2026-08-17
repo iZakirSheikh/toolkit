@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Coffee
@@ -68,56 +69,14 @@ import com.zs.compose.theme.snackbar.SnackbarHostState
 @androidx.compose.ui.tooling.preview.Preview
 @Composable
 private fun Preview() {
-    Row {
-        Column() {
-            Box(
-                Modifier
-                    //.padding(2.dp)
-                    .background(
-                        shape = CompactDisk,
-                        color = Color.Green
-                    )
-                    .border(
-                        border = BorderStroke(5.dp, Color.Yellow.copy(0.5f)),
-                        CompactDisk
-                    )
-                    .graphicsLayer(){
-                        shape = CompactDisk
-                        shadowElevation= 5.dp.toPx()
-                        clip = true
-                    }
-                    .defaultMinSize(100.dp, minHeight = 100.dp)
-            ){
-                com.zs.compose.theme.text.Label("Content", color = Color.Blue)
-            }
-
-            Spacer(Modifier.padding(4.dp))
-            com.zs.compose.theme.text.Label("Modifiers")
-        }
-        Spacer(Modifier.padding(10.dp))
-        Column() {
-            Box (
-                Modifier
-                    //.padding(2.dp)
-                    .decorator(
-                        shape = CompactDisk,
-                        // border = BorderStroke(5.dp, Color.Yellow),
-                        backgroundColor = Color.Green,
-                       // foregroundColor = Color.White.copy(0.1f),
-                        borderColor = Color.Yellow.copy(0.5f),
-                        borderWidth = 5.dp,
-                        elevation = 5.dp
-                    )
-
-                    .defaultMinSize(100.dp, minHeight = 100.dp)
-            ){
-                com.zs.compose.theme.text.Label("Content", color = Color.Blue)
-            }
-            Spacer(Modifier.padding(4.dp))
-
-            com.zs.compose.theme.text.Label("Decorator")
-
-        }
+    com.zs.compose.theme.Surface(
+        modifier = Modifier.size(100.dp),
+        shape = CompactDisk,
+        color = Color.Green,
+        contentColor = Color.White,
+        border = BorderStroke(5.dp, Color.Yellow.copy(0.5f)),
+    ) {
+        com.zs.compose.theme.text.Label("Content", color = Color.Blue)
     }
 }
 

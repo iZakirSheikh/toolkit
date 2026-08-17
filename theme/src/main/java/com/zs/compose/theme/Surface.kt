@@ -23,6 +23,7 @@ import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.pointer.PointerInputEventHandler
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
@@ -41,6 +43,8 @@ import com.zs.compose.foundation.decorator
 
 @PublishedApi
 internal val BlockInputModifier = Modifier.pointerInput(Unit, {})
+@PublishedApi
+internal val ZeroSizeModifier = Modifier.size(0.dp)
 
 /**
  * A central piece of the UI hierarchy that provides a background color, content color, and
@@ -82,6 +86,11 @@ inline fun Surface(
                     @Suppress("DEPRECATION")
                     isContainer = true
                 }
+                // Workaround: Force an initial size of 0.dp to prevent the Slot/decorator from
+                // defaulting to an incorrect size (e.g., 4.dp) irrespective of explicit size provided
+                // via the incoming modifier.
+                // TODO: Investigate the root cause in Slot/decorator and remove this hack.
+                .then(ZeroSizeModifier)
                 .then(BlockInputModifier)
         )
     }
