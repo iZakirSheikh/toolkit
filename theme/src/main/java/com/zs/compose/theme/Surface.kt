@@ -23,6 +23,7 @@ import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
@@ -44,7 +45,7 @@ import com.zs.compose.foundation.decorator
 @PublishedApi
 internal val BlockInputModifier = Modifier.pointerInput(Unit, {})
 @PublishedApi
-internal val ZeroSizeModifier = Modifier.size(0.dp)
+internal val SizeHackModifier = Modifier.defaultMinSize(0.dp)
 
 /**
  * A central piece of the UI hierarchy that provides a background color, content color, and
@@ -61,14 +62,14 @@ internal val ZeroSizeModifier = Modifier.size(0.dp)
  * @param content The composable content to be displayed inside the surface.
  */
 @Composable
-inline fun Surface(
+fun Surface(
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
     color: Color = AppTheme.colors.background,
     contentColor: Color = contentColorFor(color),
     border: BorderStroke? = null,
     elevation: Dp = 0.dp,
-    crossinline content: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
         LocalContentColor provides contentColor
@@ -90,7 +91,7 @@ inline fun Surface(
                 // defaulting to an incorrect size (e.g., 4.dp) irrespective of explicit size provided
                 // via the incoming modifier.
                 // TODO: Investigate the root cause in Slot/decorator and remove this hack.
-                .then(ZeroSizeModifier)
+                .then(SizeHackModifier)
                 .then(BlockInputModifier)
         )
     }
