@@ -45,10 +45,11 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 private const val TAG = "Util"
 
@@ -277,4 +278,14 @@ fun LazyListScope.stickyHeader(
             }
         }
     )
+}
+
+// Like Kotlin's require() but without the .toString() call
+@Suppress("BanInlineOptIn")
+@OptIn(ExperimentalContracts::class) // same opt-in as using Kotlin's require()
+internal inline fun requirePrecondition(value: Boolean, lazyMessage: () -> String) {
+    contract { returns() implies value }
+    if (!value) {
+        throw IllegalArgumentException(lazyMessage())
+    }
 }

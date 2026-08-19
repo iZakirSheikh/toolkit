@@ -20,26 +20,22 @@
 
 package com.prime.toolkit
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import com.zs.compose.foundation.decorator
+import com.zs.compose.foundation.Slot
+import com.zs.compose.foundation.decorator.EdgeInsets
+import com.zs.compose.foundation.decorator.decorator
 import com.zs.compose.foundation.shapes.CompactDisk
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.adaptive.content
+import com.zs.compose.theme.text.Label
 
 @OptIn(ExperimentalFoundationApi::class)
 @androidx.compose.ui.tooling.preview.Preview
@@ -55,32 +51,40 @@ private fun Preview() {
         com.zs.compose.theme.text.Label("Content", color = Color.Blue)
     }*/
     val context = LocalContext.current
-    AsyncImage(
-        model =  ImageRequest.Builder(context)
-            .data("https://static.vecteezy.com/system/resources/thumbnails/010/700/453/small/grunge-dark-gray-color-texture-photo.jpg")
-            .build(),
-       // onError = { Log.d(TAG, "Game: ${it.result.throwable.message}")},
-        contentScale = ContentScale.Crop,
-        contentDescription = null,
-        modifier = Modifier.size(150.dp)
-            .decorator(
+    Column() {
+//        Slot (
+//            modifier = Modifier.decorator(
+//                backgroundColor = AppTheme.colors.background,
+//                elevation = 10.dp,
+//                shape = AppTheme.shapes.medium,
+//
+//            )
+//        ) {
+//            Label("None")
+//        }
+
+        Slot(
+            modifier = Modifier.decorator(
                 backgroundColor = AppTheme.colors.background,
+                elevation = 10.dp,
                 shape = CompactDisk,
-                roughness = 0.3f,
-                border = BorderStroke(1.dp, Color.White),
-                elevation = 20.dp
-            )
-    )
+                edgeInsets = EdgeInsets(10.dp),
+                roughness = 0.8f,
+            ).size(100.dp)
+        ) {
+            Label("Yses", modifier = Modifier)
+        }
+    }
 }
 
 
 @Composable
 fun PreviewNode() {
     com.zs.compose.theme.adaptive.Scaffold(topBar = {
-        com.zs.compose.theme.appbar.TopAppBar(title = { com.zs.compose.theme.text.Label("Preview") }, )
+        com.zs.compose.theme.appbar.TopAppBar(title = { com.zs.compose.theme.text.Label("Preview") })
     }) {
         val insets = WindowInsets.content
-        Column(modifier = Modifier.padding(16.dp).windowInsetsPadding(insets)) {
+        Column(/*modifier = Modifier.padding(16.dp).windowInsetsPadding(insets)*/) {
             Preview()
         }
     }
