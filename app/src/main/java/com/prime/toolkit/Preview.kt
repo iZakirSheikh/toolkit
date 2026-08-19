@@ -22,54 +22,30 @@ package com.prime.toolkit
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Coffee
-import androidx.compose.material.icons.outlined.Coffee
-import androidx.compose.material3.Label
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.zs.compose.foundation.Orange
-import com.zs.compose.foundation.SignalWhite
-import com.zs.compose.foundation.background
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.zs.compose.foundation.decorator
 import com.zs.compose.foundation.shapes.CompactDisk
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.adaptive.content
-import com.zs.compose.theme.minimumInteractiveComponentSize
-import com.zs.compose.theme.snackbar.Snackbar
-import com.zs.compose.theme.snackbar.SnackbarData
-import com.zs.compose.theme.snackbar.SnackbarDuration
-import com.zs.compose.theme.snackbar.SnackbarHostState
 
 @OptIn(ExperimentalFoundationApi::class)
 @androidx.compose.ui.tooling.preview.Preview
 @Composable
 private fun Preview() {
-    com.zs.compose.theme.Surface(
+    /*com.zs.compose.theme.Surface(
         modifier = Modifier.size(100.dp),
         shape = CompactDisk,
         color = Color.Green,
@@ -77,7 +53,24 @@ private fun Preview() {
         border = BorderStroke(5.dp, Color.Yellow.copy(0.5f)),
     ) {
         com.zs.compose.theme.text.Label("Content", color = Color.Blue)
-    }
+    }*/
+    val context = LocalContext.current
+    AsyncImage(
+        model =  ImageRequest.Builder(context)
+            .data("https://static.vecteezy.com/system/resources/thumbnails/010/700/453/small/grunge-dark-gray-color-texture-photo.jpg")
+            .build(),
+       // onError = { Log.d(TAG, "Game: ${it.result.throwable.message}")},
+        contentScale = ContentScale.Crop,
+        contentDescription = null,
+        modifier = Modifier.size(150.dp)
+            .decorator(
+                backgroundColor = AppTheme.colors.background,
+                shape = CompactDisk,
+                roughness = 0.3f,
+                border = BorderStroke(1.dp, Color.White),
+                elevation = 20.dp
+            )
+    )
 }
 
 

@@ -60,7 +60,7 @@ fun Game(
     ){
         Surface(
             shape = RoundedCornerShape(8),
-            elevation = 0.dp,
+            elevation = 5.dp,
             color = AppTheme.colors.background(1.dp),
             modifier = Modifier
                 .scale(0.90f)

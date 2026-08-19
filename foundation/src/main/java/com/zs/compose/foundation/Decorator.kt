@@ -1,15 +1,24 @@
 package com.zs.compose.foundation
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -17,20 +26,26 @@ import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.layer.setOutline
+import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.ObserverModifierNode
 import androidx.compose.ui.node.SemanticsModifierNode
+import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.invalidateSemantics
 import androidx.compose.ui.node.observeReads
 import androidx.compose.ui.node.requireGraphicsContext
 import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.isSpecified
+import kotlin.system.measureNanoTime
+
+private const val TAG = "Decorator"
 
 /**
  * A highly optimized, consolidated modifier that applies common visual decorations to a component.
@@ -59,6 +74,7 @@ import androidx.compose.ui.unit.isSpecified
  * @param borderBrush The brush used for the border (e.g., a gradient border).
  * @param borderWidth The thickness of the border. If [Dp.Unspecified], no border is drawn.
  * @param elevation The size of the shadow below the component.
+ * @param roughness Controls the grain effect intensity. Value ranges from 0 (off) to 1.
  */
 @Stable
 fun Modifier.decorator(
@@ -80,7 +96,14 @@ fun Modifier.decorator(
     borderWidth: Dp = Dp.Unspecified,
 
     //
-    elevation: Dp = Dp.Unspecified
+    elevation: Dp = Dp.Unspecified,
+
+    // scale
+    @FloatRange(from = 0.0, to = 1.0) scaleX: Float = 1.0f,
+    @FloatRange(from = 0.0, to = 1.0) scaleY: Float = 1.0f,
+
+    // noise
+    @FloatRange(from = 0.0, to = 1.0) roughness: Float = 0.0f,
 ) = this then DecoratorElement(
     // background
     backgroundColor = backgroundColor,
@@ -99,7 +122,14 @@ fun Modifier.decorator(
     borderBrush = borderBrush,
     borderWidth = borderWidth,
     //
-    elevation = elevation
+    elevation = elevation,
+
+    // scale
+    scaleX = scaleX,
+    scaleY = scaleY,
+
+    //
+    roughness = roughness
 )
 
 @Stable
@@ -120,7 +150,9 @@ fun Modifier.decorator(
     border: BorderStroke? = null,
 
     //
-    elevation: Dp = Dp.Unspecified
+    elevation: Dp = Dp.Unspecified,
+    @FloatRange(from = 0.0, to = 1.0) scale: Float = 1.0f,
+    @FloatRange(from = 0.0, to = 1.0) roughness: Float = 0.0f,
 ) = decorator(
     // background
     backgroundColor = backgroundColor,
@@ -138,7 +170,12 @@ fun Modifier.decorator(
     borderBrush = border?.brush,
     borderWidth = border?.width ?: Dp.Unspecified,
     //
-    elevation = elevation
+    scaleX = scale,
+    scaleY = scale,
+    //
+    elevation = elevation,
+    //
+    roughness = roughness
 )
 
 private class DecoratorElement(
@@ -160,7 +197,14 @@ private class DecoratorElement(
     val borderWidth: Dp,
 
     //
-    val elevation: Dp
+    val elevation: Dp,
+
+    // scale
+    @FloatRange(from = 0.0, to = 1.0) val scaleX: Float,
+    @FloatRange(from = 0.0, to = 1.0) var scaleY: Float,
+
+    //
+    val roughness: Float,
 ) : ModifierNodeElement<DecoratorNode>() {
     override fun create(): DecoratorNode = DecoratorNode(
         // background
@@ -180,7 +224,14 @@ private class DecoratorElement(
         borderBrush = borderBrush,
         borderWidth = borderWidth,
         //
-        elevation = elevation
+        elevation = elevation,
+
+        //
+        scaleX = scaleX,
+        scaleY = scaleY,
+
+        //
+        roughness = roughness
     )
 
     override fun update(node: DecoratorNode) {
@@ -198,12 +249,15 @@ private class DecoratorElement(
         node.borderColor = borderColor
         node.borderBrush = borderBrush
         node.borderWidth = borderWidth
-
         //
-        var elevation: Dp
+        node.elevation = node.elevation
+        //
+        node.scaleX = scaleX
+        node.scaleY = scaleY
+        //
+        node.roughness = roughness
         if (node.shape != shape) {
             node.shape = shape
-
             node.invalidateSemantics()
         }
         node.invalidateDraw()
@@ -230,6 +284,8 @@ private class DecoratorElement(
         if (borderBrush != other.borderBrush) return false
         if (borderWidth != other.borderWidth) return false
         if (elevation != other.elevation) return false
+        if (scaleX != other.scaleX) return false
+        if (scaleY != other.scaleY) return false
 
         return true
     }
@@ -246,6 +302,9 @@ private class DecoratorElement(
         result = 31 * result + (borderBrush?.hashCode() ?: 0)
         result = 31 * result + borderWidth.hashCode()
         result = 31 * result + elevation.hashCode()
+        result = 31 * result + scaleX.hashCode()
+        result = 31 * result + scaleY.hashCode()
+        result = 31 * result + roughness.hashCode()
         return result
     }
 }
@@ -269,8 +328,14 @@ private class DecoratorNode(
     var borderWidth: Dp,
 
     //
-    var elevation: Dp
-) : Modifier.Node(), DrawModifierNode, ObserverModifierNode, SemanticsModifierNode {
+    var elevation: Dp,
+
+    //
+    var scaleX: Float,
+    var scaleY: Float,
+    // noise
+    var roughness: Float,
+) : Modifier.Node(), DrawModifierNode, ObserverModifierNode, SemanticsModifierNode, CompositionLocalConsumerModifierNode {
     override val shouldAutoInvalidate = false
     override val isImportantForBounds = false
 
@@ -283,10 +348,47 @@ private class DecoratorNode(
     private var tmpOutline: Outline? = null
     private lateinit var graphicsLayer: GraphicsLayer
 
+    // cached matte effect brush.
+    private lateinit var matteEffectBrush: ShaderBrush
+
     // at the time of the attachment.
     override fun onAttach() {
         if (!(::graphicsLayer.isInitialized) || graphicsLayer.isReleased)
             graphicsLayer = requireGraphicsContext().createGraphicsLayer()
+    }
+
+    /**
+     * Creates a [ShaderBrush] using a bitmap resource identified by the given drawable ID.
+     *
+     * This function decodes the specified drawable resource into a bitmap, converts it
+     * to an [androidx.compose.ui.graphics.ImageBitmap], and creates an [ImageShader]
+     * with [TileMode.Repeated] for both horizontal and vertical axes.
+     *
+     * @param id The drawable resource ID to be used as the shader texture.
+     * @return A [ShaderBrush] configured to repeat the specified image.
+     */
+    private fun ShaderBrush(@DrawableRes id: Int): ShaderBrush {
+        // Determine the appropriate image source based on the ImageBrush type
+        // Decode the resource into a Bitmap for resource-based ImageBrushes.
+        val resources = currentValueOf(LocalContext).resources
+        val bmp: Bitmap
+        val time = measureNanoTime {
+            // Decode the resource, disabling scaling for optimal performance.
+            bmp = BitmapFactory.decodeResource(resources, id, BitmapFactory.Options().apply {
+                inScaled = false
+//                          inTargetDensity = inDensity
+//                          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                              this.inPreferredConfig = Bitmap.Config.HARDWARE
+//                          }
+            })
+        }
+        Log.d(TAG, "create: (width=${bmp.width}, height=${bmp.height}, time=$time")
+        // Convert the decoded Bitmap to an ImageBitmap for use in the ShaderBrush.
+        val img = bmp.asImageBitmap()
+        // Create and return a ShaderBrush using the ImageShader for repeating the image:
+        // TODO - Experiment with different tileModes.
+        val shader = ImageShader(img, TileMode.Repeated, TileMode.Repeated)
+        return ShaderBrush(shader)
     }
 
     override fun onObservedReadsChanged() {
@@ -334,6 +436,14 @@ private class DecoratorNode(
         graphicsLayer.setOutline(outline)
         graphicsLayer.shadowElevation = elevation.toPx()
         graphicsLayer.clip = true
+        graphicsLayer.scaleX = scaleX
+        graphicsLayer.scaleY = scaleY
+
+        // 2.1 Lazy initialization of Matte Brush
+        // We only decode the noise texture if a noise effect is requested (noiseAmount > 0)
+        // and it hasn't been initialized yet. This saves memory if the effect is never used.
+        if (roughness > 0f && !::matteEffectBrush.isInitialized)
+            matteEffectBrush = ShaderBrush(R.drawable.noise)
 
         // 3. Record Drawing Commands
         // We 'record' the draw calls into the GraphicsLayer. This is efficient as it avoids
@@ -342,7 +452,7 @@ private class DecoratorNode(
             // A. Draw Background
             // Backgrounds are drawn first, behind the content.
             if (backgroundColor != Color.Unspecified)
-                drawRect(backgroundColor)
+                drawRect(backgroundColor, alpha = backgroundAlpha)
             val backgroundBrush = backgroundBrush
             if (backgroundBrush != null)
                 drawRect(backgroundBrush, alpha = backgroundAlpha)
@@ -351,20 +461,31 @@ private class DecoratorNode(
             // This calls the actual Composable content that this modifier is attached to.
             this@draw.drawContent()
 
-            // C. Draw Foreground
+            // Apply Texture Effects
+            // If noise is enabled, we overlay the noise texture using the Overlay blend mode.
+            // This adds fine-grained grain/texture to both the background and the content,
+            // increasing visual depth without relying on high-resolution assets.
+            if (roughness > 0)
+                drawRect(
+                    brush = matteEffectBrush,
+                    alpha = roughness,
+                    blendMode = BlendMode.Hardlight,
+                )
+
+            // Draw Foreground
             // Foregrounds (overlays) are drawn on top of the content, but inside the border.
             if (foregroundColor != Color.Unspecified)
-                drawRect(foregroundColor)
+                drawRect(foregroundColor, alpha = foregroundAlpha)
             val foregroundBrush = foregroundBrush
             if (foregroundBrush != null)
                 drawRect(foregroundBrush, alpha = foregroundAlpha)
 
-            // D. Draw Border/Outline
+            // Draw Border/Outline
             // We draw the border last. We use a Stroke style with double thickness (borderWidthPx * 2)
             // because drawOutline centered on the path clips half of the stroke width inside/outside.
             if (borderWidthPx != -1f){
                 if (borderColor.isSpecified)
-                    drawOutline(outline, style = Stroke(width = borderWidthPx * 2), color = borderColor, )
+                    drawOutline(outline, style = Stroke(width = borderWidthPx * 2), color = borderColor)
                 val borderBrush = borderBrush
                 if (borderBrush != null)
                     drawOutline(outline, style = Stroke(width = borderWidthPx * 2), brush = borderBrush)
