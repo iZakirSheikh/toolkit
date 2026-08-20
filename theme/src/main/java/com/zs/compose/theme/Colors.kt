@@ -51,8 +51,11 @@ import kotlin.math.ln
  * @param elevation the elevation value to use in the calculation.
  * @return the color with tonal elevation applied.
  */
-internal fun applyTonalElevation(accent: Color, background: Color, elevation: Dp) =
-    accent.copy(alpha = ((4.5f * ln(elevation.value + 1)) + 2f) / 100f).compositeOver(background)
+internal fun applyTonalElevation(accent: Color, background: Color, elevation: Dp): Color {
+    if (elevation == 0.dp) return background
+    val alpha = ((4.5f * ln(elevation.value + 1)) + 2f) / 100f
+    return accent.copy(alpha = alpha).compositeOver(background)
+}
 
 /**
  * Represents a set of colors used in a UI theme.
@@ -91,8 +94,7 @@ class Colors(
      *
      * @param elevation The elevation value to calculate the overlay alpha for.
      * @return A [Color] representing the background with an overlay.*/
-    fun background(elevation: Dp) =
-        applyTonalElevation(accent, background, if (isLight) elevation else elevation * 0.5f)
+    fun background(elevation: Dp) = applyTonalElevation(accent, background, elevation)
 
     /** Returns a copy of this ColorScheme, optionally overriding some of the values. */
     fun copy(
