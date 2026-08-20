@@ -258,7 +258,6 @@ object AppTheme {
      * @see invoke
      */
     @Composable
-    @Deprecated("Replace this with another version of AppTheme")
     operator fun invoke(
         isLight: Boolean,
         accent: Color = if (!isLight) Color.TrafficYellow else Color.SepiaBrown,
@@ -270,8 +269,8 @@ object AppTheme {
     ) {
         val background by animateColorAsState(
             targetValue = when {
-                !isLight -> Color(0xFF0E0E0F)
-                else -> applyTonalElevation(accent, Color.White, 0.8.dp)
+                !isLight -> applyTonalElevation(accent, Color.Black, 1.dp)
+                else -> applyTonalElevation(accent, Color.White, 4.dp)
             },
             animationSpec = motionScheme.slowEffectsSpec(), label = "background"
         )

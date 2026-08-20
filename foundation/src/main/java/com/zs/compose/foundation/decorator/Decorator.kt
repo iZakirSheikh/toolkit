@@ -110,7 +110,7 @@ fun Modifier.decorator(
     @FloatRange(from = 0.0, to = 1.0) roughness: Float = 0.0f,
 
     // insets
-    edgeInsets: EdgeInsets = EdgeInsets(0.dp)
+    edgeInsets: EdgeInsets = EdgeInsets()
 ) = this then DecoratorElement(
     // background
     backgroundColor = backgroundColor,
@@ -166,7 +166,7 @@ fun Modifier.decorator(
     @FloatRange(from = 0.0, to = 1.0) scale: Float = 1.0f,
     @FloatRange(from = 0.0, to = 1.0) roughness: Float = 0.0f,
     //
-    edgeInsets: EdgeInsets = EdgeInsets(0.dp),
+    edgeInsets: EdgeInsets = EdgeInsets(),
 ) = decorator(
     // background
     backgroundColor = backgroundColor,

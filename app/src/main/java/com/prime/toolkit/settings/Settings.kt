@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -87,7 +88,6 @@ import com.prime.toolkit.core.background
 import com.prime.toolkit.core.observe
 import com.prime.toolkit.core.rememberBackgroundProvider
 import com.zs.compose.foundation.fadingEdge
-import com.zs.compose.foundation.plus
 import com.zs.compose.foundation.textResource
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.BaseListItem

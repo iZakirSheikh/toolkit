@@ -23,9 +23,6 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.util.Log
 import android.view.Gravity
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -38,10 +35,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
@@ -101,27 +96,6 @@ inline fun composableIf(condition: Boolean, noinline content: @Composable () -> 
  * [source](https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/material/material-ripple/src/androidMain/kotlin/androidx/compose/material/ripple/Ripple.android.kt;l=81;bpv=0)
  */
 internal val IsRunningInPreview = android.os.Build.DEVICE == "layoutlib"
-
-/**
- * Returns a new [PaddingValues] object that is the result of adding the values of the specified
- * [PaddingValues] object to this object's values.
- *
- * @param value The [PaddingValues] object to add to this object.
- * @return A new [PaddingValues] object that is the result of adding the values of the specified
- * [PaddingValues] object to this object's values.
- */
-@Composable
-@NonRestartableComposable
-@Stable
-operator fun PaddingValues.plus(value: PaddingValues): PaddingValues {
-    val direction = LocalLayoutDirection.current
-    return PaddingValues(
-        start = this.calculateStartPadding(direction) + value.calculateStartPadding(direction),
-        top = this.calculateTopPadding() + value.calculateTopPadding(),
-        bottom = this.calculateBottomPadding() + value.calculateBottomPadding(),
-        end = this.calculateEndPadding(direction) + value.calculateEndPadding(direction)
-    )
-}
 
 /**
  * A sticky header implementation that respects the top padding of the content.

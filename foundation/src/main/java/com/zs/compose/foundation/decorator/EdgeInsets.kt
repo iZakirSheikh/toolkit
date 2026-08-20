@@ -1,9 +1,13 @@
 package com.zs.compose.foundation.decorator
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
+import com.zs.compose.foundation.requirePrecondition
 import kotlin.math.roundToInt
 
 
@@ -21,32 +25,75 @@ import kotlin.math.roundToInt
  * values in the minWidth, minHeight, maxWidth, and maxHeight slots respectively.
  */
 @JvmInline
-value class EdgeInsets private constructor(private val value: Constraints) {
+@Immutable
+value class EdgeInsets internal constructor(private val value: Constraints) {
 
-    /**
-     * Creates an [EdgeInsets] with explicit start, top, end, and bottom padding.
-     */
-    constructor(start: Dp, top: Dp = 0.dp, end: Dp = 0.dp, bottom: Dp = 0.dp) : this(
-        Constraints(start.value.roundToInt(), top.value.roundToInt(), end.value.roundToInt(), bottom.value.roundToInt())
-    )
+    init {
+        requirePrecondition(
+            (start.value >= 0f) and (top.value >= 0f) and (end.value >= 0f) and (bottom.value >= 0f)
+        ) {
+            "EdgeInsets must be non-negative"
+        }
+    }
 
-    /**
-     * Creates an [EdgeInsets] with symmetric horizontal and vertical padding.
-     */
-    constructor(horizontal: Dp = 0.dp, vertical: Dp = 0.dp) : this(
-        horizontal, vertical, horizontal, vertical
-    )
-
-    /**
-     * Apply [all] dp of additional space along each edge of the content, left, top, right and bottom.
-     */
-    constructor(all: Dp):this(horizontal = all, vertical = all)
-
+    private inline val start get() = value.minHeight.dp
+    private inline val end get() = value.maxWidth.dp
+    private inline val top get() = value.minHeight.dp
+    private inline val bottom get() = value.maxHeight.dp
 
     fun calculateLeftPaddingInset(layoutDirection: LayoutDirection) =
-        if (layoutDirection == LayoutDirection.Ltr) value.minWidth.dp else value.maxWidth.dp
-    fun calculateTopInset() = value.minHeight.dp
+        if (layoutDirection == LayoutDirection.Ltr) start else end
+
+    fun calculateTopInset() = top
     fun calculateRightInset(layoutDirection: LayoutDirection) =
-        if (layoutDirection == LayoutDirection.Ltr) value.maxWidth.dp else value.minWidth.dp
-    fun calculateBottomInset() = value.maxHeight.dp
+        if (layoutDirection == LayoutDirection.Ltr) end else start
+
+    fun calculateBottomInset() = bottom
+
+    /** Adds two [EdgeInsets] together. */
+    @Stable
+    operator fun plus(other: EdgeInsets) =
+        EdgeInsets(start = start + other.start, end = end + other.end, top = top + other.top, bottom = bottom + other.bottom)
+
+    /** Subtracts [other]  from this [EdgeInsets]. */
+    @Stable
+    operator fun minus(other: EdgeInsets) =
+        EdgeInsets(
+            start = (start - other.start).coerceAtLeast(0.dp),
+            end = (end - other.end).coerceAtLeast(0.dp),
+            top = (top - other.top).coerceAtLeast(0.dp),
+            bottom = (bottom - other.bottom).coerceAtLeast(0.dp)
+        )
+
+    @Stable
+    override fun toString() = "EdgeInsets(start=$start, top=$top, end=$end, bottom=$bottom)"
 }
+
+/**
+ * Creates an [EdgeInsets] with explicit start, top, end, and bottom padding.
+ */
+@Stable
+fun EdgeInsets(start: Dp = 0.dp, top: Dp = 0.dp, end: Dp = 0.dp, bottom: Dp= 0.dp) =
+    EdgeInsets(
+        Constraints(
+            start.value.roundToInt(),
+            end.value.roundToInt(),
+            top.value.roundToInt(),
+            bottom.value.roundToInt()
+        )
+    )
+
+/**
+ * Creates an [EdgeInsets] with symmetric horizontal and vertical padding.
+ */
+@Stable
+fun EdgeInsets(horizontal: Dp = 0.dp, vertical: Dp = 0.dp) =
+    EdgeInsets(start = horizontal, end = horizontal, top = vertical, bottom = vertical)
+
+/**
+ * Creates an [EdgeInsets] with fields set to [all]
+ */
+@Stable
+fun EdgeInsets(all: Dp) =
+    EdgeInsets(start = all, end = all, top = all, bottom = all)
+
