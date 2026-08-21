@@ -294,7 +294,7 @@ class Typography internal constructor(
     }
 
     override fun toString(): String {
-        return "Typography(display1=$display1, display2=$display2, display3=$display3, " + "headline1=$headline1, headline2=$headline2, headline3=$headline3, " + "title1=$title1, title2=$title2, title3=$title3, " + "body1=$body1, body2=$body2, body3=$body3, " + "label1=$label1, label2=$label2, label3=$label3)"
+        return "Typography(display1=$display1, display2=$display2, display3=$display3, headline1=$headline1, headline2=$headline2, headline3=$headline3, title1=$title1, title2=$title2, title3=$title3, body1=$body1, body2=$body2, body3=$body3, label1=$label1, label2=$label2, label3=$label3)"
     }
 }
 

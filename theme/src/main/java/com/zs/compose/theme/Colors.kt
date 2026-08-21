@@ -94,7 +94,8 @@ class Colors(
      *
      * @param elevation The elevation value to calculate the overlay alpha for.
      * @return A [Color] representing the background with an overlay.*/
-    fun background(elevation: Dp) = applyTonalElevation(accent, background, elevation)
+    fun background(elevation: Dp) =
+        applyTonalElevation(accent, background, if (isLight) elevation else elevation * 0.5f)
 
     /** Returns a copy of this ColorScheme, optionally overriding some of the values. */
     fun copy(

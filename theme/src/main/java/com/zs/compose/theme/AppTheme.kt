@@ -56,12 +56,12 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.OrientRed
 import com.zs.compose.foundation.SepiaBrown
 import com.zs.compose.foundation.SignalWhite
@@ -269,8 +269,8 @@ object AppTheme {
     ) {
         val background by animateColorAsState(
             targetValue = when {
-                !isLight -> applyTonalElevation(accent, Color.Black, 1.dp)
-                else -> applyTonalElevation(accent, Color.White, 4.dp)
+                !isLight -> Color(0xFF0E0E0F)
+                else -> lerp(start = Color.White, accent, 0.12f)
             },
             animationSpec = motionScheme.slowEffectsSpec(), label = "background"
         )
