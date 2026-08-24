@@ -20,15 +20,28 @@
 
 package com.prime.toolkit
 
+import android.util.Log
+import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.LinearGradient
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.Slot
+import com.zs.compose.foundation.UmbraGrey
 import com.zs.compose.foundation.decorator.EdgeInsets
 import com.zs.compose.foundation.decorator.decorator
 import com.zs.compose.foundation.shapes.CompactDisk
@@ -36,6 +49,8 @@ import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.adaptive.content
 import com.zs.compose.theme.text.Label
+
+private const val TAG = "Preview"
 
 @OptIn(ExperimentalFoundationApi::class)
 @androidx.compose.ui.tooling.preview.Preview
@@ -63,16 +78,38 @@ private fun Preview() {
 //            Label("None")
 //        }
 
+        val animator  = rememberInfiniteTransition()
+
+        val gap by animator.animateFloat(0f, 10f,
+            animationSpec =
+                infiniteRepeatable(
+                    // Infinitely repeating a 1000ms tween animation using default easing curve.
+                    animation = tween(1000),
+                    // After each iteration of the animation (i.e. every 1000ms), the animation
+                    // will
+                    // start again from the [initialValue] defined above.
+                    // This is the default [RepeatMode]. See [RepeatMode.Reverse] below for an
+                    // alternative.
+                    repeatMode = RepeatMode.Reverse,
+                ),)
+
+        Log.d(TAG, "Preview: $gap")
         Slot(
-            modifier = Modifier.decorator(
-                backgroundColor = AppTheme.colors.background,
-                elevation = 10.dp,
-                shape = CompactDisk,
-                edgeInsets = EdgeInsets(10.dp),
-                roughness = 0.8f,
-            ).size(100.dp)
+            modifier = Modifier
+                .decorator(
+                    backgroundColor = Color.Green,
+                    elevation = 10.dp,
+                    outlineColor = Color.UmbraGrey,
+                    outlineWidth = 2.dp,
+                    outlineGap = gap.dp,
+                    shape = CompactDisk,
+                    edgeInsets = EdgeInsets(10.dp),
+                    roughness = 0.0f,
+                )
+                .size(100.dp)
         ) {
-            Label("Yses", modifier = Modifier)
+           // Label("Yses", modifier = Modifier)
+            Brush.linearGradient()
         }
     }
 }

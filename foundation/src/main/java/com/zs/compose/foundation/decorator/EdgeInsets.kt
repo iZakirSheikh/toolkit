@@ -36,7 +36,7 @@ value class EdgeInsets internal constructor(private val value: Constraints) {
         }
     }
 
-    private inline val start get() = value.minHeight.dp
+    private inline val start get() = value.minWidth.dp
     private inline val end get() = value.maxWidth.dp
     private inline val top get() = value.minHeight.dp
     private inline val bottom get() = value.maxHeight.dp
@@ -96,4 +96,3 @@ fun EdgeInsets(horizontal: Dp = 0.dp, vertical: Dp = 0.dp) =
 @Stable
 fun EdgeInsets(all: Dp) =
     EdgeInsets(start = all, end = all, top = all, bottom = all)
-

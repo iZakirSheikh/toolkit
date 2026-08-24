@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
@@ -100,6 +101,13 @@ fun Modifier.decorator(
     borderPathEffect: PathEffect? = null,
 
     //
+    outlineColor: Color = Color.Unspecified,
+    outlineGap: Dp = 0.dp,
+    outlineBrush: Brush? = null,
+    outlineWidth: Dp = 0.dp,
+    outlinePathEffect: PathEffect? = null,
+
+    //
     elevation: Dp = Dp.Unspecified,
 
     // scale
@@ -129,6 +137,13 @@ fun Modifier.decorator(
     borderBrush = borderBrush,
     borderWidth = borderWidth,
     borderPathEffect = borderPathEffect,
+    //
+    outlineColor = outlineColor,
+    outlineGap = outlineGap,
+    outlineBrush = outlineBrush,
+    outlineWidth = outlineWidth,
+    outlinePathEffect = outlinePathEffect,
+
     //
     elevation = elevation,
 
@@ -160,6 +175,10 @@ fun Modifier.decorator(
     // border
     border: BorderStroke? = null,
     borderPathEffect: PathEffect? = null,
+    //
+    outline: BorderStroke? = null,
+    outlineGap: Dp = 0.dp,
+    outlinePathEffect: PathEffect? = null,
 
     //
     elevation: Dp = Dp.Unspecified,
@@ -184,6 +203,13 @@ fun Modifier.decorator(
     borderBrush = border?.brush,
     borderWidth = border?.width ?: Dp.Unspecified,
     borderPathEffect = borderPathEffect,
+    //
+    outlineColor = Color.Unspecified,
+    outlineGap = outlineGap,
+    outlineBrush = outline?.brush,
+    outlineWidth = outline?.width ?: 0.dp,
+    outlinePathEffect = outlinePathEffect,
+
     //
     scaleX = scale,
     scaleY = scale,
@@ -213,6 +239,13 @@ private class DecoratorElement(
     val borderBrush: Brush?,
     val borderWidth: Dp,
     val borderPathEffect: PathEffect?,
+
+    // Outline styling (for styling that strictly traces the outer contour of the content.)
+    var outlineColor: Color,
+    var outlineGap: Dp,
+    var outlineBrush: Brush?,
+    var outlineWidth: Dp,
+    var outlinePathEffect: PathEffect? = null, // e.g. dashed outine
 
     //
     val elevation: Dp,
@@ -244,6 +277,14 @@ private class DecoratorElement(
         borderBrush = borderBrush,
         borderWidth = borderWidth,
         borderPathEffect = borderPathEffect,
+
+
+        outlineColor = outlineColor,
+        outlineGap = outlineGap,
+        outlineBrush = outlineBrush,
+        outlineWidth = outlineWidth,
+        outlinePathEffect = outlinePathEffect,
+
         //
         elevation = elevation,
 
@@ -269,12 +310,19 @@ private class DecoratorElement(
         node.foregroundAlpha = foregroundAlpha
 
         // border
-        // re-init
-        if (node.borderWidth != borderWidth || node.borderPathEffect != borderPathEffect) node.borderStroke =
-            null
+        if (node.borderWidth != borderWidth || node.borderPathEffect != borderPathEffect)
+            node.borderStroke = null // reset
         node.borderColor = borderColor
         node.borderBrush = borderBrush
         node.borderWidth = borderWidth
+        // outline stroke
+        if (node.outlineWidth != outlineWidth || node.outlinePathEffect != outlinePathEffect)
+            node.outlineStroke = null // reset
+        node.outlineColor = outlineColor
+        node.outlineGap = outlineGap
+        node.outlineBrush = outlineBrush
+        node.outlineWidth = outlineWidth
+        node.outlinePathEffect = outlinePathEffect
 
         //
         node.elevation = node.elevation
@@ -306,6 +354,9 @@ private class DecoratorElement(
 
         if (backgroundAlpha != other.backgroundAlpha) return false
         if (foregroundAlpha != other.foregroundAlpha) return false
+        if (scaleX != other.scaleX) return false
+        if (scaleY != other.scaleY) return false
+        if (roughness != other.roughness) return false
         if (backgroundColor != other.backgroundColor) return false
         if (backgroundBrush != other.backgroundBrush) return false
         if (foregroundColor != other.foregroundColor) return false
@@ -314,11 +365,13 @@ private class DecoratorElement(
         if (borderColor != other.borderColor) return false
         if (borderBrush != other.borderBrush) return false
         if (borderWidth != other.borderWidth) return false
-        if (borderWidth != other.borderWidth) return false
+        if (borderPathEffect != other.borderPathEffect) return false
+        if (outlineColor != other.outlineColor) return false
+        if (outlineGap != other.outlineGap) return false
+        if (outlineBrush != other.outlineBrush) return false
+        if (outlineWidth != other.outlineWidth) return false
+        if (outlinePathEffect != other.outlinePathEffect) return false
         if (elevation != other.elevation) return false
-        if (scaleX != other.scaleX) return false
-        if (scaleY != other.scaleY) return false
-        if (scaleY != other.scaleY) return false
         if (edgeInsets != other.edgeInsets) return false
 
         return true
@@ -327,6 +380,9 @@ private class DecoratorElement(
     override fun hashCode(): Int {
         var result = backgroundAlpha.hashCode()
         result = 31 * result + foregroundAlpha.hashCode()
+        result = 31 * result + scaleX.hashCode()
+        result = 31 * result + scaleY.hashCode()
+        result = 31 * result + roughness.hashCode()
         result = 31 * result + backgroundColor.hashCode()
         result = 31 * result + (backgroundBrush?.hashCode() ?: 0)
         result = 31 * result + foregroundColor.hashCode()
@@ -335,11 +391,13 @@ private class DecoratorElement(
         result = 31 * result + borderColor.hashCode()
         result = 31 * result + (borderBrush?.hashCode() ?: 0)
         result = 31 * result + borderWidth.hashCode()
+        result = 31 * result + (borderPathEffect?.hashCode() ?: 0)
+        result = 31 * result + outlineColor.hashCode()
+        result = 31 * result + outlineGap.hashCode()
+        result = 31 * result + (outlineBrush?.hashCode() ?: 0)
+        result = 31 * result + outlineWidth.hashCode()
+        result = 31 * result + (outlinePathEffect?.hashCode() ?: 0)
         result = 31 * result + elevation.hashCode()
-        result = 31 * result + scaleX.hashCode()
-        result = 31 * result + scaleY.hashCode()
-        result = 31 * result + roughness.hashCode()
-        result = 31 * result + borderPathEffect.hashCode()
         result = 31 * result + edgeInsets.hashCode()
         return result
     }
@@ -347,7 +405,6 @@ private class DecoratorElement(
 
 // Custom Modifier.Node that handles background, foreground, border, elevation,
 // scaling, noise effects, and content padding in a single unified draw/layout pass.
-
 private class DecoratorNode(
     // 🎨 Background styling
     var backgroundColor: Color,          // Solid background color
@@ -367,6 +424,13 @@ private class DecoratorNode(
     var borderBrush: Brush?,
     var borderWidth: Dp,
     var borderPathEffect: PathEffect? = null, // e.g. dashed border
+
+    // Outline styling (for styling that strictly traces the outer contour of the content.)
+    var outlineColor: Color,
+    var outlineGap: Dp,
+    var outlineBrush: Brush?,
+    var outlineWidth: Dp,
+    var outlinePathEffect: PathEffect? = null, // e.g. dashed outine
 
     // 🌑 Elevation (shadow depth)
     var elevation: Dp,
@@ -401,6 +465,7 @@ private class DecoratorNode(
     // Cached border stroke style
     var noiseEffectBrush: ShaderBrush? = null
     var borderStroke: Stroke? = null
+    var outlineStroke: Stroke? = null
 
     // 🔗 Lifecycle: initialize graphics layer when node is attached
     override fun onAttach() {
@@ -477,6 +542,39 @@ private class DecoratorNode(
     override fun ContentDrawScope.draw() {
         val outline = obtainOutline()
         val borderWidthPx = if (borderWidth.isSpecified) borderWidth.toPx() else -1f
+
+        // Draws a silhouette-style outline positioned at a configurable distance (GAP)
+        // from the actual content. The GAP ensures the outline sits outside the shape
+        // rather than overlapping it.
+        //
+        // Currently, we only support drawing outlines from paths, which may represent
+        // complex shapes (e.g., a compact disk with a hole in the center). For now, we
+        // assume the background covers any internal holes; in future we may revisit
+        // this with more precise operations.
+        //
+        // TODO: Explore better alternatives such as clipPath or PathOperation.Difference
+        // for handling complex shapes and internal cutouts.
+        //
+        // Note: This outline is drawn here instead of using a graphicsLayer to avoid
+        // unintended clipping behavior.
+        val outlineWidthPx = outlineWidth.toPx().coerceAtLeast(0f)
+        val outlineGapPx = outlineGap.toPx().coerceAtLeast(0f)
+        if (outlineWidthPx >= 0 && (outlineColor.isSpecified || outlineBrush != null)) {
+            // Compute scale factors relative to the content size.
+            // The outline is centered, so we expand by GAP and half the outline width
+            // to ensure the stroke sits correctly outside the content.
+            val scaleOutlineX = (size.width + outlineGapPx * 2 + outlineWidthPx / 2) / size.width
+            val scaleOutlineY = (size.height + outlineGapPx * 2 + outlineWidthPx / 2) / size.height
+
+            scale(scaleX = scaleOutlineX, scaleY = scaleOutlineY) {
+                val stroke = outlineStroke ?: Stroke(outlineWidthPx, pathEffect = outlinePathEffect)
+                outlineStroke = stroke
+                if (outlineColor.isSpecified)
+                    drawOutline(outline, color = outlineColor, style = stroke)
+                val brush = outlineBrush ?: return@scale
+                drawOutline(outline, brush = brush, style = stroke)
+            }
+        }
 
         // Configure graphics layer
         graphicsLayer.setOutline(outline)
