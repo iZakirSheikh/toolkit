@@ -44,6 +44,7 @@ import com.zs.compose.foundation.Slot
 import com.zs.compose.foundation.UmbraGrey
 import com.zs.compose.foundation.decorator.EdgeInsets
 import com.zs.compose.foundation.decorator.decorator
+import com.zs.compose.foundation.linearGradient
 import com.zs.compose.foundation.shapes.CompactDisk
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
@@ -80,11 +81,11 @@ private fun Preview() {
 
         val animator  = rememberInfiniteTransition()
 
-        val gap by animator.animateFloat(0f, 10f,
+        val gap by animator.animateFloat(0f, 1f,
             animationSpec =
                 infiniteRepeatable(
                     // Infinitely repeating a 1000ms tween animation using default easing curve.
-                    animation = tween(1000),
+                    animation = tween(10000),
                     // After each iteration of the animation (i.e. every 1000ms), the animation
                     // will
                     // start again from the [initialValue] defined above.
@@ -97,12 +98,22 @@ private fun Preview() {
         Slot(
             modifier = Modifier
                 .decorator(
-                    backgroundColor = Color.Green,
+                    backgroundColor = Color.Unspecified,
+                    backgroundBrush = Brush.linearGradient(
+                        listOf(
+                            Color.Green,
+                            Color.UmbraGrey,
+                            Color.Transparent,
+                            Color.Transparent,
+                            Color.Transparent,
+                        ),
+                      //  angle = gap * 360
+                    ),
                     elevation = 10.dp,
                     outlineColor = Color.UmbraGrey,
                     outlineWidth = 2.dp,
-                    outlineGap = gap.dp,
-                    shape = CompactDisk,
+                    outlineGap = (gap * 10).dp,
+                    shape = AppTheme.shapes.medium,
                     edgeInsets = EdgeInsets(10.dp),
                     roughness = 0.0f,
                 )
@@ -110,6 +121,32 @@ private fun Preview() {
         ) {
            // Label("Yses", modifier = Modifier)
             Brush.linearGradient()
+        }
+
+        Slot(
+            modifier = Modifier
+                .decorator(
+                    backgroundColor = Color.Unspecified,
+                    backgroundBrush = Brush.linearGradient(
+                        listOf(
+                            Color.Green,
+                            Color.UmbraGrey,
+                            Color.Transparent,
+                            Color.Transparent,
+                            Color.Transparent,
+                        ),
+                          angle = gap * 360
+                    ),
+                    elevation = 10.dp,
+                    outlineColor = Color.UmbraGrey,
+                    outlineWidth = 2.dp,
+                    outlineGap = (gap * 10).dp,
+                    shape = AppTheme.shapes.medium,
+                    edgeInsets = EdgeInsets(10.dp),
+                    roughness = 0.0f,
+                )
+                .size(100.dp)
+        ) {
         }
     }
 }
