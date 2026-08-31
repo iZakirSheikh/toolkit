@@ -179,13 +179,15 @@ fun Games() {
     Scaffold(
         topBar = {
             AdaptiveLargeTopAppBar(
-                height > width,
+                false,
                 behavior = behaviour,
                 background = Background(Modifier.mistEffect(
                     backdrop,
                     AppTheme.colors.background,
-                    100f,
+                    200f,
                     vibrancy = 1.3f,
+                    tint = AppTheme.colors.background(10.dp).copy(0.63f),
+                    noiseAmount = 0.5f
                 )),
                 title = { Label(stringResource(R.string.video_games)) },
                 navigationIcon = {
@@ -202,6 +204,8 @@ fun Games() {
                             AppTheme.colors.background,
                             30f,
                             vibrancy = 1.3f,
+                            tint = AppTheme.colors.background(10.dp).copy(0.63f),
+                            noiseAmount = 0.5f
                         )
                     ))
                 }

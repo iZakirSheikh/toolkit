@@ -17,16 +17,12 @@ import com.zs.compose.foundation.decorator.decorator
 /**
  * A [ModifierNodeElement] that creates and updates a [MistEffectNode], applying a frosted
  * "mist" (glassmorphism-style) blur effect to the composable it modifies.
- *
- * @property backdrop The shared [Backdrop] state containing the captured background layer to be blurred.
- * @property blurRadiusPx The radius of the blur effect in pixels.
- * @property vibrancy A multiplier for the background's color saturation to boost vibrancy.
- *                    (e.g., 1.0f is neutral, >1.0f increases color saturation to prevent washed-out glass).
  */
 private class MistEffectElement(
     val backdrop: Backdrop,
     val blurRadiusPx: Float,
     val vibrancy: Float,
+    val tint: Color
 ) : ModifierNodeElement<MistEffectNode>() {
 
     /**
@@ -36,6 +32,7 @@ private class MistEffectElement(
         backdrop = backdrop,
         blurRadiusPx = blurRadiusPx,
         vibrancy = vibrancy,
+        tint = tint
     )
 
     /**
@@ -55,6 +52,7 @@ private class MistEffectElement(
         node.backdrop = backdrop
         node.blurRadiusPx = blurRadiusPx
         node.vibrancy = vibrancy
+        node.tint = tint
 
         // Trigger a redraw cycle:
         // Because this modifier manipulates pixels on the screen, changing its properties
@@ -71,6 +69,7 @@ private class MistEffectElement(
         properties["backdrop"] = backdrop
         properties["blurRadiusPx"] = blurRadiusPx
         properties["vibrancy"] = vibrancy
+        properties["tint"] = tint
     }
 
     override fun equals(other: Any?): Boolean {
@@ -82,6 +81,7 @@ private class MistEffectElement(
         if (blurRadiusPx != other.blurRadiusPx) return false
         if (vibrancy != other.vibrancy) return false
         if (backdrop != other.backdrop) return false
+        if (tint != other.tint) return false
 
         return true
     }
@@ -90,6 +90,7 @@ private class MistEffectElement(
         var result = blurRadiusPx.hashCode()
         result = 31 * result + vibrancy.hashCode()
         result = 31 * result + backdrop.hashCode()
+        result = 31 * result + tint.hashCode()
         return result
     }
 }
@@ -133,7 +134,7 @@ fun Modifier.mistEffect(
         // The decorator draws the foundation and the top-level accents.
         Modifier.decorator(
             backgroundColor = surface,
-            foregroundColor = tint,
+            //foregroundColor = tint,
             roughness = noiseAmount,
             border = edgeHighlight,
             shape = shape
@@ -146,4 +147,5 @@ fun Modifier.mistEffect(
             backdrop = backdrop,
             blurRadiusPx = blurRadiusPx,
             vibrancy = vibrancy,
+            tint = tint
         )

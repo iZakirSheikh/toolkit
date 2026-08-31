@@ -2,10 +2,12 @@ package com.zs.compose.foundation.backdrop.mist
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlurEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -32,6 +34,7 @@ internal class MistEffectNode(
     var backdrop: Backdrop,
     var blurRadiusPx: Float,
     var vibrancy: Float,
+    var tint: Color
 ) : Modifier.Node(), DrawModifierNode, GlobalPositionAwareModifierNode {
 
     // Disables automatic invalidation. We handle recomposition and redraws manually
@@ -112,7 +115,8 @@ internal class MistEffectNode(
      * The core rendering loop, executed every time this composable needs to paint.
      */
     override fun ContentDrawScope.draw() {
-        // Step 1: Apply our cached effects to the offscreen layer
+        // Step 1: Apply our cached GPU effects (blur and saturation) to the offscreen layer.
+        // These properties are processed by the GPU when the layer is eventually drawn.
         content.colorFilter = saturation
         content.renderEffect = effect
 
@@ -125,9 +129,20 @@ internal class MistEffectNode(
             }
         }
 
-        // Step 3: Draw the fully processed (blurred and color-filtered) layer to the screen.
+        // Step 3: Draw the fully processed (blurred and color-filtered) background layer to the screen.
         drawLayer(content)
-        // Step 4: Draw the content of this componet
+
+        // Step 4: Draw the color tint overlay on top of the blurred background.
+        // In Microsoft's Acrylic design, this layer normalizes contrast and luminosity
+        // so that text placed on top remains legible regardless of the bright/dark images behind it.
+        if (tint.isSpecified) {
+            drawRect(tint)
+        }
+
+        // Step 5: Render the Foreground.
+        // drawContent() renders the actual children of this composable (e.g., Text, Icons).
+        // Because it is called last, the children are drawn perfectly crisp and unblurred
+        // over the frosted glass backdrop we just created.
         drawContent()
     }
 }
