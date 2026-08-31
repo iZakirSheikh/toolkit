@@ -1,4 +1,4 @@
-package com.zs.compose.foundation.backdrop.glass
+package com.zs.compose.foundation.backdrop.mist
 
 import android.content.Context
 import android.graphics.Color

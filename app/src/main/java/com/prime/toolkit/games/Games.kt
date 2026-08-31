@@ -59,8 +59,9 @@ import com.prime.toolkit.R
 import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.backdrop.backdrop
-import com.zs.compose.foundation.backdrop.glass.glassEffect
+import com.zs.compose.foundation.backdrop.mist.mistEffect
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
+import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.IconButton
@@ -180,7 +181,12 @@ fun Games() {
             AdaptiveLargeTopAppBar(
                 height > width,
                 behavior = behaviour,
-                background = Background(Modifier.glassEffect(backdrop, 30f)),
+                background = Background(Modifier.mistEffect(
+                    backdrop,
+                    AppTheme.colors.background,
+                    100f,
+                    vibrancy = 1.3f,
+                )),
                 title = { Label(stringResource(R.string.video_games)) },
                 navigationIcon = {
                     IconButton(
@@ -191,7 +197,12 @@ fun Games() {
                 },
                 actions = {
                     ActionRow(Background(Modifier
-                        .glassEffect(backdrop, 30f)
+                        .mistEffect(
+                            backdrop,
+                            AppTheme.colors.background,
+                            30f,
+                            vibrancy = 1.3f,
+                        )
                     ))
                 }
             )

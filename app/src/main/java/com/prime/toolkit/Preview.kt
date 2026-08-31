@@ -28,20 +28,43 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.LinearGradient
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.Slot
 import com.zs.compose.foundation.UmbraGrey
+import com.zs.compose.foundation.backdrop.backdrop
+import com.zs.compose.foundation.backdrop.mist.mistEffect
+import com.zs.compose.foundation.backdrop.rememberBackdropLayer
 import com.zs.compose.foundation.decorator.EdgeInsets
 import com.zs.compose.foundation.decorator.decorator
 import com.zs.compose.foundation.linearGradient
@@ -57,97 +80,52 @@ private const val TAG = "Preview"
 @androidx.compose.ui.tooling.preview.Preview
 @Composable
 private fun Preview() {
-    /*com.zs.compose.theme.Surface(
-        modifier = Modifier.size(100.dp),
-        shape = CompactDisk,
-        color = Color.Green,
-        contentColor = Color.White,
-        border = BorderStroke(5.dp, Color.Yellow.copy(0.5f)),
-    ) {
-        com.zs.compose.theme.text.Label("Content", color = Color.Blue)
-    }*/
-    val context = LocalContext.current
-    Column() {
-//        Slot (
-//            modifier = Modifier.decorator(
-//                backgroundColor = AppTheme.colors.background,
-//                elevation = 10.dp,
-//                shape = AppTheme.shapes.medium,
-//
-//            )
-//        ) {
-//            Label("None")
-//        }
-
-        val animator  = rememberInfiniteTransition()
-
-        val gap by animator.animateFloat(0f, 1f,
-            animationSpec =
-                infiniteRepeatable(
-                    // Infinitely repeating a 1000ms tween animation using default easing curve.
-                    animation = tween(10000),
-                    // After each iteration of the animation (i.e. every 1000ms), the animation
-                    // will
-                    // start again from the [initialValue] defined above.
-                    // This is the default [RepeatMode]. See [RepeatMode.Reverse] below for an
-                    // alternative.
-                    repeatMode = RepeatMode.Reverse,
-                ),)
-
-        Log.d(TAG, "Preview: $gap")
-        Slot(
+    val backdrop = rememberBackdropLayer()
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Image(
+            painter = painterResource(R.drawable.wallpaper_light),
             modifier = Modifier
-                .decorator(
-                    backgroundColor = Color.Unspecified,
-                    backgroundBrush = Brush.linearGradient(
-                        listOf(
-                            Color.Green,
-                            Color.UmbraGrey,
-                            Color.Transparent,
-                            Color.Transparent,
-                            Color.Transparent,
-                        ),
-                      //  angle = gap * 360
-                    ),
-                    elevation = 10.dp,
-                    outlineColor = Color.UmbraGrey,
-                    outlineWidth = 2.dp,
-                    outlineGap = (gap * 10).dp,
-                    shape = AppTheme.shapes.medium,
-                    edgeInsets = EdgeInsets(10.dp),
-                    roughness = 0.0f,
-                )
-                .size(100.dp)
-        ) {
-           // Label("Yses", modifier = Modifier)
-            Brush.linearGradient()
-        }
+                .fillMaxSize()
+                .backdrop(backdrop),
+            contentScale = ContentScale.Crop,
+            contentDescription = null,
+        )
 
-        Slot(
-            modifier = Modifier
-                .decorator(
-                    backgroundColor = Color.Unspecified,
-                    backgroundBrush = Brush.linearGradient(
-                        listOf(
-                            Color.Green,
-                            Color.UmbraGrey,
-                            Color.Transparent,
-                            Color.Transparent,
-                            Color.Transparent,
-                        ),
-                          angle = gap * 360
+        // Current animated offset
+        var offset by remember { mutableStateOf(Offset.Zero) }
+
+        Spacer(
+            Modifier
+                .requiredSize(100.dp)
+                .graphicsLayer {
+                    translationX = offset.x
+                    translationY = offset.y
+                }
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        offset += dragAmount
+                    }
+                }
+                .mistEffect(
+                    backdrop,
+                    Color.Transparent,
+                    blurRadiusPx = 30f,
+                    vibrancy = 1.6f,
+                    edgeHighlight = BorderStroke(
+                        2.dp,
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.6f),
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.1f)
+                            ),
+                        )
                     ),
-                    elevation = 10.dp,
-                    outlineColor = Color.UmbraGrey,
-                    outlineWidth = 2.dp,
-                    outlineGap = (gap * 10).dp,
-                    shape = AppTheme.shapes.medium,
-                    edgeInsets = EdgeInsets(10.dp),
-                    roughness = 0.0f,
+                    shape = RoundedCornerShape(12.dp),
+                    noiseAmount = 0.25f
                 )
-                .size(100.dp)
-        ) {
-        }
+        )
     }
 }
 
