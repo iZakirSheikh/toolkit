@@ -21,17 +21,14 @@
 package com.prime.toolkit
 
 import android.util.Log
-import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +37,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,29 +46,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.LinearGradient
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.zs.compose.foundation.Slot
-import com.zs.compose.foundation.UmbraGrey
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.zs.compose.foundation.backdrop.backdrop
-import com.zs.compose.foundation.backdrop.mist.mistEffect
+import com.zs.compose.foundation.backdrop.haze.BlurProfile
+import com.zs.compose.foundation.backdrop.haze.hazeEffect
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
-import com.zs.compose.foundation.decorator.EdgeInsets
-import com.zs.compose.foundation.decorator.decorator
-import com.zs.compose.foundation.linearGradient
-import com.zs.compose.foundation.shapes.CompactDisk
-import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.adaptive.content
-import com.zs.compose.theme.text.Label
 
 private const val TAG = "Preview"
 
@@ -82,17 +70,43 @@ private const val TAG = "Preview"
 private fun Preview() {
     val backdrop = rememberBackdropLayer()
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Image(
-            painter = painterResource(R.drawable.wallpaper_light),
-            modifier = Modifier
-                .fillMaxSize()
-                .backdrop(backdrop),
+//        Image(
+//            painter = painterResource(R.drawable.wallpaper_light),
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .backdrop(backdrop),
+//            contentScale = ContentScale.Crop,
+//            contentDescription = null,
+//        )
+
+        val context = LocalContext.current
+        AsyncImage(
+            model =  ImageRequest.Builder(context)
+                .data("https://cdn.thegamesdb.net/images/original/boxart/front/53-1.jpg")
+                .build(),
+            onError = { Log.d(TAG, "Game: ${it.result.throwable.message}")},
             contentScale = ContentScale.Crop,
             contentDescription = null,
+            modifier = Modifier.fillMaxSize().backdrop(backdrop)
         )
 
         // Current animated offset
         var offset by remember { mutableStateOf(Offset.Zero) }
+
+        val infiniteTransition = rememberInfiniteTransition(label = "infinite_transition")
+
+        val animatedValue by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(
+                    durationMillis = 10_000,
+                    easing = LinearEasing // Change to FastOutSlowInEasing for a smoother effect
+                ),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "zero_to_one_animation"
+        )
 
         Spacer(
             Modifier
@@ -107,10 +121,10 @@ private fun Preview() {
                         offset += dragAmount
                     }
                 }
-                .mistEffect(
+                .hazeEffect(
                     backdrop,
                     Color.Transparent,
-                    blurRadiusPx = 30f,
+                    blurProfile = BlurProfile(0.25f, 100f * animatedValue),
                     vibrancy = 1.6f,
                     edgeHighlight = BorderStroke(
                         2.dp,

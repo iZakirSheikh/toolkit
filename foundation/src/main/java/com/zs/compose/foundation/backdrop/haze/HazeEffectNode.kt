@@ -1,12 +1,15 @@
-package com.zs.compose.foundation.backdrop.mist
+package com.zs.compose.foundation.backdrop.haze
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
@@ -15,49 +18,43 @@ import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.GlobalPositionAwareModifierNode
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.requireGraphicsContext
+import androidx.compose.ui.unit.IntSize
 import com.zs.compose.foundation.backdrop.Backdrop
 
 private const val TAG = "BlurEffectNode"
 
 /**
- * The core [Modifier.Node] that executes the rendering logic for the mist (glassmorphism) effect.
+ * The core [Modifier.Node] that executes the rendering logic for the haze (glassmorphism) effect.
  *
  * This node relies on a hardware-accelerated [GraphicsLayer] to capture a specific portion
  * of the screen (the [backdrop]), apply expensive GPU operations (like blurs and color matrices),
  * and render the result efficiently.
  *
+ * @see Modifier.hazeEffect
+ *
  * @property backdrop The shared state holding the background content to be blurred.
- * @property blurRadiusPx The radius for the Gaussian blur.
+ * @property blurProfile The performance and visual specifications for the blur (downsample factor and radius).
  * @property vibrancy A multiplier for color saturation to prevent the blur from looking washed out.
+ * @property tint An optional color overlay applied with a Softlight blend mode before the blur layer.
+ * @property content The hardware-accelerated offscreen buffer used to process and cache the blur and color effects.
+ * @property position Tracks the exact screen coordinates of this component to properly crop the global backdrop.
+ * @property saturation Lazily initialized and cached [ColorFilter] used to apply the [vibrancy] boost.
+ * @property effect Lazily initialized and cached [BlurEffect] to prevent allocating new RenderEffects on every frame.
  */
-internal class MistEffectNode(
+internal class HazeEffectNode(
     var backdrop: Backdrop,
-    var blurRadiusPx: Float,
+    var blurProfile: BlurProfile,
     var vibrancy: Float,
     var tint: Color
 ) : Modifier.Node(), DrawModifierNode, GlobalPositionAwareModifierNode {
-
     // Disables automatic invalidation. We handle recomposition and redraws manually
-    // inside the [MistEffectElement.update] function and [onGloballyPositioned].
+    // inside the [HazeEffectElement.update] function and [onGloballyPositioned].
     // This prevents unnecessary GPU redraws when non-visual properties change.
     override val shouldAutoInvalidate: Boolean = false
 
-    /**
-     * The hardware-accelerated offscreen buffer used to process the blur and color effects.
-     */
     private lateinit var content: GraphicsLayer
-
-    /**
-     * Tracks the exact location of this component on the screen.
-     * This is required so we know *which part* of the global backdrop to crop and draw.
-     */
     private var position: LayoutCoordinates? = null
-
-    /**
-     * Lazily initialized [ColorFilter] that boosts the background's saturation.
-     * The companion [MistEffectElement] sets this to `null` when [vibrancy] changes,
-     * forcing it to regenerate only when absolutely necessary.
-     */
+    var effect: BlurEffect? = null
     var saturation: ColorFilter? = null
         get() {
             if (field != null) return field
@@ -68,23 +65,6 @@ internal class MistEffectNode(
             field = ColorFilter.colorMatrix(ColorMatrix().apply {
                 setToSaturation(vibrancy)
             })
-            return field
-        }
-
-    /**
-     * Lazily initialized [BlurEffect].
-     * The companion [MistEffectElement] sets this to `null` when [blurRadiusPx] changes,
-     * forcing it to regenerate. This prevents allocating new RenderEffects on every frame.
-     */
-    var effect: BlurEffect? = null
-        get() {
-            if (field != null) return field
-
-            field = BlurEffect(
-                blurRadiusPx,
-                blurRadiusPx,
-                TileMode.Clamp // Clamp prevents transparent pixels from bleeding in from the edges
-            )
             return field
         }
 
@@ -111,38 +91,64 @@ internal class MistEffectNode(
         invalidateDraw()
     }
 
-    /**
-     * The core rendering loop, executed every time this composable needs to paint.
-     */
-    override fun ContentDrawScope.draw() {
-        // Step 1: Apply our cached GPU effects (blur and saturation) to the offscreen layer.
-        // These properties are processed by the GPU when the layer is eventually drawn.
-        content.colorFilter = saturation
-        content.renderEffect = effect
 
-        // Step 2: Record the background content into our GraphicsLayer buffer.
-        content.record {
-            with(backdrop) {
-                // Draws only the slice of the background that sits directly behind this node,
-                // using the coordinates captured in onGloballyPositioned.
-                draw(this@MistEffectNode.position)
+    override fun ContentDrawScope.draw() {
+
+        // Step 1: Configure the offscreen layer with the cached color filter.
+        content.colorFilter = saturation
+
+        // Step 2: Calculate the downsample factor and blur radius.
+        //
+        // The backdrop is rendered at a reduced resolution before being blurred.
+        // This significantly reduces the number of pixels the blur operation needs
+        // to process.
+        val (downsample, radius) = blurProfile
+
+        if (effect == null) {
+            if (radius != 0f)
+                effect = BlurEffect(
+                    radius,
+                    radius,
+                    TileMode.Decal // Prevents transparent/empty pixels from bleeding in at the edges.
+                )
+
+            content.renderEffect = effect
+        }
+
+        // Step 3: Calculate the size of the reduced-resolution backdrop buffer.
+        val newSize = IntSize(
+            (size.width * downsample).toInt().coerceAtLeast(1),
+            (size.height * downsample).toInt().coerceAtLeast(1)
+        )
+
+        // Step 4: Capture the portion of the BACKDROP that sits behind this node.
+        content.record(size = newSize) {
+            scale(scaleX = downsample, scaleY = downsample, pivot = Offset.Zero) {
+                with(backdrop) {
+                    draw(this@HazeEffectNode.position)
+                }
             }
         }
 
-        // Step 3: Draw the fully processed (blurred and color-filtered) background layer to the screen.
-        drawLayer(content)
-
-        // Step 4: Draw the color tint overlay on top of the blurred background.
-        // In Microsoft's Acrylic design, this layer normalizes contrast and luminosity
-        // so that text placed on top remains legible regardless of the bright/dark images behind it.
+        // Step 5: Draw the SURFACE TINT.
+        //
+        // We apply the softlight tint first so it blends directly with the underlying
+        // canvas before the blurred layer is drawn over it.
         if (tint.isSpecified) {
-            drawRect(tint)
+            drawRect(tint, blendMode = BlendMode.Softlight)
         }
 
-        // Step 5: Render the Foreground.
-        // drawContent() renders the actual children of this composable (e.g., Text, Icons).
-        // Because it is called last, the children are drawn perfectly crisp and unblurred
-        // over the frosted glass backdrop we just created.
+        // Step 6: Draw the PROCESSED SURFACE back at its original size.
+        //
+        // The small blurred layer is stretched back to the node's full size
+        // and rendered on top of the tinted base.
+        scale(scaleX = 1f / downsample, scaleY = 1f / downsample, pivot = Offset.Zero) {
+            drawLayer(content)
+        }
+
+        // Step 7: Draw the FOREGROUND CONTENT.
+        //
+        // This renders the actual children of this composable, such as text or icons.
         drawContent()
     }
 }

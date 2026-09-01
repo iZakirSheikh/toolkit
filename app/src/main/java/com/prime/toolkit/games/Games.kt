@@ -59,7 +59,8 @@ import com.prime.toolkit.R
 import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.backdrop.backdrop
-import com.zs.compose.foundation.backdrop.mist.mistEffect
+import com.zs.compose.foundation.backdrop.haze.BlurProfile
+import com.zs.compose.foundation.backdrop.haze.hazeEffect
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
@@ -181,13 +182,13 @@ fun Games() {
             AdaptiveLargeTopAppBar(
                 false,
                 behavior = behaviour,
-                background = Background(Modifier.mistEffect(
+                background = Background(Modifier.hazeEffect(
                     backdrop,
-                    AppTheme.colors.background,
-                    200f,
+                    AppTheme.colors.background(0.4.dp),
+                    blurProfile = BlurProfile(0.1f, 20f),
                     vibrancy = 1.3f,
-                    tint = AppTheme.colors.background(10.dp).copy(0.63f),
-                    noiseAmount = 0.5f
+                    tint = AppTheme.colors.background,
+                    noiseAmount = 0.0f
                 )),
                 title = { Label(stringResource(R.string.video_games)) },
                 navigationIcon = {
@@ -199,10 +200,10 @@ fun Games() {
                 },
                 actions = {
                     ActionRow(Background(Modifier
-                        .mistEffect(
+                        .hazeEffect(
                             backdrop,
                             AppTheme.colors.background,
-                            30f,
+                            BlurProfile(0.25f, 10f),
                             vibrancy = 1.3f,
                             tint = AppTheme.colors.background(10.dp).copy(0.63f),
                             noiseAmount = 0.5f

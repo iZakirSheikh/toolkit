@@ -1,4 +1,4 @@
-package com.zs.compose.foundation.backdrop.mist
+package com.zs.compose.foundation.backdrop.haze
 
 import android.content.Context
 import android.graphics.Color
@@ -20,13 +20,15 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
+import com.zs.compose.foundation.backdrop.haze.RsBlurEffect.Companion.MAX_RS_RADIUS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.withContext
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
-import androidx.compose.ui.geometry.Offset as BlurParams
+import kotlin.math.sqrt
+import androidx.compose.ui.geometry.Offset as ScaleRadius
 
 private const val MAX_BLUR_RADIUS = 25f
 private const val SKIA_ALIGNMENT_MULTIPLIER = 0.85f
@@ -50,7 +52,7 @@ private const val TAG = "RenderScriptContext"
  *                   lifecycle with Kotlin Coroutines, pausing rendering until GPU writes complete.
  * @property isReleased Tracks the lifecycle state to prevent operations on destroyed RS contexts.
  */
-class RenderScriptBlurEffect(context: Context) {
+class RsBlurEffect(context: Context) {
     private val rs = RenderScript.create(context.applicationContext)
     private val rsBlurScript = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs))
 
@@ -73,7 +75,7 @@ class RenderScriptBlurEffect(context: Context) {
      * @return The actual radius to pass to RenderScript (guaranteed to be <= 25f).
      * @throws IllegalStateException if called after [release] has been invoked.
      */
-    private fun prepare(size: IntSize, radius: Float): BlurParams {
+    private fun prepare(size: IntSize, radius: Float): ScaleRadius {
         check(!isReleased) {
             "Cannot prepare blur: the blur processor has already been released."
         }
@@ -117,7 +119,7 @@ class RenderScriptBlurEffect(context: Context) {
             lock.withLock {
                 // Double-check release state inside the lock.
                 // Return from function entirely to avoid touching dead RS contexts.
-                if (isReleased) return BlurParams(scale, radiusPx)
+                if (isReleased) return ScaleRadius(scale, radiusPx)
 
                 if (::buffer.isInitialized) {
                     inAllocation.destroy()
@@ -151,7 +153,7 @@ class RenderScriptBlurEffect(context: Context) {
             }
         }
 
-        return BlurParams(scale, radiusPx)
+        return ScaleRadius(scale, radiusPx)
     }
 
     /**
@@ -283,6 +285,39 @@ class RenderScriptBlurEffect(context: Context) {
                     }
                 }
             }
+        }
+    }
+
+    companion object {
+        private const val MAX_RS_RADIUS = 25f
+
+        // K controls how aggressively downsampling ramps in. Larger K = downsampling
+        // stays closer to 1.0 for longer (delays quality loss), smaller K = ramps in
+        // sooner. Tune empirically — try values in the 20–40 range.
+        private const val K = 30f
+
+        private const val MIN_SCALE = 0.05f
+
+        /**
+         * Computes a downsample scale and adjusted blur radius for the given input.
+         *
+         * The scale curve is smooth and continuous across all radii:
+         * - Approaches 1.0 as radius → 0
+         * - Gradually decreases as radius grows, avoiding hard thresholds
+         * - Ensures a minimum scale and caps the effective radius at [MAX_RS_RADIUS]
+         *
+         * @param radius Desired blur radius in pixels.
+         * @return [ScaleRadius] containing the resolved scale and effective radius.
+         */
+        fun calculateAdaptiveScaleAndRadius(radius: Float): ScaleRadius {
+            // 1 / sqrt(1 + (radius/K)^2) — smoothly transitions from ~1.0 at small
+            // radius to ~K/radius at large radius, with a gentle knee instead of a
+            // hard corner (this shape is the same family used for smooth mip-level
+            // selection in graphics pipelines).
+            val ratio = radius / K
+            val scale =  (1f / sqrt(1f + ratio * ratio)).coerceAtLeast(MIN_SCALE)
+            val adjustedRadius = (radius * scale).coerceAtMost(MAX_RS_RADIUS)
+            return ScaleRadius(scale, adjustedRadius)
         }
     }
 }
