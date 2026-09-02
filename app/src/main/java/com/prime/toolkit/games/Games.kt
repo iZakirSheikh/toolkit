@@ -60,6 +60,7 @@ import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.backdrop.backdrop
 import com.zs.compose.foundation.backdrop.haze.BlurConfig
+import com.zs.compose.foundation.backdrop.haze.hazeEffect
 import com.zs.compose.foundation.backdrop.haze.legacyHazeEffect
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
 import com.zs.compose.theme.AppTheme
@@ -185,9 +186,10 @@ fun Games() {
                 background = Background(Modifier.legacyHazeEffect(
                     backdrop,
                     AppTheme.colors.background(0.4.dp),
-                    blurConfig = BlurConfig(0.25f, 15f),
-                    vibrancy = 1.8f,
-                    tint = AppTheme.colors.background.copy(0.63f),
+                    blurConfig = BlurConfig(0.25f, 25f),
+                    vibrancy = 1.0f,
+                    luminosity = 0.65f,
+                    tint = AppTheme.colors.background(0.4.dp).copy(0.85f),
                     noiseAmount = 0.1f
                 )),
                 title = { Label(stringResource(R.string.video_games)) },
