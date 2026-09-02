@@ -144,7 +144,7 @@ internal class RsHazeEffectNode(
         //
         // When blur is enabled, draw the most recently processed RenderScript
         // result. `drawLayer()` handles scaling the processed layer back to size.
-        if (radiusPx == 0f) {
+        if (radiusPx < 1f) {
             if (downsample != 0f)
                 scale(scaleX = 1f / downsample, scaleY = 1f / downsample, pivot = Offset.Zero) {
                     drawLayer(content)
@@ -170,7 +170,7 @@ internal class RsHazeEffectNode(
 
         // Stop here when blur is disabled. The backdrop, tint, and content have
         // already been drawn, so there is no RenderScript work to schedule.
-        if (radiusPx == 0f)
+        if (radiusPx < 1f)
             return
 
         // Step 8: Lazily create the RenderScript blur effect.

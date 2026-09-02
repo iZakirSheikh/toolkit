@@ -96,14 +96,14 @@ private fun Preview() {
         val infiniteTransition = rememberInfiniteTransition(label = "infinite_transition")
 
         val animatedValue by infiniteTransition.animateFloat(
-            initialValue = 0.1f,
+            initialValue = 0.0f,
             targetValue = 1f,
             animationSpec = infiniteRepeatable(
                 animation = tween(
-                    durationMillis = 10_000,
+                    durationMillis = 3_000,
                     easing = LinearEasing // Change to FastOutSlowInEasing for a smoother effect
                 ),
-                repeatMode = RepeatMode.Reverse
+                repeatMode = RepeatMode.Restart
             ),
             label = "zero_to_one_animation"
         )
@@ -124,7 +124,7 @@ private fun Preview() {
                 .legacyHazeEffect(
                     backdrop,
                     Color.Transparent,
-                    blurConfig = BlurConfig(0.25f, 20f * animatedValue),
+                    blurConfig = BlurConfig(0.1f, 20f * animatedValue),
                     vibrancy = 1.0f,
                     edgeHighlight = BorderStroke(
                         2.dp,
