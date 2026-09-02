@@ -125,7 +125,7 @@ private fun Preview() {
                     backdrop,
                     Color.Transparent,
                     blurConfig = BlurConfig(0.25f, 20f * animatedValue),
-                    vibrancy = 1.6f,
+                    vibrancy = 1.0f,
                     edgeHighlight = BorderStroke(
                         2.dp,
                         Brush.linearGradient(

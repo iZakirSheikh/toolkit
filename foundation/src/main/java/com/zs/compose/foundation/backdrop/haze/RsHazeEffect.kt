@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.invalidateDraw
@@ -46,10 +47,9 @@ private class RsHazeEffectElement(
     override fun update(node: RsHazeEffectNode) {
         // Cache Invalidation:
         // If the blur profile (radius) or vibrancy or luminsity changed, we nullify
-        // the cached RenderEffect and ColorMatrix inside the node so they are regenerated on
+        // the cached ColorMatrix inside the node so they are regenerated on
         // the next draw pass. This avoids recreating expensive GPU objects if the values
         // haven't actually changed.
-        if (node.config.radiusPx != config.radiusPx) node.effect = null
         if (node.vibrancy != vibrancy || node.luminsity != luminsity) node.filter = null
 
         // Apply new values
@@ -126,7 +126,7 @@ fun Modifier.legacyHazeEffect(
     tint: Color = Color.Unspecified,
     elevation: Dp = Dp.Unspecified,
     vibrancy: Float = 1.0f,
-    @FloatRange(0.0, 1.0) luminosity: Float = tint.luminance(),
+    @FloatRange(0.0, 1.0) luminosity: Float = if (tint.isUnspecified) -1f else tint.luminance(),
     @FloatRange(0.0, 1.0) noiseAmount: Float = 0f,
     edgeHighlight: BorderStroke? = null,
     shape: Shape = RectangleShape,
@@ -142,7 +142,7 @@ fun Modifier.legacyHazeEffect(
         // Capture and process the backdrop using the configured GPU blur effect.
         RsHazeEffectElement(
             backdrop = backdrop,
-            config = blurConfig,
+            config = blurConfig.copy(radiusPx = blurConfig.radiusPx.coerceAtMost(25f)),
             luminsity = luminosity,
             vibrancy = vibrancy,
             tint = tint

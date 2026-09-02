@@ -119,8 +119,8 @@ internal class HazeEffectNode(
         }
         // Step 3: Calculate the size of the reduced-resolution backdrop buffer.
         val newSize = IntSize(
-            (size.width * downsample).toInt().coerceAtLeast(1),
-            (size.height * downsample).toInt().coerceAtLeast(1)
+            (size.width * downsample).toInt(),
+            (size.height * downsample).toInt()
         )
 
         // Step 4: Capture the portion of the BACKDROP that sits behind this node.
@@ -136,9 +136,10 @@ internal class HazeEffectNode(
         //
         // The small blurred layer is stretched back to the node's full size
         // and rendered on top of the tinted base.
-        scale(scaleX = 1f / downsample, scaleY = 1f / downsample, pivot = Offset.Zero) {
-            drawLayer(content)
-        }
+        if (downsample != 0f) // dont draw if downsample is 0
+            scale(scaleX = 1f / downsample, scaleY = 1f / downsample, pivot = Offset.Zero) {
+                drawLayer(content)
+            }
         // Step 7: Draw the tint as noraml overlay
         //
         // the user must contrl opacity of tint through its alpha

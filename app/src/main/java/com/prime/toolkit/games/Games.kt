@@ -185,9 +185,9 @@ fun Games() {
                 background = Background(Modifier.legacyHazeEffect(
                     backdrop,
                     AppTheme.colors.background(0.4.dp),
-                    blurConfig = BlurConfig(0.25f, 25f),
+                    blurConfig = BlurConfig(0.25f, 15f),
                     vibrancy = 1.8f,
-                    tint = AppTheme.colors.background.copy(0.90f),
+                    tint = AppTheme.colors.background.copy(0.63f),
                     noiseAmount = 0.1f
                 )),
                 title = { Label(stringResource(R.string.video_games)) },

@@ -61,7 +61,8 @@ internal class RsHazeEffectNode(
     var filter: ColorFilter? = null
         get() {
             // Reuse the cached filter until any dependent property changes.
-            field?.let { return it }
+            if (field != null)
+                return field
 
             // No filter is needed when all color adjustments are disabled.
             // `-1f` means luminosity has not been explicitly set.
@@ -121,8 +122,8 @@ internal class RsHazeEffectNode(
 
         // Step 3: Calculate the size of the downsampled capture buffer.
         val newSize = IntSize(
-            (size.width * downsample).toInt().coerceAtLeast(1),
-            (size.height * downsample).toInt().coerceAtLeast(1)
+            (size.width * downsample).toInt(),
+            (size.height * downsample).toInt()
         )
 
         // Step 4: Capture the portion of the backdrop behind this node.
@@ -144,9 +145,10 @@ internal class RsHazeEffectNode(
         // When blur is enabled, draw the most recently processed RenderScript
         // result. `drawLayer()` handles scaling the processed layer back to size.
         if (radiusPx == 0f) {
-            scale(scaleX = 1f / downsample, scaleY = 1f / downsample, pivot = Offset.Zero) {
-                drawLayer(content)
-            }
+            if (downsample != 0f)
+                scale(scaleX = 1f / downsample, scaleY = 1f / downsample, pivot = Offset.Zero) {
+                    drawLayer(content)
+                }
 
             // No blur is required, so clean up any previously-created effect
             // and cancel any pending RenderScript work.

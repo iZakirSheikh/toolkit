@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.invalidateDraw
@@ -141,7 +142,7 @@ fun Modifier.hazeEffect(
     tint: Color = Color.Unspecified,
     elevation: Dp = Dp.Unspecified,
     vibrancy: Float = 1.0f,
-    @FloatRange(0.0, 1.0) luminosity: Float = tint.luminance(),
+    @FloatRange(0.0, 1.0) luminosity: Float = if (tint.isSpecified)tint.luminance() else -1f,
     @FloatRange(0.0, 1.0) noiseAmount: Float = 0f,
     edgeHighlight: BorderStroke? = null,
     shape: Shape = RectangleShape,

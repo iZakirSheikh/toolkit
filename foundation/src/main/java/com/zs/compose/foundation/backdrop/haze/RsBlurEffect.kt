@@ -8,7 +8,6 @@ import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
 import android.renderscript.Type
-import android.util.Log
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -67,31 +66,56 @@ class RsBlurEffect(context: Context) {
     private var isReleased = false
 
     /**
-     * Calculates the necessary scaling factors and re-allocates RenderScript memory buffers
-     * if the required dimensions have changed.
+     * Ensures the RenderScript input/output allocations and the Compose [buffer]
+     * match the current downsampled size, reallocating only when the size has
+     * actually changed.
+     *
+     * Uses a fast, unsynchronized check first ([recreate]) so calls where nothing
+     * changed skip the lock entirely. The lock is only taken when a resize looks
+     * necessary, and the check is repeated once inside it in case another thread
+     * already performed the same recreation while this call was waiting.
      *
      * @param size The physical pixel dimensions of the UI layer being blurred.
-     * @param radius The requested blur radius in pixels.
-     * @return The actual radius to pass to RenderScript (guaranteed to be <= 25f).
-     * @throws IllegalStateException if called after [release] has been invoked.
+     * @param downsample The capture scale factor in (0, 1]. A size/downsample
+     *   combination that rounds the effective target to zero in either dimension
+     *   is treated as a valid "nothing to draw right now" state, not an error.
+     * @return `true` if [inAllocation]/[outAllocation]/[buffer] are live and
+     *   correctly sized and safe for the caller to use; `false` if the target
+     *   is zero-sized, or if [release] ran concurrently with this call. Callers
+     *   must check this before touching [inAllocation]/[outAllocation]/[buffer].
+     * @throws IllegalStateException if called after [release] has completed.
      */
-    private fun ensureBlurSurfaceReady(size: IntSize, downsample: Float) {
+    private fun prepare(size: IntSize, downsample: Float): Boolean {
         check(!isReleased) {
             "Cannot prepare blur: the blur processor has already been released."
         }
-
         val newSize = IntSize(
-            width = (size.width * downsample).toInt().coerceAtLeast(1),
-            height = (size.height * downsample).toInt().coerceAtLeast(1)
+            width = (size.width * downsample).toInt(),
+            height = (size.height * downsample).toInt()
         )
-
+        // True when the current buffer (if any) doesn't match what's needed:
+        // nothing allocated yet, or the size has changed.
         fun recreate() =
             !::buffer.isInitialized || buffer.width != newSize.width || buffer.height != newSize.height
-
-        if (!recreate()) return
-
-        lock.withLock {
-            if (!recreate() || isReleased) return@withLock
+        // Fast path: buffer already matches the requested size, no lock needed.
+        if (!recreate()) return true
+        // Lock the ENTIRE recreation process to prevent race conditions where
+        // a drawing thread tries to use an allocation mid-destruction.
+        return lock.withLock {
+            // release() may have completed while we waited for the lock — bail
+            // out rather than touching allocations it already destroyed.
+            if (isReleased) return@withLock false
+            // Another thread may have already performed this exact recreation
+            // while we waited for the lock.
+            if (!recreate()) return@withLock true
+            // NOTE: guarded on buffer.isInitialized, which — once true — never
+            // goes back to false even after destroy()/recycle() below. If this
+            // branch is ever reached twice in a row for a zero-sized target
+            // (see the zero-size early-return further down), this will call
+            // destroy() a second time on already-destroyed allocations. Not
+            // currently reproducible under the call patterns this class expects,
+            // but flagging here since it's the one invariant this function relies
+            // on without being able to enforce it locally.
             if (::buffer.isInitialized) {
                 inAllocation.destroy()
                 outAllocation.destroy()
@@ -101,11 +125,14 @@ class RsBlurEffect(context: Context) {
                 // Note: Channel is NOT cancelled here because it is reused for the
                 // lifetime of this class instance, not just the allocation lifecycle.
             }
-
+            // Zero-sized target: nothing to allocate or process this round.
+            // Stop here; a later call with a non-zero size will allocate fresh
+            // resources from scratch via the branch below.
+            if (newSize.width == 0 || newSize.height == 0)
+                return@withLock false
             val (width, height) = newSize
             val type = Type.Builder(rs, Element.U8_4(rs)).setX(width).setY(height).create()
             val flags = Allocation.USAGE_SCRIPT or Allocation.USAGE_IO_INPUT
-
             inAllocation = Allocation.createTyped(rs, type, flags).apply {
                 setOnBufferAvailableListener { allocation ->
                     if (!isReleased) {
@@ -115,12 +142,12 @@ class RsBlurEffect(context: Context) {
                     }
                 }
             }
-
             // Create the wrapper once. asAndroidBitmap() will be used for RS writes,
             // while the Compose ImageBitmap will be used for drawing without reallocation.
             buffer = ImageBitmap(width = width, height = height)
             outAllocation = Allocation.createFromBitmap(rs, buffer.asAndroidBitmap())
             rsBlurScript.setInput(inAllocation)
+            return@withLock true
         }
     }
 
@@ -172,19 +199,16 @@ class RsBlurEffect(context: Context) {
         val size = layer.size
         val (downsample, radiusPx) = config
 
-        require(downsample > 0f && downsample <= 1f) {
+        require(downsample in 0f..1f) {
             "downsample must be > 0 and <= 1, was $downsample"
         }
         require(radiusPx in 1f..MAX_BLUR_RADIUS) {
             "blurRadius must be > 0 and <= $MAX_BLUR_RADIUS, was $radiusPx"
         }
 
-        ensureBlurSurfaceReady(size = size, downsample)
-        Log.d(TAG, "process: $config")
-
         // Re-check right after prepare(): release() may have run concurrently
         // while prepare() held (and released) the lock.
-        if (isReleased) return
+        if (isReleased ||  !prepare(size, downsample)) return
         // ----------------------------------------------------------------------
         // PHASE 1: HARDWARE CAPTURE & SCALING
         // We draw the Compose UI layer directly into the RenderScript input memory buffer.

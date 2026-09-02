@@ -47,5 +47,7 @@ value class BlurConfig(private val raw: Long) {
     operator fun component1(): Float = downsample
     operator fun component2(): Float = radiusPx
 
+    fun copy(downsample: Float = this.downsample, radiusPx: Float = this.radiusPx) = BlurConfig(downsample, radiusPx)
+
     override fun toString(): String = "BlurConfig(downsample=$downsample, radiusPx=$radiusPx)"
 }
