@@ -1,11 +1,7 @@
 package com.zs.compose.foundation.backdrop.haze
 
-import android.os.Build
 import androidx.annotation.FloatRange
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -19,22 +15,22 @@ import com.zs.compose.foundation.backdrop.Backdrop
 import com.zs.compose.foundation.decorator.decorator
 
 /**
- * A [ModifierNodeElement] that creates and updates a [HazeEffectNode], applying a frosted
+ * A [ModifierNodeElement] that creates and updates a [RsHazeEffectNode], applying a frosted
  * "mist" (glassmorphism-style) blur effect to the composable it modifies.
- * @see Modifier.hazeEffect
+ * @see Modifier.legacyHazeEffect
  */
-private class HazeEffectElement(
+private class RsHazeEffectElement(
     val backdrop: Backdrop,
     val config: BlurConfig,
     val vibrancy: Float,
     var luminsity: Float,
     val tint: Color
-) : ModifierNodeElement<HazeEffectNode>() {
+) : ModifierNodeElement<RsHazeEffectNode>() {
 
     /**
-     * Creates a new [HazeEffectNode] initialized with this element's current parameters.
+     * Creates a new [RsHazeEffectNode] initialized with this element's current parameters.
      */
-    override fun create(): HazeEffectNode = HazeEffectNode(
+    override fun create(): RsHazeEffectNode = RsHazeEffectNode(
         backdrop = backdrop,
         config = config,
         vibrancy = vibrancy,
@@ -43,11 +39,11 @@ private class HazeEffectElement(
     )
 
     /**
-     * Updates an existing [HazeEffectNode] with this element's current parameters,
+     * Updates an existing [RsHazeEffectNode] with this element's current parameters,
      * allowing the node to be reused across recompositions instead of being torn down
      * and recreated.
      */
-    override fun update(node: HazeEffectNode) {
+    override fun update(node: RsHazeEffectNode) {
         // Cache Invalidation:
         // If the blur profile (radius) or vibrancy or luminsity changed, we nullify
         // the cached RenderEffect and ColorMatrix inside the node so they are regenerated on
@@ -85,23 +81,23 @@ private class HazeEffectElement(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as HazeEffectElement
+        other as RsHazeEffectElement
 
         if (vibrancy != other.vibrancy) return false
+        if (luminsity != other.luminsity) return false
         if (backdrop != other.backdrop) return false
         if (config != other.config) return false
         if (tint != other.tint) return false
-        if (luminsity != other.luminsity) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = vibrancy.hashCode()
+        result = 31 * result + luminsity.hashCode()
         result = 31 * result + backdrop.hashCode()
         result = 31 * result + config.hashCode()
         result = 31 * result + tint.hashCode()
-        result = 31 * result + luminsity.hashCode()
         return result
     }
 }
@@ -109,32 +105,21 @@ private class HazeEffectElement(
 /**
  * Applies a frosted glass (haze) effect to the modified composable.
  *
- * The effect combines the provided [backdrop] with a configurable blur,
- * surface color, optional tint, noise, edge highlight, and shape.
+ * This is the legacy RenderScript-based implementation for older Android
+ * versions. It continuously redraws the backdrop to asynchronously process
+ * and display the latest blurred result.
  *
- * @param backdrop The [Backdrop] containing the captured UI layer behind this component.
- * @param surface The base color drawn beneath the haze effect.
- * @param blurConfig The blur configuration, including downsample factor and blur radius.
- *                   Defaults to a 0.5f downsample factor and 10f radius.
- * @param tint An optional color overlay applied to the blurred backdrop.
- * @param elevation The elevation applied to the surface.
- * @param vibrancy Controls the saturation of the blurred backdrop. `1f` leaves
- *                 the saturation unchanged.
- * @param luminosity Controls the luminosity adjustment of the blurred backdrop.
- *                   Defaults to the luminance of [tint]. Use `-1f` to disable
- *                   the luminosity adjustment.
- * @param noiseAmount Controls the intensity of the noise/grain applied to the surface.
- * @param edgeHighlight An optional border used to highlight the edge of the glass surface.
- * @param shape The shape of the glass surface.
+ * This approach is more expensive than the modern implementation and should
+ * only be used when supporting Android versions that require the RenderScript
+ * fallback.
  *
- * TODO: Consider refactoring away from the decorator. Currently, noise is drawn over the content;
- *       integrating surface and noise rendering directly into the haze effect would likely
- *       improve performance and visual accuracy.
+ * @see Modifier.hazeEffect
  */
-@RequiresApi(Build.VERSION_CODES.S)
-@Stable
-@ExperimentalFoundationApi
-fun Modifier.hazeEffect(
+@Deprecated(
+    message = "Uses the legacy RenderScript-based implementation. " +
+            "Use Modifier.hazeEffect instead on Android 12 (API 31) and above."
+)
+fun Modifier.legacyHazeEffect(
     backdrop: Backdrop,
     surface: Color,
     blurConfig: BlurConfig = BlurConfig(0.5f, 10.0f),
@@ -155,7 +140,7 @@ fun Modifier.hazeEffect(
             shape = shape
         ) then
         // Capture and process the backdrop using the configured GPU blur effect.
-        HazeEffectElement(
+        RsHazeEffectElement(
             backdrop = backdrop,
             config = blurConfig,
             luminsity = luminosity,

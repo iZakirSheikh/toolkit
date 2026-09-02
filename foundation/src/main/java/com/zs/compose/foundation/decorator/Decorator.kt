@@ -603,7 +603,7 @@ private class DecoratorNode(
             val noise =
                 if (noiseEffectBrush == null && roughness > 0) ShaderBrush(id = R.drawable.noise) else noiseEffectBrush
             noiseEffectBrush = noise // cache
-            if (noise != null) drawRect(noise, alpha = roughness, blendMode = BlendMode.Hardlight)
+            if (noise != null) drawRect(noise, alpha = roughness, blendMode = BlendMode.Overlay)
 
             // Draw Foreground
             // Foregrounds (overlays) are drawn on top of the content, but inside the border.

@@ -59,8 +59,8 @@ import com.prime.toolkit.R
 import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.backdrop.backdrop
-import com.zs.compose.foundation.backdrop.haze.BlurProfile
-import com.zs.compose.foundation.backdrop.haze.hazeEffect
+import com.zs.compose.foundation.backdrop.haze.BlurConfig
+import com.zs.compose.foundation.backdrop.haze.legacyHazeEffect
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
@@ -182,13 +182,13 @@ fun Games() {
             AdaptiveLargeTopAppBar(
                 false,
                 behavior = behaviour,
-                background = Background(Modifier.hazeEffect(
+                background = Background(Modifier.legacyHazeEffect(
                     backdrop,
                     AppTheme.colors.background(0.4.dp),
-                    blurProfile = BlurProfile(0.1f, 20f),
-                    vibrancy = 1.3f,
-                    tint = AppTheme.colors.background,
-                    noiseAmount = 0.0f
+                    blurConfig = BlurConfig(0.25f, 25f),
+                    vibrancy = 1.8f,
+                    tint = AppTheme.colors.background.copy(0.90f),
+                    noiseAmount = 0.1f
                 )),
                 title = { Label(stringResource(R.string.video_games)) },
                 navigationIcon = {
@@ -200,13 +200,13 @@ fun Games() {
                 },
                 actions = {
                     ActionRow(Background(Modifier
-                        .hazeEffect(
+                        .legacyHazeEffect(
                             backdrop,
-                            AppTheme.colors.background,
-                            BlurProfile(0.25f, 10f),
-                            vibrancy = 1.3f,
-                            tint = AppTheme.colors.background(10.dp).copy(0.63f),
-                            noiseAmount = 0.5f
+                            AppTheme.colors.background(0.4.dp),
+                            blurConfig = BlurConfig(0.35f, 25f),
+                            vibrancy = 1.8f,
+                            //tint = AppTheme.colors.background(0.4.dp).copy(0.65f),
+                            noiseAmount = 0.1f
                         )
                     ))
                 }

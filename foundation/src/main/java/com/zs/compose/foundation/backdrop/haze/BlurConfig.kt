@@ -1,18 +1,23 @@
 package com.zs.compose.foundation.backdrop.haze
 
+
 import androidx.annotation.FloatRange
 import androidx.compose.ui.util.packFloats
+import androidx.compose.ui.util.unpackFloat1
+import androidx.compose.ui.util.unpackFloat2
 
 /**
  * Defines the specifications for a performance-optimized blur effect.
  *
  * @param raw The packed 64-bit representation of the blur specifications.
+ * @property downsample The factor by which content is scaled down before applying the blur.
+ * @property radiusPx The actual radius of the blur effect in pixels.
  */
 @JvmInline
-value class BlurProfile(private val raw: Long) {
+value class BlurConfig(private val raw: Long) {
 
     /**
-     * Creates a new [BlurProfile].
+     * Creates a new [BlurConfig].
      *
      * @param downsample The factor by which content is scaled down before applying the blur.
      *                   For example, `0.5f` reduces the resolution by half, improving rendering performance.
@@ -28,34 +33,19 @@ value class BlurProfile(private val raw: Long) {
                     "downsample must be between 0.0 and 1.0, was $it"
                 }
             },
-            radiusPx
+            radiusPx.coerceAtLeast(0f)
         )
     )
 
-    /**
-     * The downscale ratio applied before the blur calculation.
-     */
+
     val downsample: Float
-        get() = Float.fromBits((raw shr 32).toInt())
-
-    /**
-     * The radius of the blur effect in pixels.
-     */
+        get() = unpackFloat1(raw)
     val radiusPx: Float
-        get() = Float.fromBits((raw and 0xFFFFFFFFL).toInt())
+        get() = unpackFloat2(raw)
 
-    /**
-     * Retrieves the [downsample] factor for destructuring declarations.
-     */
+
     operator fun component1(): Float = downsample
-
-    /**
-     * Retrieves the [radiusPx] for destructuring declarations.
-     */
     operator fun component2(): Float = radiusPx
 
-    /**
-     * Returns a string representation of the [BlurProfile].
-     */
-    override fun toString(): String = "BlurSpec(downsample=$downsample, radiusPx=$radiusPx)"
+    override fun toString(): String = "BlurConfig(downsample=$downsample, radiusPx=$radiusPx)"
 }

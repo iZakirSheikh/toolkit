@@ -56,8 +56,8 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.zs.compose.foundation.backdrop.backdrop
-import com.zs.compose.foundation.backdrop.haze.BlurProfile
-import com.zs.compose.foundation.backdrop.haze.hazeEffect
+import com.zs.compose.foundation.backdrop.haze.BlurConfig
+import com.zs.compose.foundation.backdrop.haze.legacyHazeEffect
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.adaptive.content
@@ -96,7 +96,7 @@ private fun Preview() {
         val infiniteTransition = rememberInfiniteTransition(label = "infinite_transition")
 
         val animatedValue by infiniteTransition.animateFloat(
-            initialValue = 0f,
+            initialValue = 0.1f,
             targetValue = 1f,
             animationSpec = infiniteRepeatable(
                 animation = tween(
@@ -121,10 +121,10 @@ private fun Preview() {
                         offset += dragAmount
                     }
                 }
-                .hazeEffect(
+                .legacyHazeEffect(
                     backdrop,
                     Color.Transparent,
-                    blurProfile = BlurProfile(0.25f, 100f * animatedValue),
+                    blurConfig = BlurConfig(0.25f, 20f * animatedValue),
                     vibrancy = 1.6f,
                     edgeHighlight = BorderStroke(
                         2.dp,
