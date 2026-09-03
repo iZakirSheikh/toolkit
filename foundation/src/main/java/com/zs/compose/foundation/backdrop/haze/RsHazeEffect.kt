@@ -57,6 +57,7 @@ private class RsHazeEffectElement(
         node.config = config
         node.vibrancy = vibrancy
         node.tint = tint
+        node.settled = false
 
         // Trigger a redraw cycle:
         // Because this modifier manipulates pixels on the screen, changing its properties

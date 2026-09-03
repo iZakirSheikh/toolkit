@@ -105,6 +105,7 @@ internal class RsHazeEffectNode(
 
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
         position = coordinates
+        settled = false
         // If the component moves on the screen, the background behind it has visually changed.
         // We must invalidate the draw phase to capture the new portion of the backdrop.
         invalidateDraw()
@@ -125,7 +126,7 @@ internal class RsHazeEffectNode(
      * there's nothing new to blur until something external changes (resize,
      * new image, config change) and calls requestUpdate() to reset this.
      */
-    private var settled = false
+    var settled = false
 
     override fun ContentDrawScope.draw() {
         // Step 1: Apply the current color filter to the captured layer.
