@@ -2,7 +2,11 @@
 
 package com.prime.toolkit
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -68,6 +72,7 @@ import com.zs.preferences.Preferences
 import com.zs.preferences.stringPreferenceKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import android.provider.Settings as System
 
 private const val TAG = "MainActivity"
 
@@ -127,7 +132,7 @@ class MainActivity : ComponentActivity() {
                 Crossfade(selected, modifier = Modifier.observe(surface)) { value ->
                     when (value) {
                         0 -> Games()
-                        3 -> Settings()
+                        3 -> System()
                         2 -> Strings()
                         1 -> M3()
                         4 -> PreviewNode()
@@ -245,6 +250,16 @@ class MainActivity : ComponentActivity() {
                 icon = Icons.Default.Feedback,
                 duration = SnackbarDuration.Indefinite
             )
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                val intent = Intent(
+                    System.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                    Uri.parse("package:$packageName")
+                )
+                startActivity(intent)
+            }
         }
 
         // Content

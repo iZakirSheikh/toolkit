@@ -55,9 +55,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.zs.compose.foundation.backdrop.backdrop
 import com.zs.compose.foundation.backdrop.haze.BlurConfig
 import com.zs.compose.foundation.backdrop.haze.legacyHazeEffect
+import com.zs.compose.foundation.backdrop.layerBackdropProvider
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.adaptive.content
@@ -87,7 +87,7 @@ private fun Preview() {
             onError = { Log.d(TAG, "Game: ${it.result.throwable.message}")},
             contentScale = ContentScale.Crop,
             contentDescription = null,
-            modifier = Modifier.fillMaxSize().backdrop(backdrop)
+            modifier = Modifier.fillMaxSize().layerBackdropProvider(backdrop)
         )
 
         // Current animated offset

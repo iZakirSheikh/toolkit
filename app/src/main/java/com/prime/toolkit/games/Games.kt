@@ -22,6 +22,7 @@
 
 package com.prime.toolkit.games
 
+import android.app.WallpaperManager
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,16 +54,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import coil3.compose.rememberAsyncImagePainter
 import com.prime.toolkit.R
 import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.zs.compose.foundation.Background
-import com.zs.compose.foundation.backdrop.backdrop
+import com.zs.compose.foundation.backdrop.layerBackdropProvider
 import com.zs.compose.foundation.backdrop.haze.BlurConfig
-import com.zs.compose.foundation.backdrop.haze.hazeEffect
 import com.zs.compose.foundation.backdrop.haze.legacyHazeEffect
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
+import com.zs.compose.foundation.backdrop.rememberWallpaperBackdrop
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
@@ -176,6 +180,19 @@ fun Games() {
     val behaviour = AppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navInsets = WindowInsets.content
     val backdrop = rememberBackdropLayer()
+
+    val context = LocalContext.current
+
+    val mgr = remember {
+        WallpaperManager.getInstance(context)
+    }
+
+    val screen = rememberWallpaperBackdrop(
+        painter = rememberAsyncImagePainter(
+//            "https://cdn.thegamesdb.net/images/original/boxart/front/53-1.jpg"
+            mgr.drawable
+        )
+    )
     val (width, height) = LocalWindowSize.current
 
     Scaffold(
@@ -184,12 +201,12 @@ fun Games() {
                 false,
                 behavior = behaviour,
                 background = Background(Modifier.legacyHazeEffect(
-                    backdrop,
+                    screen,
                     AppTheme.colors.background(0.4.dp),
-                    blurConfig = BlurConfig(0.25f, 25f),
+                    blurConfig = BlurConfig(1f, 0f),
                     vibrancy = 1.0f,
-                    luminosity = 0.65f,
-                    tint = AppTheme.colors.background(0.4.dp).copy(0.85f),
+                  //  luminosity = 0.65f,
+                  //  tint = AppTheme.colors.background(0.4.dp).copy(0.80f),
                     noiseAmount = 0.1f
                 )),
                 title = { Label(stringResource(R.string.video_games)) },
@@ -230,7 +247,7 @@ fun Games() {
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(behaviour.nestedScrollConnection)
-                    .backdrop(backdrop)/*.fadingEdge(state,  false, length = 50.dp)*/,
+                    .layerBackdropProvider(backdrop)/*.fadingEdge(state,  false, length = 50.dp)*/,
                 content = {
                     items(Games) { item ->
                         Game(

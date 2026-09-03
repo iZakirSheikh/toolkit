@@ -127,7 +127,7 @@ internal class HazeEffectNode(
         content.record(size = newSize) {
             scale(scaleX = downsample, scaleY = downsample, pivot = Offset.Zero) {
                 with(backdrop) {
-                    draw(this@HazeEffectNode.position)
+                    drawRegion(this@HazeEffectNode.position)
                 }
             }
         }

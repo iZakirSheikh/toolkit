@@ -131,7 +131,7 @@ internal class RsHazeEffectNode(
         content.record(size = newSize) {
             scale(scaleX = downsample, scaleY = downsample, pivot = Offset.Zero) {
                 with(backdrop) {
-                    draw(this@RsHazeEffectNode.position)
+                    drawRegion(this@RsHazeEffectNode.position)
                 }
             }
         }
