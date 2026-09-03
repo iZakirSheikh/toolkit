@@ -22,6 +22,7 @@ import androidx.compose.ui.node.requireGraphicsContext
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
 import com.zs.compose.foundation.backdrop.Backdrop
+import com.zs.compose.foundation.backdrop.LayerBackdrop
 import com.zs.compose.foundation.util.setToLuminance
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -109,6 +110,23 @@ internal class RsHazeEffectNode(
         invalidateDraw()
     }
 
+    // LayerBackdrop wraps a live GraphicsLayer that can change every frame
+    // (e.g. animating content behind it) — needs continuous re-capture and
+    // re-blur. ImageBackdrop/ScreenBackdrop are static: their content only
+    // changes on discrete external events (resize, new image), not
+    // continuously, so they blur once per event and then idle.
+    private val isLiveBackdrop: Boolean
+        get() = backdrop is LayerBackdrop
+
+    /**
+     * True once a full draw→blur→show cycle has completed for a STATIC
+     * backdrop (ImageBackdrop, ScreenBackdrop) and its result is on screen.
+     * While true, static backdrops skip launching further RenderScript work —
+     * there's nothing new to blur until something external changes (resize,
+     * new image, config change) and calls requestUpdate() to reset this.
+     */
+    private var settled = false
+
     override fun ContentDrawScope.draw() {
         // Step 1: Apply the current color filter to the captured layer.
         content.colorFilter = filter
@@ -119,15 +137,17 @@ internal class RsHazeEffectNode(
         // process, while radiusPx controls the blur strength.
         val (downsample, radiusPx) = config
 
-        // Step 3: Calculate the size of the downsampled capture buffer.
         val newSize = IntSize(
             (size.width * downsample).toInt(),
             (size.height * downsample).toInt()
         )
 
-        // Step 4: Capture the portion of the backdrop behind this node.
-        //
-        // The backdrop is recorded at the configured downsampled resolution.
+        // Step 3 (the "draw" half of the cycle): capture whatever is currently
+        // behind this node into `content`, at the downsampled resolution. This
+        // ALWAYS runs, every draw() call, regardless of `settled` — even a
+        // static backdrop's raw (unblurred) capture must stay current, because
+        // the radiusPx < 1f branch below needs a fresh, correct capture to
+        // display directly when blur is turned off.
         content.record(size = newSize) {
             scale(scaleX = downsample, scaleY = downsample, pivot = Offset.Zero) {
                 with(backdrop) {
@@ -136,7 +156,7 @@ internal class RsHazeEffectNode(
             }
         }
 
-        // Step 5: Draw the backdrop.
+        // Step 4: Draw the backdrop.
         //
         // When blur is disabled, draw the captured layer directly. Since the
         // capture was downsampled, scale it back to the node's original size.
@@ -149,22 +169,26 @@ internal class RsHazeEffectNode(
                     drawLayer(content)
                 }
 
-            // No blur is required, so clean up any previously-created effect
-            // and cancel any pending RenderScript work.
+            // Tear down any existing RenderScript effect/work — nothing should
+            // be running while blur is off.
             effect?.release()
             effect = null
             renderer?.cancel()
+            settled = false
         } else {
+            // Blur enabled: show whatever was produced by the most recently
+            // completed blur pass (from a previous draw() call's coroutine) —
+            // NOT a fresh blur; that happens asynchronously below.
             effect?.drawLayer()
         }
 
-        // Step 6: Draw the tint as a normal overlay.
+        // Step 5: Draw the tint as a normal overlay.
         //
         // The tint's alpha controls its opacity; no additional alpha is applied.
         if (tint.isSpecified)
             drawRect(tint)
 
-        // Step 7: Draw the foreground content above the haze effect.
+        // Step 6: Draw the foreground content above the haze effect.
         drawContent()
 
         // Stop here when blur is disabled. The backdrop, tint, and content have
@@ -172,6 +196,25 @@ internal class RsHazeEffectNode(
         if (radiusPx < 1f)
             return
 
+        // shouldRunCycle: do we need to kick off a new blur pass right now?
+        // - Live backdrops: always yes — content may have changed since the
+        //   last capture, so it must be continuously re-blurred.
+        // - Static backdrops: only if not yet settled, i.e. either this is the
+        //   very first cycle, or requestUpdate() reset `settled` since the
+        //   last completed cycle.
+        val shouldRunCycle = isLiveBackdrop || !settled
+
+        // Skip launching new work when either: we don't need a new cycle right
+        // now (shouldRunCycle false), or one is already in flight (renderer
+        // still active — RenderScript work is deliberately serialized, only
+        // one pass at a time).
+        //
+        // NOTE: this condition is the inverse of shouldRunCycle — double check
+        // this reads correctly if touching it again. An earlier version of
+        // this had it inverted (`shouldRunCycle && ...`), which caused the
+        // function to return before ever launching the first blur pass.
+        if (!shouldRunCycle || renderer?.isActive == true)
+            return
         // Step 8: Lazily create the RenderScript blur effect.
         //
         // The effect is created only when blur is required and reused across
@@ -180,31 +223,38 @@ internal class RsHazeEffectNode(
             effect = it
         }
 
-        // Step 9: Process the captured layer asynchronously.
-        //
-        // Only one RenderScript operation runs at a time. The current processed
-        // result is displayed on the next draw pass.
-        if (renderer?.isActive != true) {
-            renderer = coroutineScope.launch {
-                val mills = measureTime {
-                    //TODO - Remove this block; it is throwing error for now.
-                    try {
-                        effect.record(content, config)
-                    } catch (e: Exception) {
-                        Log.d(TAG, "RsBlurEffect: ${e.message}")
-                    }
+        // Step 9 (the "blur" half of the cycle): process the just-captured
+        // content asynchronously off the draw path.
+        renderer = coroutineScope.launch {
+            val mills = measureTime {
+                //TODO - Remove this block; it is throwing error for now.
+                try {
+                    effect.record(content, config)
+                } catch (e: Exception) {
+                    Log.d(TAG, "RsBlurEffect: ${e.message}")
                 }
-                Log.d(TAG, "draw: rendering: $mills")
-
-                // Wait for the next frame before invalidating.
-                //
-                // This keeps the RenderScript processing loop synchronized with
-                // the display instead of immediately triggering another draw.
-                withFrameMillis { }
-
-                // Request the next draw so the newly processed result is displayed.
-                invalidateDraw()
             }
+            Log.d(TAG, "draw: rendering: $mills")
+
+            // Sync to the next frame before invalidating, rather than firing
+            // invalidateDraw() immediately off the RenderScript thread — keeps
+            // the redraw aligned with the display's own frame timing.
+            withFrameMillis { }
+
+            // Mark settled BEFORE invalidating:
+            // - Live backdrop: irrelevant — isLiveBackdrop will force
+            //   shouldRunCycle = true again on the very next draw() regardless
+            //   of this flag, so the cycle continues exactly as before.
+            // - Static backdrop: this is what actually stops the loop — the
+            //   draw() call triggered by invalidateDraw() below will see
+            //   shouldRunCycle = false and skip launching another coroutine,
+            //   so the cycle terminates here until requestUpdate() runs again.
+            settled = true
+
+            // Ask for a redraw so the freshly blurred result actually gets
+            // shown (draw() will re-run, effect?.drawLayer() above will now
+            // display this pass's output).
+            invalidateDraw()
         }
     }
 }

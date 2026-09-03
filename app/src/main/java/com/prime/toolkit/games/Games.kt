@@ -23,6 +23,7 @@
 package com.prime.toolkit.games
 
 import android.app.WallpaperManager
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,25 +49,33 @@ import androidx.compose.material.icons.rounded.HomeMax
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
 import com.prime.toolkit.R
 import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.zs.compose.foundation.Background
+import com.zs.compose.foundation.backdrop.ImageBackdrop
 import com.zs.compose.foundation.backdrop.layerBackdropProvider
 import com.zs.compose.foundation.backdrop.haze.BlurConfig
+import com.zs.compose.foundation.backdrop.haze.hazeEffect
 import com.zs.compose.foundation.backdrop.haze.legacyHazeEffect
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
-import com.zs.compose.foundation.backdrop.rememberWallpaperBackdrop
+import com.zs.compose.foundation.backdrop.rememberImageBackdrop
+import com.zs.compose.foundation.backdrop.rememberScreenBackdrop
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
@@ -78,6 +87,8 @@ import com.zs.compose.theme.appbar.AppBarDefaults
 import com.zs.compose.theme.menu.DropDownMenu
 import com.zs.compose.theme.menu.DropDownMenuItem
 import com.zs.compose.theme.text.Label
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A simple pair that contais the information about the video fgame
@@ -145,6 +156,9 @@ private fun ActionRow(
                 expanded = showMore,
                 onDismissRequest = { showMore = false },
                 background = background,
+                border = null,
+                shape = RectangleShape,
+                elevation = 0.dp,
                 content = {
                     DropDownMenuItem(
                         "Dropdown Item 1",
@@ -187,12 +201,25 @@ fun Games() {
         WallpaperManager.getInstance(context)
     }
 
-    val screen = rememberWallpaperBackdrop(
+    val screen = rememberScreenBackdrop(
         painter = rememberAsyncImagePainter(
 //            "https://cdn.thegamesdb.net/images/original/boxart/front/53-1.jpg"
             mgr.drawable
         )
     )
+
+    var url: String? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(Unit) {
+        delay(10.seconds)
+        url = "https://cdn.thegamesdb.net/images/original/boxart/front/53-1.jpg"
+        delay(10.seconds)
+        url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAiPfxWT-gXBjXWFqo82-D-R7V9M2zuqGRPnNf_NaNTQO4UgDKCbErKbs&s=10"
+    }
+    val painter =  rememberAsyncImagePainter(url)
+    val imgebg by remember(url) {
+        mutableStateOf(ImageBackdrop(painter))
+    }
     val (width, height) = LocalWindowSize.current
 
     Scaffold(
@@ -201,13 +228,13 @@ fun Games() {
                 false,
                 behavior = behaviour,
                 background = Background(Modifier.legacyHazeEffect(
-                    screen,
+                    imgebg,
                     AppTheme.colors.background(0.4.dp),
-                    blurConfig = BlurConfig(1f, 0f),
+                    blurConfig = BlurConfig(0.8f, 25f),
                     vibrancy = 1.0f,
-                  //  luminosity = 0.65f,
-                  //  tint = AppTheme.colors.background(0.4.dp).copy(0.80f),
-                    noiseAmount = 0.1f
+                    //luminosity = 0.84f,
+                    //tint = AppTheme.colors.background(0.dp).copy(0.60f),
+                    noiseAmount = 0.25f
                 )),
                 title = { Label(stringResource(R.string.video_games)) },
                 navigationIcon = {
@@ -220,12 +247,25 @@ fun Games() {
                 actions = {
                     ActionRow(Background(Modifier
                         .legacyHazeEffect(
-                            backdrop,
+                            imgebg,
                             AppTheme.colors.background(0.4.dp),
-                            blurConfig = BlurConfig(0.35f, 25f),
-                            vibrancy = 1.8f,
-                            //tint = AppTheme.colors.background(0.4.dp).copy(0.65f),
-                            noiseAmount = 0.1f
+                            blurConfig = BlurConfig(0.33f, 25f),
+                            vibrancy = 1.0f,
+                            luminosity = 0.90f,
+                            tint = AppTheme.colors.background(0.dp).copy(0.74f),
+                            shape = AppTheme.shapes.medium,
+                            elevation = 8.dp,
+                            noiseAmount = 0.25f,
+                            edgeHighlight = BorderStroke(
+                                2.dp,
+                                Brush.linearGradient(
+                                    colors = listOf(
+                                        Color.White.copy(alpha = 0.6f),
+                                        Color.Transparent,
+                                        Color.Black.copy(alpha = 0.1f)
+                                    ),
+                                )
+                            )
                         )
                     ))
                 }
