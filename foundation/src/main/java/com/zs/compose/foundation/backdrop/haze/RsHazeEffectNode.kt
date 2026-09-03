@@ -1,6 +1,5 @@
 package com.zs.compose.foundation.backdrop.haze
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
@@ -188,7 +187,12 @@ internal class RsHazeEffectNode(
         if (renderer?.isActive != true) {
             renderer = coroutineScope.launch {
                 val mills = measureTime {
-                    effect.record(content, config)
+                    //TODO - Remove this block; it is throwing error for now.
+                    try {
+                        effect.record(content, config)
+                    } catch (e: Exception) {
+                        Log.d(TAG, "RsBlurEffect: ${e.message}")
+                    }
                 }
                 Log.d(TAG, "draw: rendering: $mills")
 
