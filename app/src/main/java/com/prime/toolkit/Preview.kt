@@ -59,6 +59,8 @@ import com.zs.compose.foundation.backdrop.haze.BlurConfig
 import com.zs.compose.foundation.backdrop.haze.legacyHazeEffect
 import com.zs.compose.foundation.backdrop.layerBackdropProvider
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
+import com.zs.compose.foundation.backdrop.rememberScreenBackdrop
+import com.zs.compose.foundation.backdrop.rememberWallpaperPainter
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.adaptive.content
 
@@ -107,6 +109,8 @@ private fun Preview() {
             ),
             label = "zero_to_one_animation"
         )
+        val painter = rememberWallpaperPainter()
+        val wallbd = rememberScreenBackdrop(painter)
 
         Spacer(
             Modifier
@@ -122,9 +126,9 @@ private fun Preview() {
                     }
                 }
                 .legacyHazeEffect(
-                    backdrop,
+                    wallbd,
                     Color.Transparent,
-                    blurConfig = BlurConfig(0.1f, 20f * animatedValue),
+                    blurConfig = BlurConfig(0.5f, 20f * animatedValue),
                     vibrancy = 1.0f,
                     edgeHighlight = BorderStroke(
                         2.dp,
@@ -136,6 +140,7 @@ private fun Preview() {
                             ),
                         )
                     ),
+
                     shape = RoundedCornerShape(12.dp),
                     noiseAmount = 0.25f
                 )

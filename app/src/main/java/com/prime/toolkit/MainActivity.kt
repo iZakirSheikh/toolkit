@@ -219,7 +219,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         if (!::preferences.isInitialized){
-            preferences = Preferences(this, "app_preferences")
+            preferences = Preferences.get(context = this)
             val key = stringPreferenceKey("test")
             preferences[key] = "new string pref test"
             Log.d(TAG, "onCreate: ${preferences[key]}")
@@ -269,11 +269,11 @@ class MainActivity : ComponentActivity() {
                 statusBarStyle = style,
                 navigationBarStyle = style
             )
-
+            val accent by com.zs.compose.foundation.backdrop.dynamicAccentColor()
             AppTheme(
                 isLight = !darkMode,
-                accent = if (!darkMode) /*Color.ClaretViolet*/ Color.BlueLilac else Color(0xFFD8A25E),
-                //accent = dynamicAccentColor(LocalContext.current, darkMode),
+                //accent = if (!darkMode) /*Color.ClaretViolet*/ Color.BlueLilac else Color(0xFFD8A25E),
+                accent = Color(accent?.tertiaryColor?.toArgb() ?: Color.MetroGreen.toArgb())/*dynamicAccentColor(LocalContext.current, darkMode)*/,
                 content = {
                     val clazz = calculateWindowSizeClass(this)
                     CompositionLocalProvider(

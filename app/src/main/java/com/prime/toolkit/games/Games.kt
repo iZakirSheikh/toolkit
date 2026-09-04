@@ -58,6 +58,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -77,6 +78,7 @@ import com.zs.compose.foundation.backdrop.observeAzimuthElevation
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
 import com.zs.compose.foundation.backdrop.rememberImageBackdrop
 import com.zs.compose.foundation.backdrop.rememberScreenBackdrop
+import com.zs.compose.foundation.backdrop.rememberWallpaperPainter
 import com.zs.compose.foundation.linearGradient
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
@@ -229,26 +231,29 @@ fun Games() {
             .build()
     }
     val (width, height) = LocalWindowSize.current
+    val wallaperPainter = rememberWallpaperPainter()
     val painter = rememberAsyncImagePainter(request)
     val state by painter.state.collectAsStateWithLifecycle()
-    val imgebg = rememberImageBackdrop(painter)
-
+    val imgebg = rememberScreenBackdrop(wallaperPainter)
 
     Scaffold(
         topBar = {
+            val tint = AppTheme.colors.background(0.dp).copy(0.74f)
             AdaptiveLargeTopAppBar(
                 false,
                 behavior = behaviour,
                 background = Background(Modifier.legacyHazeEffect(
                     imgebg,
                     AppTheme.colors.background(0.4.dp),
-                    blurConfig = BlurConfig(1f, 1f),
+                    blurConfig = BlurConfig(0.33f, 25f),
                     vibrancy = 1.0f,
-                    //luminosity = 0.84f,
-                    //tint = AppTheme.colors.background(0.dp).copy(0.60f),
+                   // luminosity = tint.luminance() * 0.95f,
+                    tint = tint,
+                    shape = AppTheme.shapes.medium,
+                    elevation = 8.dp,
+                    key = wallaperPainter.isLoaded,
                     noiseAmount = 0.25f,
-                    key = 31 * (state is AsyncImagePainter.State.Success).hashCode() + request.hashCode(),
-                    duration = 500.milliseconds
+                    //edgeHighlight = edgeHighlight
                 )),
                 title = { Label(stringResource(R.string.video_games)) },
                 navigationIcon = {
@@ -289,7 +294,7 @@ fun Games() {
                             AppTheme.colors.background(0.4.dp),
                             blurConfig = BlurConfig(0.33f, 25f),
                             vibrancy = 1.0f,
-                            luminosity = 0.90f,
+                          //  luminosity = 0.90f,
                             tint = AppTheme.colors.background(0.dp).copy(0.74f),
                             shape = AppTheme.shapes.medium,
                             elevation = 8.dp,
