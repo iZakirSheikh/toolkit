@@ -50,10 +50,10 @@ import androidx.compose.ui.unit.IntSize
  * need a measured content-vs-visible scale factor (see conversation
  * history / TODO if revisiting this).
  */
-class ScreenBackdrop(
-    private val painter: Painter,
-    private val scale: ContentScale = ContentScale.Crop,
-) : Backdrop {
+class ScreenBackdrop : Backdrop {
+
+   internal var painter: Painter? = null
+   internal var scale: ContentScale = ContentScale.Crop
 
     /**
      * Real physical display size in px. DrawScope has no Context, so this
@@ -76,6 +76,7 @@ class ScreenBackdrop(
 
         val fullSize = Size(screenSize.width.toFloat(), screenSize.height.toFloat())
 
+        val painter = painter ?: return
         val intrinsicSize = painter.intrinsicSize
         // e.g. Coil hasn't resolved a real image yet — nothing sensible to draw.
         // (A Coil AsyncImagePainter reports Unspecified/Zero here until its
@@ -186,13 +187,13 @@ private fun getScreenSize(context: Context): IntSize {
  */
 @Composable
 fun rememberScreenBackdrop(
-    painter: Painter,
+    painter: Painter?= null,
     scale: ContentScale = ContentScale.Crop,
 ): ScreenBackdrop {
     val view = LocalView.current
     // Keyed on painter/scale so swapping either produces a fresh backdrop
     // instance rather than mutating one meant for a different painter.
-    val backdrop = remember(painter, scale) { ScreenBackdrop(painter, scale) }
+    val backdrop = remember(::ScreenBackdrop)
 
     DisposableEffect(view) {
         fun refresh() {
@@ -220,5 +221,14 @@ fun rememberScreenBackdrop(
         onDispose { view.removeOnLayoutChangeListener(listener) }
     }
 
-    return backdrop
+    // Mutate the backdrop properties in-place. Because these properties are used inside
+    // the draw phase of the consumer modifier (which receives key),
+    // any changes here will trigger a redraw.
+    //
+    // This "late-binding" approach is specifically compatible with Coil's
+    // CrossfadePainter and AsyncImagePainter: as the painter internally transitions
+    // from a placeholder to the final bitmap, it invalidates itself. Because we
+    // pass the painter instance directly, the backdrop correctly observes those
+    // internal invalidations and re-renders the smooth transition.
+    return backdrop.also { it.scale = scale; it.painter = painter }
 }

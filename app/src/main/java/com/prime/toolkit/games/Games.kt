@@ -58,24 +58,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.prime.toolkit.R
 import com.prime.toolkit.core.AdaptiveLargeTopAppBar
 import com.zs.compose.foundation.Background
-import com.zs.compose.foundation.backdrop.ImageBackdrop
 import com.zs.compose.foundation.backdrop.layerBackdropProvider
 import com.zs.compose.foundation.backdrop.haze.BlurConfig
-import com.zs.compose.foundation.backdrop.haze.hazeEffect
 import com.zs.compose.foundation.backdrop.haze.legacyHazeEffect
+import com.zs.compose.foundation.backdrop.observeAzimuthElevation
 import com.zs.compose.foundation.backdrop.rememberBackdropLayer
 import com.zs.compose.foundation.backdrop.rememberImageBackdrop
 import com.zs.compose.foundation.backdrop.rememberScreenBackdrop
+import com.zs.compose.foundation.linearGradient
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ExperimentalThemeApi
 import com.zs.compose.theme.Icon
@@ -88,6 +90,8 @@ import com.zs.compose.theme.menu.DropDownMenu
 import com.zs.compose.theme.menu.DropDownMenuItem
 import com.zs.compose.theme.text.Label
 import kotlinx.coroutines.delay
+import kotlin.math.cos
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -208,19 +212,27 @@ fun Games() {
         )
     )
 
-    var url: String? by remember { mutableStateOf(null) }
+    var request by remember { mutableStateOf<ImageRequest?>(null) }
 
     LaunchedEffect(Unit) {
-        delay(10.seconds)
-        url = "https://cdn.thegamesdb.net/images/original/boxart/front/53-1.jpg"
-        delay(10.seconds)
-        url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAiPfxWT-gXBjXWFqo82-D-R7V9M2zuqGRPnNf_NaNTQO4UgDKCbErKbs&s=10"
-    }
-    val painter =  rememberAsyncImagePainter(url)
-    val imgebg by remember(url) {
-        mutableStateOf(ImageBackdrop(painter))
+        delay(3.seconds)
+        request = ImageRequest.Builder(context)
+            .data("https://cdn.thegamesdb.net/images/original/boxart/front/53-1.jpg")
+            //.crossfade(true)
+            .crossfade(2000)
+            .build()
+
+        delay(5.seconds)
+        request = ImageRequest.Builder(context)
+            .data("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAiPfxWT-gXBjXWFqo82-D-R7V9M2zuqGRPnNf_NaNTQO4UgDKCbErKbs&s=10")
+            .crossfade(2000)
+            .build()
     }
     val (width, height) = LocalWindowSize.current
+    val painter = rememberAsyncImagePainter(request)
+    val state by painter.state.collectAsStateWithLifecycle()
+    val imgebg = rememberImageBackdrop(painter)
+
 
     Scaffold(
         topBar = {
@@ -230,11 +242,13 @@ fun Games() {
                 background = Background(Modifier.legacyHazeEffect(
                     imgebg,
                     AppTheme.colors.background(0.4.dp),
-                    blurConfig = BlurConfig(0.8f, 25f),
+                    blurConfig = BlurConfig(1f, 1f),
                     vibrancy = 1.0f,
                     //luminosity = 0.84f,
                     //tint = AppTheme.colors.background(0.dp).copy(0.60f),
-                    noiseAmount = 0.25f
+                    noiseAmount = 0.25f,
+                    key = 31 * (state is AsyncImagePainter.State.Success).hashCode() + request.hashCode(),
+                    duration = 500.milliseconds
                 )),
                 title = { Label(stringResource(R.string.video_games)) },
                 navigationIcon = {
@@ -245,6 +259,30 @@ fun Games() {
                     )
                 },
                 actions = {
+                    val (azimuth, elevation) = observeAzimuthElevation()
+
+                    // Only consider the upper hemisphere (elevation 0°..90°). Elevation < 0
+                    // means the phone is face-down / past vertical from the "light overhead"
+                    // reference — clamp it to 0° so grazingFactor never goes past its max
+                    // (1.0) or produces a meaningless direction for a highlight that,
+                    // realistically, no one is looking at in that orientation anyway.
+                    val clampedElevation = elevation.coerceIn(0f, 90f)
+
+                    // 0 = light directly overhead (phone flat, cos(90°) = 0) -> no highlight.
+                    // 1 = light at the horizon (phone near-vertical, cos(0°) = 1) -> max highlight.
+                    val grazingFactor = cos(Math.toRadians(clampedElevation.toDouble())).toFloat()
+                    val edgeHighlight = remember(azimuth, grazingFactor) {
+                        BorderStroke(
+                            2.dp * grazingFactor,
+                            Brush.linearGradient(
+                                0.0f  to Color.White.copy(alpha = 0.55f * grazingFactor),
+                                0.45f to Color.White.copy(alpha = 0.08f * grazingFactor),
+                                0.55f to Color.Transparent,
+                                1.0f  to Color.Black.copy(alpha = 0.15f * grazingFactor),
+                                angle = (azimuth + 180f) % 360f
+                            )
+                        )
+                    }
                     ActionRow(Background(Modifier
                         .legacyHazeEffect(
                             imgebg,
@@ -256,16 +294,7 @@ fun Games() {
                             shape = AppTheme.shapes.medium,
                             elevation = 8.dp,
                             noiseAmount = 0.25f,
-                            edgeHighlight = BorderStroke(
-                                2.dp,
-                                Brush.linearGradient(
-                                    colors = listOf(
-                                        Color.White.copy(alpha = 0.6f),
-                                        Color.Transparent,
-                                        Color.Black.copy(alpha = 0.1f)
-                                    ),
-                                )
-                            )
+                            edgeHighlight = edgeHighlight
                         )
                     ))
                 }

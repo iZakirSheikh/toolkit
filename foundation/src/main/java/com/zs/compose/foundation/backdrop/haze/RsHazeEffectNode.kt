@@ -30,12 +30,43 @@ import kotlin.time.measureTime
 
 private const val TAG = "RsHazeEffectNode"
 
+
+//
+// ┌─────────────────────────────────────────────────────────────────────────┐
+// │                          RsHazeEffectNode                                │
+// │           RenderScript-based backdrop blur (legacy / API < 31)           │
+// └─────────────────────────────────────────────────────────────────────────┘
+// ┌─ draw() cycle ──────────────────────────────────────────┐
+// │ 1. filter        apply cached vibrancy/luminosity        │
+// │ 2. CAPTURE        record backdrop → content (every frame)│
+// │        │                                                 │
+// │ 3. radius<1f? ──yes──► draw raw content (scaled up)      │
+// │        │                kill effect + renderer, return   │
+// │        │no                                                │
+// │        ▼                                                 │
+// │ 4. draw last blurred layer (effect?.drawLayer())         │
+// │ 5. draw tint (if specified)                               │
+// │ 6. drawContent()  ← foreground                            │
+// │        │                                                 │
+// │ 7. shouldRunCycle = isLive || !settled                    │
+// │        │no / busy ──► return (skip new blur)              │
+// │        │yes                                               │
+// │ 8. launch: blur(content) → wait frame → settled=now>deadline │
+// │            → invalidateDraw()                             │
+// └────────────────────────────────────────────────────────┘
+
 /**
  * [Modifier.Node] that draws a blurred, vibrancy/tint-adjusted view of [backdrop]
  * behind this composable's own content.
  * This node relies on a hardware-accelerated [GraphicsLayer] to capture a specific portion
  * of the screen (the [backdrop]), apply expensive GPU operations (like blurs and color matrices),
  * and render the result efficiently.
+ *
+ * @param futureMills Represents a timestamp in the future (in milliseconds) until which
+ * the node should continue cycling/redrawing, even if the backdrop is otherwise considered
+ * static. This is primarily a workaround for Android 12 and below, where there isn't a
+ * reliable way to detect if child components have stopped composing or changing
+ * within the captured area.
  *
  * @see Modifier.hazeEffect
  * @see Modifier.legacyHazeEffect
@@ -46,6 +77,7 @@ internal class RsHazeEffectNode(
     var vibrancy: Float,
     var luminsity: Float,
     var tint: Color,
+    var futureMills: Long = -1L
 ) : Modifier.Node(), DrawModifierNode, GlobalPositionAwareModifierNode,
     CompositionLocalConsumerModifierNode {
 
@@ -242,15 +274,19 @@ internal class RsHazeEffectNode(
             // the redraw aligned with the display's own frame timing.
             withFrameMillis { }
 
-            // Mark settled BEFORE invalidating:
-            // - Live backdrop: irrelevant — isLiveBackdrop will force
-            //   shouldRunCycle = true again on the very next draw() regardless
-            //   of this flag, so the cycle continues exactly as before.
-            // - Static backdrop: this is what actually stops the loop — the
-            //   draw() call triggered by invalidateDraw() below will see
-            //   shouldRunCycle = false and skip launching another coroutine,
-            //   so the cycle terminates here until requestUpdate() runs again.
-            settled = true
+            // Mark settled BEFORE invalidating to determine if the loop continues:
+            // - If current time > futureMills: the "grace period" for static content
+            //   has expired. For static backdrops, this sets settled = true,
+            //   which stops the cycle in the next draw() call.
+            // - If current time <= futureMills: settled remains false,
+            //   forcing another cycle. This acts as a watchdog for Android 12 and
+            //   below to catch late-composing children in static backdrops.
+            // - Live backdrops: this flag is checked but ignored via
+            //   isLiveBackdrop || !settled, so they continue to cycle regardless.
+            //
+            // The draw() call triggered by invalidateDraw() below will respect
+            // this new settled state.
+            settled = System.currentTimeMillis() > futureMills
 
             // Ask for a redraw so the freshly blurred result actually gets
             // shown (draw() will re-run, effect?.drawLayer() above will now

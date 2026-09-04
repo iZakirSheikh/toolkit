@@ -24,10 +24,11 @@ import androidx.compose.ui.layout.LayoutCoordinates
  * If multiple children need to look like they're viewing different slices
  * of one continuous image, use [ScreenBackdrop] instead.
  */
-class ImageBackdrop(
-    private val painter: Painter,
-    private val scale: ContentScale = ContentScale.Crop,
-) : Backdrop {
+class ImageBackdrop() : Backdrop {
+
+    internal var painter: Painter? = null
+    internal var scale: ContentScale = ContentScale.Crop
+
     override fun DrawScope.drawRegion(coordinates: LayoutCoordinates?) {
         // Normal for the first frame or two, not an error — the child
         // hasn't reported its layout coordinates yet.
@@ -35,9 +36,11 @@ class ImageBackdrop(
 
         // Local reference frame only — no screen/window coordinates
         // involved at all, since each child is self-contained.
-        val componentSize = Size(coordinates.size.width.toFloat(), coordinates.size.height.toFloat())
+        val componentSize =
+            Size(coordinates.size.width.toFloat(), coordinates.size.height.toFloat())
         if (componentSize == Size.Zero) return
 
+        val painter = painter ?: return
         val intrinsicSize = painter.intrinsicSize
         // e.g. a Coil AsyncImagePainter hasn't resolved a real image yet —
         // nothing sensible to draw. Compose's snapshot system will trigger
@@ -89,6 +92,11 @@ class ImageBackdrop(
  */
 @Composable
 fun rememberImageBackdrop(
-    painter: Painter,
-    scale: ContentScale = ContentScale.Crop,
-): ImageBackdrop = remember(painter, scale) { ImageBackdrop(painter, scale) }
+    painter: Painter? = null,
+    scale: ContentScale = ContentScale.Crop
+): ImageBackdrop = remember() {
+    ImageBackdrop()
+}.also {
+    it.painter = painter
+    it.scale = scale
+}

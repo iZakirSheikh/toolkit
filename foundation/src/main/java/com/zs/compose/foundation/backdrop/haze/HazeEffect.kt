@@ -1,5 +1,6 @@
 package com.zs.compose.foundation.backdrop.haze
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.FloatRange
 import androidx.annotation.RequiresApi
@@ -29,7 +30,8 @@ private class HazeEffectElement(
     val config: BlurConfig,
     val vibrancy: Float,
     var luminsity: Float,
-    val tint: Color
+    val tint: Color,
+    val key: Any? = null
 ) : ModifierNodeElement<HazeEffectNode>() {
 
     /**
@@ -80,6 +82,7 @@ private class HazeEffectElement(
         properties["vibrancy"] = vibrancy
         properties["tint"] = tint
         properties["luminosity"] = luminsity
+        properties["key"] = key
     }
 
     override fun equals(other: Any?): Boolean {
@@ -93,6 +96,7 @@ private class HazeEffectElement(
         if (config != other.config) return false
         if (tint != other.tint) return false
         if (luminsity != other.luminsity) return false
+        if (key != other.key) return false
 
         return true
     }
@@ -103,6 +107,7 @@ private class HazeEffectElement(
         result = 31 * result + config.hashCode()
         result = 31 * result + tint.hashCode()
         result = 31 * result + luminsity.hashCode()
+        result = 31 * result + (key?.hashCode() ?: 0)
         return result
     }
 }
@@ -127,7 +132,11 @@ private class HazeEffectElement(
  * @param noiseAmount Controls the intensity of the noise/grain applied to the surface.
  * @param edgeHighlight An optional border used to highlight the edge of the glass surface.
  * @param shape The shape of the glass surface.
+ * @param key An optional key to force a modifier update. Useful when properties of static backdrops
+ *            (like ImageBackdrop or ScreenBackdrop) change, ensuring the modifier element is
+ *            re-evaluated.
  *
+ * @see Modifier.legacyHazeEffect
  * TODO: Consider refactoring away from the decorator. Currently, noise is drawn over the content;
  *       integrating surface and noise rendering directly into the haze effect would likely
  *       improve performance and visual accuracy.
@@ -142,10 +151,11 @@ fun Modifier.hazeEffect(
     tint: Color = Color.Unspecified,
     elevation: Dp = Dp.Unspecified,
     vibrancy: Float = 1.0f,
-    @FloatRange(0.0, 1.0) luminosity: Float = if (tint.isSpecified)tint.luminance() else -1f,
+    @SuppressLint("Range") @FloatRange(0.0, 1.0) luminosity: Float = if (tint.isSpecified)tint.luminance() else -1f,
     @FloatRange(0.0, 1.0) noiseAmount: Float = 0f,
     edgeHighlight: BorderStroke? = null,
     shape: Shape = RectangleShape,
+    key: Any? = null
 ) = this then
         // Draw the base surface and decorative elements such as noise and border.
         Modifier.decorator(
@@ -161,5 +171,6 @@ fun Modifier.hazeEffect(
             config = blurConfig,
             luminsity = luminosity,
             vibrancy = vibrancy,
-            tint = tint
+            tint = tint,
+            key = key
         )
